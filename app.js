@@ -1,31 +1,26 @@
-// Importa e inicializa Firebase desde URLs completas
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js";
-import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-database.js";
-
-// Configuración de Firebase
+// Inicializar Firebase desde el objeto global firebase, ya no necesitas `import`
 const firebaseConfig = {
     apiKey: "AIzaSyBw2XLVQTZE5XJAusfiZ16HjoTJJkNZLvg",
     authDomain: "fondini-aridos.firebaseapp.com",
     databaseURL: "https://fondini-aridos-default-rtdb.firebaseio.com",
     projectId: "fondini-aridos",
-    storageBucket: "fondini-aridos.firebasestorage.app",
+    storageBucket: "fondini-aridos.appspot.com",
     messagingSenderId: "60588617990",
     appId: "1:60588617990:web:bc0c7cbc8a98e524d3ae87",
     measurementId: "G-MBSSKYWQTM"
 };
 
 // Inicializa Firebase
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const database = getDatabase(app);
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const database = firebase.database();
 
 // Función para iniciar sesión
 function iniciarSesion() {
     const email = document.getElementById("email").value;
     const password = document.getElementById("password").value;
 
-    signInWithEmailAndPassword(auth, email, password)
+    auth.signInWithEmailAndPassword(email, password)
         .then((userCredential) => {
             const user = userCredential.user;
             alert("Inicio de sesión exitoso");
@@ -43,8 +38,8 @@ function agregarDatos() {
     const pedido = document.getElementById("pedido").value;
 
     if (nombre && pedido) {
-        const referencia = ref(database, 'clientes/');
-        push(referencia, {
+        const referencia = database.ref('clientes/');
+        referencia.push({
             nombre: nombre,
             pedido: pedido
         })
@@ -66,10 +61,16 @@ function obtenerDatos() {
     const listaPedidos = document.getElementById("listaPedidos");
     listaPedidos.innerHTML = ""; // Limpiar la lista
 
-    const referencia = ref(database, 'clientes/');
-    onValue(referencia, (snapshot) => {
+    const referencia = database.ref('clientes/');
+    referencia.on("value", (snapshot) => {
         const data = snapshot.val();
         listaPedidos.innerHTML = ""; // Limpiar la lista antes de mostrar
         for (const key in data) {
             if (data.hasOwnProperty(key)) {
-                const li = document.createEleme
+                const li = document.createElement("li");
+                li.textContent = `Cliente: ${data[key].nombre} - Pedido: ${data[key].pedido}`;
+                listaPedidos.appendChild(li);
+            }
+        }
+    });
+}
