@@ -1,7 +1,7 @@
-// Importa e inicializa Firebase
-import { initializeApp } from "firebase/app";
-import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
-import { getDatabase, ref, push, onValue } from "firebase/database";
+// Importa e inicializa Firebase desde URLs completas
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js";
+import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-database.js";
 
 // Configuración de Firebase
 const firebaseConfig = {
@@ -9,7 +9,7 @@ const firebaseConfig = {
     authDomain: "fondini-aridos.firebaseapp.com",
     databaseURL: "https://fondini-aridos-default-rtdb.firebaseio.com",
     projectId: "fondini-aridos",
-    storageBucket: "fondini-aridos.firebaseapp.com",
+    storageBucket: "fondini-aridos.firebasestorage.app",
     messagingSenderId: "60588617990",
     appId: "1:60588617990:web:bc0c7cbc8a98e524d3ae87",
     measurementId: "G-MBSSKYWQTM"
@@ -72,16 +72,4 @@ function obtenerDatos() {
         listaPedidos.innerHTML = ""; // Limpiar la lista antes de mostrar
         for (const key in data) {
             if (data.hasOwnProperty(key)) {
-                const li = document.createElement("li");
-                li.textContent = `${data[key].nombre}: ${data[key].pedido}`;
-                listaPedidos.appendChild(li);
-            }
-        }
-    });
-}
-
-// Llamar a obtenerDatos para mostrar la lista inicial
-obtenerDatos();
-
-window.iniciarSesion = iniciarSesion;
-window.agregarDatos = agregarDatos;
+                const li = document.createEleme
