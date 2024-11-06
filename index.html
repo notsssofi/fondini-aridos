@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ejemplo Firebase y GitHub Pages</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Bienvenido</h1>
+
+        <div class="login-form">
+            <h2>Iniciar Sesión</h2>
+            <input type="email" id="email" placeholder="Email">
+            <input type="password" id="password" placeholder="Contraseña">
+            <button onclick="iniciarSesion()">Iniciar Sesión</button>
+        </div>
+
+        <div class="add-data">
+            <h2>Agregar Datos</h2>
+            <input type="text" id="nombre" placeholder="Nombre del Cliente">
+            <input type="text" id="pedido" placeholder="Detalle del Pedido">
+            <button onclick="agregarDatos()">Agregar</button>
+        </div>
+
+        <div class="data-display">
+            <h2>Lista de Pedidos</h2>
+            <ul id="listaPedidos"></ul>
+        </div>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js"></script>
+    <!-- Archivos de JavaScript -->
+    <script src="app.js"></script>
+</body>
+</html>
