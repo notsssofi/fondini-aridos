@@ -82,3 +82,6 @@ function obtenerDatos() {
 
 // Llamar a obtenerDatos para mostrar la lista inicial
 obtenerDatos();
+
+window.iniciarSesion = iniciarSesion;
+window.agregarDatos = agregarDatos;
