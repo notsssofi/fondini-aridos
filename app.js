@@ -1,4 +1,4 @@
-// Inicializar Firebase desde el objeto global firebase, ya no necesitas `import`
+// Inicializar Firebase desde el objeto global firebase
 const firebaseConfig = {
     apiKey: "AIzaSyBw2XLVQTZE5XJAusfiZ16HjoTJJkNZLvg",
     authDomain: "fondini-aridos.firebaseapp.com",
@@ -16,7 +16,7 @@ const auth = firebase.auth();
 const database = firebase.database();
 
 // Función para iniciar sesión
-function iniciarSesion() {
+window.iniciarSesion = function() {
     const email = document.getElementById("email").value;
     const password = document.getElementById("password").value;
 
@@ -33,7 +33,7 @@ function iniciarSesion() {
 }
 
 // Función para agregar datos a la base de datos
-function agregarDatos() {
+window.agregarDatos = function() {
     const nombre = document.getElementById("nombre").value;
     const pedido = document.getElementById("pedido").value;
 
@@ -57,7 +57,7 @@ function agregarDatos() {
 }
 
 // Función para obtener y mostrar los datos de la base de datos
-function obtenerDatos() {
+window.obtenerDatos = function() {
     const listaPedidos = document.getElementById("listaPedidos");
     listaPedidos.innerHTML = ""; // Limpiar la lista
 
