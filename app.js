@@ -1,76 +1,59 @@
-// Inicializar Firebase desde el objeto global firebase
-const firebaseConfig = {
-    apiKey: "AIzaSyBw2XLVQTZE5XJAusfiZ16HjoTJJkNZLvg",
-    authDomain: "fondini-aridos.firebaseapp.com",
-    databaseURL: "https://fondini-aridos-default-rtdb.firebaseio.com",
-    projectId: "fondini-aridos",
-    storageBucket: "fondini-aridos.appspot.com",
-    messagingSenderId: "60588617990",
-    appId: "1:60588617990:web:bc0c7cbc8a98e524d3ae87",
-    measurementId: "G-MBSSKYWQTM"
-};
+let clientes = [];
+let pedidos = [];
 
-// Inicializa Firebase
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const database = firebase.database();
-
-// Función para iniciar sesión
-window.iniciarSesion = function() {
-    const email = document.getElementById("email").value;
-    const password = document.getElementById("password").value;
-
-    auth.signInWithEmailAndPassword(email, password)
-        .then((userCredential) => {
-            const user = userCredential.user;
-            alert("Inicio de sesión exitoso");
-            console.log("Usuario:", user);
-        })
-        .catch((error) => {
-            console.error("Error al iniciar sesión:", error);
-            alert("Error al iniciar sesión: " + error.message);
-        });
-}
-
-// Función para agregar datos a la base de datos
-window.agregarDatos = function() {
+document.getElementById("clienteForm").addEventListener("submit", function (e) {
+    e.preventDefault();
     const nombre = document.getElementById("nombre").value;
-    const pedido = document.getElementById("pedido").value;
+    const direccion = document.getElementById("direccion").value;
+    const telefono = document.getElementById("telefono").value;
+    const dni = document.getElementById("dni").value;
 
-    if (nombre && pedido) {
-        const referencia = database.ref('clientes/');
-        referencia.push({
-            nombre: nombre,
-            pedido: pedido
-        })
-        .then(() => {
-            alert("Datos agregados correctamente");
-            obtenerDatos(); // Actualizar la lista de pedidos
-        })
-        .catch((error) => {
-            console.error("Error al agregar datos:", error);
-            alert("Error al agregar datos: " + error.message);
-        });
-    } else {
-        alert("Por favor, llena todos los campos");
-    }
+    const cliente = { id: Date.now(), nombre, direccion, telefono, dni };
+    clientes.push(cliente);
+    mostrarClientes();
+    this.reset();
+});
+
+document.getElementById("pedidoForm").addEventListener("submit", function (e) {
+    e.preventDefault();
+    const clientePedido = document.getElementById("clientePedido").value;
+    const producto = document.getElementById("producto").value;
+    const estado = document.getElementById("estado").value;
+
+    const pedido = { id: Date.now(), clientePedido, producto, estado };
+    pedidos.push(pedido);
+    mostrarPedidos();
+    this.reset();
+});
+
+function mostrarClientes() {
+    const listaClientes = document.getElementById("listaClientes");
+    listaClientes.innerHTML = "";
+    clientes.forEach(cliente => {
+        const li = document.createElement("li");
+        li.innerHTML = `${cliente.nombre} - ${cliente.direccion} - ${cliente.telefono} - ${cliente.dni}
+                        <button class="delete" onclick="eliminarCliente(${cliente.id})">Eliminar</button>`;
+        listaClientes.appendChild(li);
+    });
 }
 
-// Función para obtener y mostrar los datos de la base de datos
-window.obtenerDatos = function() {
+function mostrarPedidos() {
     const listaPedidos = document.getElementById("listaPedidos");
-    listaPedidos.innerHTML = ""; // Limpiar la lista
-
-    const referencia = database.ref('clientes/');
-    referencia.on("value", (snapshot) => {
-        const data = snapshot.val();
-        listaPedidos.innerHTML = ""; // Limpiar la lista antes de mostrar
-        for (const key in data) {
-            if (data.hasOwnProperty(key)) {
-                const li = document.createElement("li");
-                li.textContent = `Cliente: ${data[key].nombre} - Pedido: ${data[key].pedido}`;
-                listaPedidos.appendChild(li);
-            }
-        }
+    listaPedidos.innerHTML = "";
+    pedidos.forEach(pedido => {
+        const li = document.createElement("li");
+        li.innerHTML = `${pedido.clientePedido} - ${pedido.producto} - ${pedido.estado}
+                        <button class="delete" onclick="eliminarPedido(${pedido.id})">Eliminar</button>`;
+        listaPedidos.appendChild(li);
     });
+}
+
+function eliminarCliente(id) {
+    clientes = clientes.filter(cliente => cliente.id !== id);
+    mostrarClientes();
+}
+
+function eliminarPedido(id) {
+    pedidos = pedidos.filter(pedido => pedido.id !== id);
+    mostrarPedidos();
 }
