@@ -1,48 +1,23 @@
 body {
     font-family: Arial, sans-serif;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    margin: 0;
-    background-color: #f4f4f9;
-}
-
-.container {
-    width: 100%;
-    max-width: 400px;
+    max-width: 800px;
+    margin: auto;
     padding: 20px;
-    background-color: #fff;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
-    text-align: center;
 }
 
 h1, h2 {
-    color: #333;
+    text-align: center;
 }
 
-input {
-    width: 100%;
-    padding: 10px;
-    margin: 10px 0;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+form {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
 }
 
-button {
-    width: 100%;
-    padding: 10px;
-    margin: 10px 0;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-button:hover {
-    background-color: #0056b3;
+input, button {
+    padding: 8px;
+    font-size: 16px;
 }
 
 ul {
@@ -51,6 +26,21 @@ ul {
 }
 
 li {
+    background: #f4f4f4;
     padding: 10px;
-    border-bottom: 1px solid #ddd;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+button {
+    background: #4CAF50;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+button.delete {
+    background: #f44336;
 }
