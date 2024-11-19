@@ -3,38 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ejemplo Firebase y GitHub Pages</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Gestión de Clientes y Pedidos</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container">
-        <h1>Bienvenido</h1>
+    <h1>Gestión de Clientes y Pedidos</h1>
 
-        <div class="login-form">
-            <h2>Iniciar Sesión</h2>
-            <input type="email" id="email" placeholder="Email">
-            <input type="password" id="password" placeholder="Contraseña">
-            <button onclick="iniciarSesion()">Iniciar Sesión</button>
-        </div>
+    <section id="clientes">
+        <h2>Clientes</h2>
+        <form id="clienteForm">
+            <input type="text" id="nombre" placeholder="Nombre" required>
+            <input type="text" id="direccion" placeholder="Dirección" required>
+            <input type="text" id="telefono" placeholder="Teléfono" required>
+            <input type="text" id="dni" placeholder="DNI" required>
+            <button type="submit">Agregar Cliente</button>
+        </form>
+        <ul id="listaClientes"></ul>
+    </section>
 
-        <div class="add-data">
-            <h2>Agregar Datos</h2>
-            <input type="text" id="nombre" placeholder="Nombre del Cliente">
-            <input type="text" id="pedido" placeholder="Detalle del Pedido">
-            <button onclick="agregarDatos()">Agregar</button>
-        </div>
+    <section id="pedidos">
+        <h2>Pedidos</h2>
+        <form id="pedidoForm">
+            <input type="text" id="clientePedido" placeholder="Cliente" required>
+            <input type="text" id="producto" placeholder="Producto (áridos, ladrillos...)" required>
+            <input type="text" id="estado" placeholder="Estado (entregado, demorado)" required>
+            <button type="submit">Agregar Pedido</button>
+        </form>
+        <ul id="listaPedidos"></ul>
+    </section>
 
-        <div class="data-display">
-            <h2>Lista de Pedidos</h2>
-            <ul id="listaPedidos"></ul>
-        </div>
-    </div>
-
-    <!-- Firebase SDKs compat -->
-    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js"></script>
-    <!-- Archivo de JavaScript -->
-    <script src="app.js" defer></script>
+    <script src="script.js"></script>
 </body>
 </html>
