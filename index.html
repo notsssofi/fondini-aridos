@@ -9,6 +9,7 @@
 <body>
     <h1>Gestión de Clientes y Pedidos</h1>
 
+    <!-- Sección de Clientes -->
     <section id="clientes">
         <h2>Clientes</h2>
         <form id="clienteForm">
@@ -16,22 +17,27 @@
             <input type="text" id="direccion" placeholder="Dirección" required>
             <input type="text" id="telefono" placeholder="Teléfono" required>
             <input type="text" id="dni" placeholder="DNI" required>
-            <button type="submit">Agregar Cliente</button>
+            <button type="submit" id="agregarClienteBtn">Agregar Cliente</button>
+            <button type="button" id="editarClienteBtn" style="display: none;">Guardar Cambios</button>
+            <button type="button" id="cancelarEdicionCliente" style="display: none;">Cancelar</button>
         </form>
         <ul id="listaClientes"></ul>
     </section>
 
+    <!-- Sección de Pedidos -->
     <section id="pedidos">
         <h2>Pedidos</h2>
         <form id="pedidoForm">
             <input type="text" id="clientePedido" placeholder="Cliente" required>
             <input type="text" id="producto" placeholder="Producto (áridos, ladrillos...)" required>
             <input type="text" id="estado" placeholder="Estado (entregado, demorado)" required>
-            <button type="submit">Agregar Pedido</button>
+            <button type="submit" id="agregarPedidoBtn">Agregar Pedido</button>
+            <button type="button" id="editarPedidoBtn" style="display: none;">Guardar Cambios</button>
+            <button type="button" id="cancelarEdicionPedido" style="display: none;">Cancelar</button>
         </form>
         <ul id="listaPedidos"></ul>
     </section>
 
-    <script src="script.js"></script>
+    <script src="app.js"></script>
 </body>
 </html>
