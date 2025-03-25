@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -32,11 +31,11 @@
         </form>
         <p><a href="#" id="volverLogin">Volver al inicio de sesión</a></p>
     </section>
-    
+
     <section id="dashboard" style="display: none;">
         <h2>Gestión de Clientes y Pedidos</h2>
         <button id="nuevoRegistroBtn">Nuevo Cliente/Pedido</button>
-        <button id="logoutBtn">Cerrar Sesión</button> <!-- Agregado -->
+        <button id="logoutBtn">Cerrar Sesión</button>
         
         <div id="registroContainer" style="display: none;">
             <section id="clientes">
@@ -63,10 +62,14 @@
             </section>
         </div>
     </section>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js"></script>
     
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js"></script>
-<script src="app.js" defer></script>
+    <!-- Script Principal -->
+    <script src="app.js" defer></script>
 
 </body>
 </html>
