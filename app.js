@@ -1,36 +1,42 @@
-
-// Configuración de Firebase
+// 🔥 Configuración de Firebase
 const firebaseConfig = {
     apiKey: "AIzaSyBw2XLVQTZE5XJAusfiZ16HjoTJJkNZLvg",
     authDomain: "fondini-aridos.firebaseapp.com",
     databaseURL: "https://fondini-aridos-default-rtdb.firebaseio.com",
     projectId: "fondini-aridos",
-    storageBucket: "fondini-aridos.firebasestorage.app",
+    storageBucket: "fondini-aridos.appspot.com",
     messagingSenderId: "60588617990",
     appId: "1:60588617990:web:bc0c7cbc8a98e524d3ae87",
     measurementId: "G-MBSSKYWQTM"
 };
 
-// Inicializar Firebase
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getDatabase(app);
+// 🔥 Inicializar Firebase
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.database();
 
-let editandoCliente = null;
-let editandoPedido = null;
+// 🔹 Cambiar entre login y registro
+document.getElementById("crearCuentaLink").addEventListener("click", function () {
+    document.getElementById("login").style.display = "none";
+    document.getElementById("registro").style.display = "block";
+});
+document.getElementById("volverLogin").addEventListener("click", function () {
+    document.getElementById("registro").style.display = "none";
+    document.getElementById("login").style.display = "block";
+});
 
-// --- Registro de Usuario ---
+// --- Registro ---
 document.getElementById("registroForm").addEventListener("submit", function (e) {
     e.preventDefault();
     const nombreCompleto = document.getElementById("nombreCompleto").value;
     const correo = document.getElementById("correo").value;
     const password = document.getElementById("nuevaPassword").value;
 
-    createUserWithEmailAndPassword(auth, correo, password)
+    auth.createUserWithEmailAndPassword(correo, password)
         .then((userCredential) => {
             const user = userCredential.user;
-            set(ref(db, 'usuarios/' + user.uid), { nombre: nombreCompleto, correo: correo });
-            alert("Cuenta creada con éxito. Ahora puedes iniciar sesión.");
+            db.ref('usuarios/' + user.uid).set({ nombre: nombreCompleto, correo: correo });
+            alert("Cuenta creada con éxito.");
             document.getElementById("registro").style.display = "none";
             document.getElementById("login").style.display = "block";
         })
@@ -40,27 +46,40 @@ document.getElementById("registroForm").addEventListener("submit", function (e) 
 // --- Inicio de Sesión ---
 document.getElementById("loginForm").addEventListener("submit", function (e) {
     e.preventDefault();
-    const correo = document.getElementById("correoLogin").value; // Corregido
+    const correo = document.getElementById("correoLogin").value;
     const password = document.getElementById("password").value;
 
-    signInWithEmailAndPassword(auth, correo, password)
+    auth.signInWithEmailAndPassword(correo, password)
         .then(() => {
-            console.log("Inicio de sesión exitoso");
+            alert("Inicio de sesión exitoso");
             document.getElementById("login").style.display = "none";
             document.getElementById("dashboard").style.display = "block";
+            mostrarClientes();
+            mostrarPedidos();
         })
-        .catch((error) => {
-            console.error("Error en inicio de sesión:", error);
-            alert("Usuario o contraseña incorrectos.");
-        });
+        .catch((error) => alert("Usuario o contraseña incorrectos."));
 });
 
 // --- Cerrar Sesión ---
 document.getElementById("logoutBtn").addEventListener("click", function () {
-    signOut(auth).then(() => {
-        console.log("Sesión cerrada");
+    auth.signOut().then(() => {
+        alert("Sesión cerrada");
         document.getElementById("dashboard").style.display = "none";
         document.getElementById("login").style.display = "block";
+    });
+});
+
+// --- Agregar Cliente ---
+document.getElementById("clienteForm").addEventListener("submit", function (e) {
+    e.preventDefault();
+    const nombre = document.getElementById("nombre").value;
+    const direccion = document.getElementById("direccion").value;
+    const telefono = document.getElementById("telefono").value;
+    const dni = document.getElementById("dni").value;
+
+    db.ref('clientes').push({ nombre, direccion, telefono, dni }).then(() => {
+        alert("Cliente agregado con éxito.");
+        mostrarClientes();
     });
 });
 
@@ -68,14 +87,13 @@ document.getElementById("logoutBtn").addEventListener("click", function () {
 function mostrarClientes() {
     const listaClientes = document.getElementById("listaClientes");
     listaClientes.innerHTML = "";
-    get(ref(db, 'clientes')).then((snapshot) => {
+    db.ref('clientes').once('value').then((snapshot) => {
         if (snapshot.exists()) {
             snapshot.forEach((childSnapshot) => {
                 const cliente = childSnapshot.val();
                 const id = childSnapshot.key;
                 const li = document.createElement("li");
                 li.innerHTML = `${cliente.nombre} - ${cliente.direccion} - ${cliente.telefono} - ${cliente.dni}
-                                <button onclick="editarCliente('${id}')">Editar</button>
                                 <button onclick="eliminarCliente('${id}')">Eliminar</button>`;
                 listaClientes.appendChild(li);
             });
@@ -85,8 +103,57 @@ function mostrarClientes() {
     });
 }
 
-// --- Cargar clientes y pedidos al cargar la página ---
+// --- Eliminar Cliente ---
+function eliminarCliente(id) {
+    db.ref('clientes/' + id).remove().then(() => {
+        alert("Cliente eliminado.");
+        mostrarClientes();
+    });
+}
+
+// --- Agregar Pedido ---
+document.getElementById("pedidoForm").addEventListener("submit", function (e) {
+    e.preventDefault();
+    const clientePedido = document.getElementById("clientePedido").value;
+    const producto = document.getElementById("producto").value;
+    const estado = document.getElementById("estado").value;
+
+    db.ref('pedidos').push({ clientePedido, producto, estado }).then(() => {
+        alert("Pedido agregado con éxito.");
+        mostrarPedidos();
+    });
+});
+
+// --- Mostrar Pedidos ---
+function mostrarPedidos() {
+    const listaPedidos = document.getElementById("listaPedidos");
+    listaPedidos.innerHTML = "";
+    db.ref('pedidos').once('value').then((snapshot) => {
+        if (snapshot.exists()) {
+            snapshot.forEach((childSnapshot) => {
+                const pedido = childSnapshot.val();
+                const id = childSnapshot.key;
+                const li = document.createElement("li");
+                li.innerHTML = `${pedido.clientePedido} - ${pedido.producto} - ${pedido.estado}
+                                <button onclick="eliminarPedido('${id}')">Eliminar</button>`;
+                listaPedidos.appendChild(li);
+            });
+        } else {
+            listaPedidos.innerHTML = "No hay pedidos.";
+        }
+    });
+}
+
+// --- Eliminar Pedido ---
+function eliminarPedido(id) {
+    db.ref('pedidos/' + id).remove().then(() => {
+        alert("Pedido eliminado.");
+        mostrarPedidos();
+    });
+}
+
+// --- Cargar datos al iniciar ---
 window.onload = function () {
-    console.log("Página cargada");
     mostrarClientes();
+    mostrarPedidos();
 };
