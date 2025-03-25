@@ -1,5 +1,6 @@
 import { initializeApp } from "firebase/app";
-import { getDatabase, ref, set, get, child, update, remove } from "firebase/database";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "firebase/auth";
+import { getDatabase, ref, set, get, push, update, remove } from "firebase/database";
 
 // Configuración de Firebase
 const firebaseConfig = {
@@ -15,12 +16,53 @@ const firebaseConfig = {
 
 // Inicializar Firebase
 const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
 const db = getDatabase(app);
 
 let editandoCliente = null;
 let editandoPedido = null;
 
-// Formulario de clientes
+// --- Registro de Usuario ---
+document.getElementById("registroForm").addEventListener("submit", function (e) {
+    e.preventDefault();
+    const nombreCompleto = document.getElementById("nombreCompleto").value;
+    const correo = document.getElementById("correo").value;
+    const password = document.getElementById("nuevaPassword").value;
+
+    createUserWithEmailAndPassword(auth, correo, password)
+        .then((userCredential) => {
+            const user = userCredential.user;
+            set(ref(db, 'usuarios/' + user.uid), { nombre: nombreCompleto, correo: correo });
+            alert("Cuenta creada con éxito. Ahora puedes iniciar sesión.");
+            document.getElementById("registro").style.display = "none";
+            document.getElementById("login").style.display = "block";
+        })
+        .catch((error) => alert("Error: " + error.message));
+});
+
+// --- Inicio de Sesión ---
+document.getElementById("loginForm").addEventListener("submit", function (e) {
+    e.preventDefault();
+    const correo = document.getElementById("username").value;
+    const password = document.getElementById("password").value;
+
+    signInWithEmailAndPassword(auth, correo, password)
+        .then(() => {
+            document.getElementById("login").style.display = "none";
+            document.getElementById("dashboard").style.display = "block";
+        })
+        .catch(() => alert("Usuario o contraseña incorrectos. Si no tienes una cuenta, regístrate."));
+});
+
+// --- Cerrar Sesión ---
+document.getElementById("logoutBtn").addEventListener("click", function () {
+    signOut(auth).then(() => {
+        document.getElementById("dashboard").style.display = "none";
+        document.getElementById("login").style.display = "block";
+    });
+});
+
+// --- Agregar o Editar Cliente ---
 document.getElementById("clienteForm").addEventListener("submit", function (e) {
     e.preventDefault();
     const nombre = document.getElementById("nombre").value;
@@ -29,103 +71,42 @@ document.getElementById("clienteForm").addEventListener("submit", function (e) {
     const dni = document.getElementById("dni").value;
 
     if (editandoCliente) {
-        // Editar cliente existente en Firebase
-        const clienteRef = ref(db, 'clientes/' + editandoCliente.id);
-        update(clienteRef, {
-            nombre: nombre,
-            direccion: direccion,
-            telefono: telefono,
-            dni: dni
-        });
+        update(ref(db, 'clientes/' + editandoCliente.id), { nombre, direccion, telefono, dni });
         editandoCliente = null;
     } else {
-        // Crear nuevo cliente en Firebase
-        const cliente = { nombre, direccion, telefono, dni };
-        const clientesRef = ref(db, 'clientes');
-        const newClientRef = push(clientesRef);
-        set(newClientRef, cliente);
+        const newClientRef = push(ref(db, 'clientes'));
+        set(newClientRef, { nombre, direccion, telefono, dni });
     }
+    this.reset();
     mostrarClientes();
-    this.reset();
 });
 
-// Formulario de pedidos
-document.getElementById("pedidoForm").addEventListener("submit", function (e) {
-    e.preventDefault();
-    const clientePedido = document.getElementById("clientePedido").value;
-    const producto = document.getElementById("producto").value;
-    const estado = document.getElementById("estado").value;
-
-    if (editandoPedido) {
-        // Editar pedido existente en Firebase
-        const pedidoRef = ref(db, 'pedidos/' + editandoPedido.id);
-        update(pedidoRef, {
-            clientePedido: clientePedido,
-            producto: producto,
-            estado: estado
-        });
-        editandoPedido = null;
-    } else {
-        // Crear nuevo pedido en Firebase
-        const pedido = { clientePedido, producto, estado };
-        const pedidosRef = ref(db, 'pedidos');
-        const newOrderRef = push(pedidosRef);
-        set(newOrderRef, pedido);
-    }
-    mostrarPedidos();
-    this.reset();
-});
-
-// Mostrar clientes desde Firebase
+// --- Mostrar Clientes ---
 function mostrarClientes() {
     const listaClientes = document.getElementById("listaClientes");
     listaClientes.innerHTML = "";
-    const clientesRef = ref(db, 'clientes');
-    get(clientesRef).then((snapshot) => {
+    get(ref(db, 'clientes')).then((snapshot) => {
         if (snapshot.exists()) {
-            const clientes = snapshot.val();
-            for (const id in clientes) {
-                const cliente = clientes[id];
+            snapshot.forEach((childSnapshot) => {
+                const cliente = childSnapshot.val();
+                const id = childSnapshot.key;
                 const li = document.createElement("li");
                 li.innerHTML = `${cliente.nombre} - ${cliente.direccion} - ${cliente.telefono} - ${cliente.dni}
-                                <button class="edit" onclick="editarCliente('${id}')">Editar</button>
-                                <button class="delete" onclick="eliminarCliente('${id}')">Eliminar</button>`;
+                                <button onclick="editarCliente('${id}')">Editar</button>
+                                <button onclick="eliminarCliente('${id}')">Eliminar</button>`;
                 listaClientes.appendChild(li);
-            }
+            });
         } else {
             listaClientes.innerHTML = "No hay clientes.";
         }
     });
 }
 
-// Mostrar pedidos desde Firebase
-function mostrarPedidos() {
-    const listaPedidos = document.getElementById("listaPedidos");
-    listaPedidos.innerHTML = "";
-    const pedidosRef = ref(db, 'pedidos');
-    get(pedidosRef).then((snapshot) => {
-        if (snapshot.exists()) {
-            const pedidos = snapshot.val();
-            for (const id in pedidos) {
-                const pedido = pedidos[id];
-                const li = document.createElement("li");
-                li.innerHTML = `${pedido.clientePedido} - ${pedido.producto} - ${pedido.estado}
-                                <button class="edit" onclick="editarPedido('${id}')">Editar</button>
-                                <button class="delete" onclick="eliminarPedido('${id}')">Eliminar</button>`;
-                listaPedidos.appendChild(li);
-            }
-        } else {
-            listaPedidos.innerHTML = "No hay pedidos.";
-        }
-    });
-}
-
-// Editar cliente desde Firebase
+// --- Editar Cliente ---
 function editarCliente(id) {
-    const clienteRef = ref(db, 'clientes/' + id);
-    get(clienteRef).then((snapshot) => {
-        const cliente = snapshot.val();
-        if (cliente) {
+    get(ref(db, 'clientes/' + id)).then((snapshot) => {
+        if (snapshot.exists()) {
+            const cliente = snapshot.val();
             document.getElementById("nombre").value = cliente.nombre;
             document.getElementById("direccion").value = cliente.direccion;
             document.getElementById("telefono").value = cliente.telefono;
@@ -135,12 +116,56 @@ function editarCliente(id) {
     });
 }
 
-// Editar pedido desde Firebase
+// --- Eliminar Cliente ---
+function eliminarCliente(id) {
+    remove(ref(db, 'clientes/' + id));
+    mostrarClientes();
+}
+
+// --- Agregar o Editar Pedido ---
+document.getElementById("pedidoForm").addEventListener("submit", function (e) {
+    e.preventDefault();
+    const clientePedido = document.getElementById("clientePedido").value;
+    const producto = document.getElementById("producto").value;
+    const estado = document.getElementById("estado").value;
+
+    if (editandoPedido) {
+        update(ref(db, 'pedidos/' + editandoPedido.id), { clientePedido, producto, estado });
+        editandoPedido = null;
+    } else {
+        const newOrderRef = push(ref(db, 'pedidos'));
+        set(newOrderRef, { clientePedido, producto, estado });
+    }
+    this.reset();
+    mostrarPedidos();
+});
+
+// --- Mostrar Pedidos ---
+function mostrarPedidos() {
+    const listaPedidos = document.getElementById("listaPedidos");
+    listaPedidos.innerHTML = "";
+    get(ref(db, 'pedidos')).then((snapshot) => {
+        if (snapshot.exists()) {
+            snapshot.forEach((childSnapshot) => {
+                const pedido = childSnapshot.val();
+                const id = childSnapshot.key;
+                const li = document.createElement("li");
+                li.innerHTML = `${pedido.clientePedido} - ${pedido.producto} - ${pedido.estado}
+                                <button onclick="editarPedido('${id}')">Editar</button>
+                                <button onclick="eliminarPedido('${id}')">Eliminar</button>`;
+                listaPedidos.appendChild(li);
+            });
+        } else {
+            listaPedidos.innerHTML = "No hay pedidos.";
+        }
+    });
+}
+
+// --- Editar Pedido ---
 function editarPedido(id) {
-    const pedidoRef = ref(db, 'pedidos/' + id);
-    get(pedidoRef).then((snapshot) => {
-        const pedido = snapshot.val();
-        if (pedido) {
+    get(ref(db, 'pedidos/' + id)).then((snapshot) => {
+        if (snapshot.exists()) {
+            const pedido = snapshot.val();
             document.getElementById("clientePedido").value = pedido.clientePedido;
             document.getElementById("producto").value = pedido.producto;
             document.getElementById("estado").value = pedido.estado;
@@ -149,17 +174,9 @@ function editarPedido(id) {
     });
 }
 
-// Eliminar cliente desde Firebase
-function eliminarCliente(id) {
-    const clienteRef = ref(db, 'clientes/' + id);
-    remove(clienteRef);
-    mostrarClientes();
-}
-
-// Eliminar pedido desde Firebase
+// --- Eliminar Pedido ---
 function eliminarPedido(id) {
-    const pedidoRef = ref(db, 'pedidos/' + id);
-    remove(pedidoRef);
+    remove(ref(db, 'pedidos/' + id));
     mostrarPedidos();
 }
 
