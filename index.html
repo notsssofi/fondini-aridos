@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Áridos Fondini - Gestión de Clientes y Pedidos</title>
     <link rel="stylesheet" href="styles.css">
-
 </head>
 <body>
     <header>
@@ -15,7 +14,7 @@
     <section id="login">
         <h2>Iniciar Sesión</h2>
         <form id="loginForm">
-            <input type="text" id="username" placeholder="Nombre de Usuario" required>
+            <input type="email" id="correoLogin" placeholder="Correo Electrónico" required>
             <input type="password" id="password" placeholder="Contraseña" required>
             <button type="submit">Ingresar</button>
         </form>
@@ -36,6 +35,7 @@
     <section id="dashboard" style="display: none;">
         <h2>Gestión de Clientes y Pedidos</h2>
         <button id="nuevoRegistroBtn">Nuevo Cliente/Pedido</button>
+        <button id="logoutBtn">Cerrar Sesión</button> <!-- Agregado -->
         
         <div id="registroContainer" style="display: none;">
             <section id="clientes">
@@ -63,6 +63,6 @@
         </div>
     </section>
     
-   <script src="app.js" defer></script>
+    <script src="app.js" defer></script>
 </body>
 </html>
