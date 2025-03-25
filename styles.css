@@ -1,11 +1,12 @@
+/* Estilos generales */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    font-family: 'Arial', sans-serif;
 }
 
 body {
-    font-family: Arial, sans-serif;
     background: url('background.jpg') no-repeat center center fixed;
     background-size: cover;
     display: flex;
@@ -13,37 +14,48 @@ body {
     align-items: center;
     height: 100vh;
     flex-direction: column;
+    padding: 20px;
 }
 
+/* Contenedor principal */
 .container {
     background: rgba(255, 255, 255, 0.9);
     padding: 30px;
     border-radius: 10px;
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
     text-align: center;
-    width: 350px;
+    width: 400px;
+}
+
+/* Encabezado */
+header {
+    text-align: center;
+    margin-bottom: 20px;
 }
 
 h1 {
     color: #FF7F50;
-    margin-bottom: 10px;
+    font-size: 28px;
+    font-weight: bold;
 }
 
 h2 {
     color: #e64a19;
-    margin-bottom: 20px;
+    font-size: 22px;
+    margin-bottom: 15px;
 }
 
+/* Formularios */
 form {
     display: flex;
     flex-direction: column;
+    gap: 10px;
+    padding: 15px;
 }
 
 input {
-    display: block;
     width: 100%;
-    padding: 10px;
-    margin: 10px 0;
+    padding: 12px;
     border: 1px solid #ccc;
     border-radius: 5px;
     font-size: 16px;
@@ -58,11 +70,11 @@ input:focus {
 button {
     background-color: #ff7043;
     color: white;
-    cursor: pointer;
-    padding: 10px;
+    padding: 12px;
     border: none;
     border-radius: 5px;
     font-size: 16px;
+    cursor: pointer;
     transition: background 0.3s;
 }
 
@@ -70,14 +82,72 @@ button:hover {
     background-color: #e64a19;
 }
 
+/* Links */
 a {
-    display: block;
-    margin-top: 15px;
     color: #007BFF;
     text-decoration: none;
     font-size: 14px;
+    margin-top: 10px;
 }
 
 a:hover {
     text-decoration: underline;
+}
+
+/* Dashboard */
+#dashboard {
+    width: 90%;
+    max-width: 800px;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+    text-align: center;
+}
+
+#clientes, #pedidos {
+    margin-top: 20px;
+    padding: 15px;
+    background: rgba(240, 240, 240, 0.9);
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+ul {
+    list-style-type: none;
+    margin-top: 10px;
+}
+
+li {
+    padding: 10px;
+    background: white;
+    border-radius: 5px;
+    margin-top: 5px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Botones de editar y eliminar */
+button.edit, button.delete {
+    background: #007BFF;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+button.delete {
+    background: #d9534f;
+}
+
+button.edit:hover {
+    background: #0056b3;
+}
+
+button.delete:hover {
+    background: #c9302c;
 }
