@@ -1,5 +1,5 @@
-// Inicializar Firebase
-const firebaseConfig = {
+// Usa la variable global `firebase` en lugar de `import`
+const app = firebase.initializeApp({
   apiKey: "AIzaSyAHTfYQXgWb3l5DqCar3ooOv2yzzsww9Ek",
   authDomain: "bd-fondini-aridos.firebaseapp.com",
   databaseURL: "https://bd-fondini-aridos-default-rtdb.firebaseio.com",
@@ -7,11 +7,9 @@ const firebaseConfig = {
   storageBucket: "bd-fondini-aridos.firebasestorage.app",
   messagingSenderId: "1038135881192",
   appId: "1:1038135881192:web:215908840951025da9485d"
-};
+});
 
-
-// Inicializar Firebase
-firebase.initializeApp(firebaseConfig);
+// Inicializar módulos
 const auth = firebase.auth();
 const db = firebase.database();
 
