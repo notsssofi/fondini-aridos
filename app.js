@@ -1,9 +1,4 @@
-// Importar Firebase
-import { initializeApp } from "firebase/app";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "firebase/auth";
-import { getDatabase, ref, set, push, onValue } from "firebase/database";
-
-// Configuración de Firebase
+// Inicializar Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyAHTfYQXgWb3l5DqCar3ooOv2yzzsww9Ek",
   authDomain: "bd-fondini-aridos.firebaseapp.com",
@@ -14,18 +9,11 @@ const firebaseConfig = {
   appId: "1:1038135881192:web:215908840951025da9485d"
 };
 
-// Inicializar Firebase
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getDatabase(app);
 
-// Referencias a elementos HTML
-const loginSection = document.getElementById("login");
-const registroSection = document.getElementById("registro");
-const dashboardSection = document.getElementById("dashboard");
-const registroContainer = document.getElementById("registroContainer");
-const listaClientes = document.getElementById("listaClientes");
-const listaPedidos = document.getElementById("listaPedidos");
+// Inicializar Firebase
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.database();
 
 // Manejar estado de sesión
 onAuthStateChanged(auth, (user) => {
