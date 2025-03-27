@@ -251,62 +251,32 @@ pedidoForm.addEventListener("submit", (e) => {
     });
 });
 
-// Agregar pedido con validación completa
-pedidoForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    
-    const clienteId = document.getElementById("clientePedido").value.trim();
-    const producto = document.getElementById("producto").value.trim();
-    const estado = document.getElementById("estado").value.trim();
-    
-    // Validar campos requeridos
-    if (!clienteId || !producto || !estado) {
-        alert("Todos los campos son obligatorios");
-        return;
-    }
-
-    // Mostrar estado de carga
-    const submitBtn = pedidoForm.querySelector('button[type="submit"]');
-    const originalText = submitBtn.textContent;
-    submitBtn.disabled = true;
-    submitBtn.textContent = "Validando...";
-
-    try {
-        // 1. Verificar si el cliente existe
-        const clienteSnapshot = await db.ref(`clientes/${clienteId}`).once('value');
-        if (!clienteSnapshot.exists()) {
-            throw new Error(`El cliente con ID ${clienteId} no existe. Registre al cliente primero.`);
+// Cargar pedidos de un cliente específico - CORRECCIÓN
+window.cargarPedidosCliente = function(clienteId) {
+    const pedidosRef = db.ref(`pedidos/${clienteId}`);  // <-- Usar backticks aquí
+    pedidosRef.on("value", (snapshot) => {
+        listaPedidos.innerHTML = "";
+        const data = snapshot.val();
+        
+        if (data) {
+            Object.values(data).forEach((pedido) => {
+                const tr = document.createElement("tr");
+                tr.innerHTML = `
+                    <td>${clienteId}</td>
+                    <td>${pedido.producto || ''}</td>
+                    <td>${pedido.estado || ''}</td>
+                    <td>${new Date(pedido.fecha).toLocaleString() || ''}</td>
+                `;
+                listaPedidos.appendChild(tr);
+            });
         }
+        
+        pedidosLista.classList.remove("hidden");
+        clientesLista.classList.add("hidden");
+        registroContainer.classList.add("hidden");
+    });
+};
 
-        // 2. Obtener datos del cliente
-        const cliente = clienteSnapshot.val();
-        
-        // 3. Crear el pedido solo si el cliente existe
-        const pedidosRef = db.ref(`pedidos/${clienteId}`);
-        await pedidosRef.push({ 
-            producto, 
-            estado, 
-            fecha: new Date().toISOString(),
-            clienteNombre: cliente.nombre // Guardamos el nombre por referencia
-        });
-        
-        alert(`Pedido creado exitosamente para ${cliente.nombre}`);
-        pedidoForm.reset();
-        cargarPedidosCliente(clienteId);
-
-    } catch (error) {
-        console.error("Error al crear pedido:", error);
-        alert(error.message);
-        
-        // Mostrar la lista de clientes para que puedan registrar uno nuevo
-        clientesLista.classList.remove("hidden");
-        pedidosLista.classList.add("hidden");
-        
-    } finally {
-        submitBtn.disabled = false;
-        submitBtn.textContent = originalText;
-    }
-});
 // Cargar todos los pedidos (versión simplificada)
 function cargarPedidos() {
     const pedidosRef = db.ref('pedidos');
