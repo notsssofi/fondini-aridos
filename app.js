@@ -135,62 +135,25 @@ btnNuevoRegistro.addEventListener("click", () => {
     pedidosLista.classList.add("hidden");
 });
 
-// Verificar si el DNI contiene solo dígitos
-    if (!/^\d+$/.test(dni)) {
-        return {
-            valido: false,
-            mensaje: "El DNI debe contener solo números"
-        };
-    }
-
-    // Verificar longitud (entre 7 y 8 caracteres)
-    if (dni.length < 7 || dni.length > 8) {
-        return {
-            valido: false,
-            mensaje: "El DNI debe tener entre 7 y 8 caracteres"
-        };
-    }
-
-    // Verificar que el número sea positivo
-    if (parseInt(dni) <= 0) {
-        return {
-            valido: false,
-            mensaje: "El DNI debe ser un número positivo"
-        };
-    }
-
-    // Si todas las validaciones pasan
-    return {
-        valido: true,
-        mensaje: "DNI válido"
-    };
-}
-
-// 🔹 Agregar cliente (modificar este bloque existente)
-document.getElementById("clienteForm").addEventListener("submit", (e) => {
+// Agregar cliente
+clienteForm.addEventListener("submit", (e) => {
     e.preventDefault();
     const nombre = document.getElementById("nombre").value;
     const direccion = document.getElementById("direccion").value;
     const telefono = document.getElementById("telefono").value;
     const dni = document.getElementById("dni").value;
 
-    // Validar DNI antes de agregar
-    const validacionDNI = validarDNI(dni);
-
-    if (!validacionDNI.valido) {
-        // Mostrar mensaje de error si el DNI no es válido
-        alert(validacionDNI.mensaje);
-        return;
-    }
-
     const clientesRef = db.ref('clientes');
-    const newClienteRef = clientesRef.push();
-    newClienteRef.set({ nombre, direccion, telefono, dni })
+    clientesRef.push({ nombre, direccion, telefono, dni })
         .then(() => {
             alert("Cliente agregado");
+            clienteForm.reset();
             cargarClientes();
         })
-        .catch((error) => alert("Error: " + error.message));
+        .catch((error) => {
+            console.error("Error al agregar cliente:", error);
+            alert("Error al agregar cliente: " + error.message);
+        });
 });
 
 // Cargar clientes
@@ -228,7 +191,7 @@ pedidoForm.addEventListener("submit", (e) => {
         return;
     }
 
-    const pedidosRef = db.ref(`pedidos/${clienteId}`);
+    const pedidosRef = db.ref(pedidos/${clienteId});
     pedidosRef.push({ 
         producto, 
         estado, 
@@ -247,7 +210,7 @@ pedidoForm.addEventListener("submit", (e) => {
 
 // Cargar pedidos de un cliente específico
 window.cargarPedidosCliente = function(clienteId) {
-    const pedidosRef = db.ref(`pedidos/${clienteId}`);
+    const pedidosRef = db.ref(pedidos/${clienteId});
     pedidosRef.on("value", (snapshot) => {
         listaPedidos.innerHTML = "";
         const data = snapshot.val();
