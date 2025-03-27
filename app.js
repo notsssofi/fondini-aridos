@@ -251,32 +251,72 @@ pedidoForm.addEventListener("submit", (e) => {
     });
 });
 
-// Cargar pedidos de un cliente específico - CORRECCIÓN
-window.cargarPedidosCliente = function(clienteId) {
-    const pedidosRef = db.ref(`pedidos/${clienteId}`);  // <-- Usar backticks aquí
-    pedidosRef.on("value", (snapshot) => {
-        listaPedidos.innerHTML = "";
-        const data = snapshot.val();
+// Cargar pedidos de un cliente específico con validación
+window.cargarPedidosCliente = async function(clienteId) {
+    // Mostrar estado de carga
+    const originalText = btnMostrarPedidos.textContent;
+    btnMostrarPedidos.disabled = true;
+    btnMostrarPedidos.textContent = "Cargando...";
+
+    try {
+        // Primero verificar si el cliente existe
+        const clienteSnapshot = await db.ref(`clientes/${clienteId}`).once('value');
         
-        if (data) {
-            Object.values(data).forEach((pedido) => {
+        if (!clienteSnapshot.exists()) {
+            throw new Error(`El cliente con ID ${clienteId} no existe`);
+        }
+
+        // Obtener datos del cliente para mostrar en la tabla
+        const cliente = clienteSnapshot.val();
+        const nombreCliente = cliente.nombre || 'Cliente desconocido';
+
+        // Ahora cargar los pedidos
+        const pedidosRef = db.ref(`pedidos/${clienteId}`);
+        pedidosRef.on("value", (snapshot) => {
+            listaPedidos.innerHTML = "";
+            const data = snapshot.val();
+            
+            if (data) {
+                Object.values(data).forEach((pedido) => {
+                    const tr = document.createElement("tr");
+                    tr.innerHTML = `
+                        <td>${nombreCliente}</td>
+                        <td>${pedido.producto || ''}</td>
+                        <td>${pedido.estado || ''}</td>
+                        <td>${new Date(pedido.fecha).toLocaleString() || ''}</td>
+                    `;
+                    listaPedidos.appendChild(tr);
+                });
+            } else {
+                // Mostrar mensaje si no hay pedidos
                 const tr = document.createElement("tr");
                 tr.innerHTML = `
-                    <td>${clienteId}</td>
-                    <td>${pedido.producto || ''}</td>
-                    <td>${pedido.estado || ''}</td>
-                    <td>${new Date(pedido.fecha).toLocaleString() || ''}</td>
+                    <td colspan="4" style="text-align: center;">
+                        ${nombreCliente} no tiene pedidos registrados
+                    </td>
                 `;
                 listaPedidos.appendChild(tr);
-            });
-        }
-        
-        pedidosLista.classList.remove("hidden");
-        clientesLista.classList.add("hidden");
-        registroContainer.classList.add("hidden");
-    });
-};
+            }
+            
+            pedidosLista.classList.remove("hidden");
+            clientesLista.classList.add("hidden");
+            registroContainer.classList.add("hidden");
+        });
 
+    } catch (error) {
+        console.error("Error al cargar pedidos:", error);
+        alert(error.message);
+        
+        // Volver a mostrar la lista de clientes
+        clientesLista.classList.remove("hidden");
+        pedidosLista.classList.add("hidden");
+        
+    } finally {
+        // Restaurar el botón
+        btnMostrarPedidos.disabled = false;
+        btnMostrarPedidos.textContent = originalText;
+    }
+};
 // Cargar todos los pedidos (versión simplificada)
 function cargarPedidos() {
     const pedidosRef = db.ref('pedidos');
