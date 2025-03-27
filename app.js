@@ -135,25 +135,62 @@ btnNuevoRegistro.addEventListener("click", () => {
     pedidosLista.classList.add("hidden");
 });
 
-// Agregar cliente
-clienteForm.addEventListener("submit", (e) => {
+// Verificar si el DNI contiene solo dígitos
+    if (!/^\d+$/.test(dni)) {
+        return {
+            valido: false,
+            mensaje: "El DNI debe contener solo números"
+        };
+    }
+
+    // Verificar longitud (entre 7 y 8 caracteres)
+    if (dni.length < 7 || dni.length > 8) {
+        return {
+            valido: false,
+            mensaje: "El DNI debe tener entre 7 y 8 caracteres"
+        };
+    }
+
+    // Verificar que el número sea positivo
+    if (parseInt(dni) <= 0) {
+        return {
+            valido: false,
+            mensaje: "El DNI debe ser un número positivo"
+        };
+    }
+
+    // Si todas las validaciones pasan
+    return {
+        valido: true,
+        mensaje: "DNI válido"
+    };
+}
+
+// 🔹 Agregar cliente (modificar este bloque existente)
+document.getElementById("clienteForm").addEventListener("submit", (e) => {
     e.preventDefault();
     const nombre = document.getElementById("nombre").value;
     const direccion = document.getElementById("direccion").value;
     const telefono = document.getElementById("telefono").value;
     const dni = document.getElementById("dni").value;
 
+    // Validar DNI antes de agregar
+    const validacionDNI = validarDNI(dni);
+
+    if (!validacionDNI.valido) {
+        // Mostrar mensaje de error si el DNI no es válido
+        alert(validacionDNI.mensaje);
+        return;
+    }
+
     const clientesRef = db.ref('clientes');
-    clientesRef.push({ nombre, direccion, telefono, dni })
+    const newClienteRef = clientesRef.push();
+    newClienteRef.set({ nombre, direccion, telefono, dni })
         .then(() => {
             alert("Cliente agregado");
-            clienteForm.reset();
             cargarClientes();
         })
-        .catch((error) => {
-            console.error("Error al agregar cliente:", error);
-            alert("Error al agregar cliente: " + error.message);
-        });
+        .catch((error) => alert("Error: " + error.message));
 });
 
 // Cargar clientes
