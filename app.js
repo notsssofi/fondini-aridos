@@ -135,24 +135,39 @@ btnNuevoRegistro.addEventListener("click", () => {
     pedidosLista.classList.add("hidden");
 });
 
-// Agregar cliente
+// Agregar cliente con validación de DNI
 clienteForm.addEventListener("submit", (e) => {
     e.preventDefault();
     const nombre = document.getElementById("nombre").value;
     const direccion = document.getElementById("direccion").value;
     const telefono = document.getElementById("telefono").value;
-    const dni = document.getElementById("dni").value;
+    const dni = document.getElementById("dni").value.trim();
 
+    // Validación básica del DNI
+    if (!/^\d{7,8}$/.test(dni)) {
+        alert("El DNI debe tener entre 7 y 8 dígitos numéricos");
+        return;
+    }
+
+    // Verificar si el DNI ya existe
     const clientesRef = db.ref('clientes');
-    clientesRef.push({ nombre, direccion, telefono, dni })
+    clientesRef.orderByChild('dni').equalTo(dni).once('value')
+        .then((snapshot) => {
+            if (snapshot.exists()) {
+                throw new Error("Ya existe un cliente con este DNI");
+            }
+            
+            // Si no existe, agregar el nuevo cliente
+            return clientesRef.push({ nombre, direccion, telefono, dni });
+        })
         .then(() => {
-            alert("Cliente agregado");
+            alert("Cliente agregado correctamente");
             clienteForm.reset();
             cargarClientes();
         })
         .catch((error) => {
             console.error("Error al agregar cliente:", error);
-            alert("Error al agregar cliente: " + error.message);
+            alert(error.message);
         });
 });
 
