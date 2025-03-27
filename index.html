@@ -13,6 +13,26 @@
     
     <section id="dashboard">
         <h2>Gestión de Clientes y Pedidos</h2>
+        <section id="login">
+        <h2>Iniciar Sesión</h2>
+        <form id="loginForm">
+            <input type="email" id="correoLogin" placeholder="Correo Electrónico" required>
+            <input type="password" id="password" placeholder="Contraseña" required>
+            <button type="submit">Ingresar</button>
+        </form>
+        <p><a href="#" id="crearCuentaLink">Crear cuenta</a></p>
+    </section>
+    
+    <section id="registro" style="display: none;">
+        <h2>Crear Cuenta</h2>
+        <form id="registroForm">
+            <input type="text" id="nombreCompleto" placeholder="Nombre Completo" required>
+            <input type="email" id="correo" placeholder="Correo Electrónico" required>
+            <input type="password" id="nuevaPassword" placeholder="Contraseña" required>
+            <button type="submit">Registrarse</button>
+        </form>
+        <p><a href="#" id="volverLogin">Volver al inicio de sesión</a></p>
+    </section>
         <div class="buttons-container">
             <button id="mostrarClientes">Clientes</button>
             <button id="mostrarPedidos">Pedidos</button>
