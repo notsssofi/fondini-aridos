@@ -1,135 +1,138 @@
-// 🔹 Inicializar Firebase (Usar firebase.initializeApp en compat)
-const firebaseConfig = {
-  apiKey: "AIzaSyAHTfYQXgWb3l5DqCar3ooOv2yzzsww9Ek",
-  authDomain: "bd-fondini-aridos.firebaseapp.com",
-  databaseURL: "https://bd-fondini-aridos-default-rtdb.firebaseio.com",
-  projectId: "bd-fondini-aridos",
-  storageBucket: "bd-fondini-aridos.firebasestorage.app",
-  messagingSenderId: "1038135881192",
-  appId: "1:1038135881192:web:215908840951025da9485d"
-};
+// Asegurar que el script se ejecuta después de que el DOM esté completamente cargado
+document.addEventListener("DOMContentLoaded", function () {
+    console.log("DOM cargado");
 
-// Inicializar Firebase
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const db = firebase.database();
+    // Inicializar Firebase
+    const firebaseConfig = {
+        apiKey: "AIzaSyAHTfYQXgWb3l5DqCar3ooOv2yzzsww9Ek",
+        authDomain: "bd-fondini-aridos.firebaseapp.com",
+        databaseURL: "https://bd-fondini-aridos-default-rtdb.firebaseio.com",
+        projectId: "bd-fondini-aridos",
+        storageBucket: "bd-fondini-aridos.firebasestorage.app",
+        messagingSenderId: "1038135881192",
+        appId: "1:1038135881192:web:215908840951025da9485d"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.database();
 
-// Selección de elementos del DOM
-const loginSection = document.getElementById("login");
-const registroSection = document.getElementById("registro");
-const dashboardSection = document.getElementById("dashboard");
-const listaClientes = document.getElementById("listaClientes");
-const listaPedidos = document.getElementById("listaPedidos");
-const registroContainer = document.getElementById("registroContainer");
+    // 🔹 Seleccionar elementos asegurando que existen
+    const dashboardSection = document.getElementById("dashboard");
+    const listaClientes = document.getElementById("listaClientes");
+    const listaPedidos = document.getElementById("listaPedidos");
+    const registroContainer = document.getElementById("registroContainer");
+    const clienteForm = document.getElementById("clienteForm");
+    const pedidoForm = document.getElementById("pedidoForm");
 
-// 🔹 Manejar estado de sesión
-auth.onAuthStateChanged((user) => {
-  if (user) {
-    loginSection.style.display = "none";
-    registroSection.style.display = "none";
-    dashboardSection.style.display = "block";
-    cargarClientes();
-  } else {
-    loginSection.style.display = "block";
-    registroSection.style.display = "none";
-    dashboardSection.style.display = "none";
-  }
-});
+    const btnMostrarClientes = document.getElementById("mostrarClientes");
+    const btnMostrarPedidos = document.getElementById("mostrarPedidos");
+    const btnNuevoRegistro = document.getElementById("nuevoRegistroBtn");
+    const btnLogout = document.getElementById("logoutBtn");
 
-// 🔹 Registrar usuario
-document.getElementById("registroForm").addEventListener("submit", (e) => {
-  e.preventDefault();
-  const nombre = document.getElementById("nombreCompleto").value;
-  const email = document.getElementById("correo").value;
-  const password = document.getElementById("nuevaPassword").value;
-
-  auth.createUserWithEmailAndPassword(email, password)
-    .then((userCredential) => {
-      return db.ref('users/' + userCredential.user.uid).set({ nombre, email });
-    })
-    .then(() => {
-      alert("Cuenta creada con éxito");
-    })
-    .catch((error) => alert(error.message));
-});
-
-// 🔹 Iniciar sesión
-document.getElementById("loginForm").addEventListener("submit", (e) => {
-  e.preventDefault();
-  const email = document.getElementById("correoLogin").value;
-  const password = document.getElementById("password").value;
-
-  auth.signInWithEmailAndPassword(email, password)
-    .then(() => console.log("Sesión iniciada"))
-    .catch((error) => alert("Error: " + error.message));
-});
-
-// 🔹 Cerrar sesión
-document.getElementById("logoutBtn").addEventListener("click", () => {
-  auth.signOut();
-});
-
-// 🔹 Alternar entre login y registro
-document.getElementById("crearCuentaLink").addEventListener("click", () => {
-  loginSection.style.display = "none";
-  registroSection.style.display = "block";
-});
-document.getElementById("volverLogin").addEventListener("click", () => {
-  registroSection.style.display = "none";
-  loginSection.style.display = "block";
-});
-// 🔹 Agregar cliente
-clienteForm.addEventListener("submit", (e) => {
-  e.preventDefault();
-  const nombre = document.getElementById("nombre").value;
-  const direccion = document.getElementById("direccion").value;
-  const telefono = document.getElementById("telefono").value;
-  const dni = document.getElementById("dni").value;
-
-  db.ref("clientes").push({ nombre, direccion, telefono, dni })
-    .then(() => alert("Cliente agregado"))
-    .catch((error) => alert("Error: " + error.message));
-});
-
-// 🔹 Agregar pedido
-pedidoForm.addEventListener("submit", (e) => {
-  e.preventDefault();
-  const clientePedido = document.getElementById("clientePedido").value;
-  const producto = document.getElementById("producto").value;
-  const estado = document.getElementById("estado").value;
-
-  db.ref(`pedidos/${clientePedido}`).push({ producto, estado, fecha: new Date().toISOString() })
-    .then(() => alert("Pedido agregado"))
-    .catch((error) => alert("Error: " + error.message));
-});
-
-// 🔹 Mostrar clientes al presionar botón
-btnMostrarClientes.addEventListener("click", () => {
-  db.ref("clientes").once("value", (snapshot) => {
-    listaClientes.innerHTML = "";
-    const data = snapshot.val();
-    if (data) {
-      Object.entries(data).forEach(([id, cliente]) => {
-        const li = document.createElement("li");
-        li.innerHTML = `<strong>${cliente.nombre}</strong> - ${cliente.direccion} - ${cliente.telefono}`;
-        listaClientes.appendChild(li);
-      });
+    // 🔹 Verificar si los botones existen antes de asignar eventos
+    if (btnMostrarClientes) {
+        btnMostrarClientes.addEventListener("click", () => {
+            console.log("Botón 'Mostrar Clientes' presionado");
+            cargarClientes();
+        });
     }
-  });
-});
 
-// 🔹 Mostrar pedidos al presionar botón
-btnMostrarPedidos.addEventListener("click", () => {
-  const clienteId = document.getElementById("clientePedido").value;
-  db.ref(`pedidos/${clienteId}`).once("value", (snapshot) => {
-    listaPedidos.innerHTML = "";
-    const data = snapshot.val();
-    if (data) {
-      Object.entries(data).forEach(([id, pedido]) => {
-        const li = document.createElement("li");
-        li.innerHTML = `<strong>${pedido.producto}</strong> - ${pedido.estado} - ${new Date(pedido.fecha).toLocaleDateString()}`;
-        listaPedidos.appendChild(li);
-      });
+    if (btnMostrarPedidos) {
+        btnMostrarPedidos.addEventListener("click", () => {
+            console.log("Botón 'Mostrar Pedidos' presionado");
+            cargarPedidos();
+        });
     }
-  });
+
+    if (btnNuevoRegistro) {
+        btnNuevoRegistro.addEventListener("click", () => {
+            registroContainer.classList.toggle("hidden");
+        });
+    }
+
+    if (btnLogout) {
+        btnLogout.addEventListener("click", () => {
+            auth.signOut().then(() => {
+                console.log("Sesión cerrada");
+            });
+        });
+    }
+
+    // 🔹 Función para cargar clientes desde Firebase
+    function cargarClientes() {
+        listaClientes.innerHTML = "";
+        db.ref("clientes").once("value", (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                Object.values(data).forEach((cliente) => {
+                    const row = `<tr>
+                        <td>${cliente.nombre}</td>
+                        <td>${cliente.direccion}</td>
+                        <td>${cliente.telefono}</td>
+                        <td>${cliente.dni}</td>
+                    </tr>`;
+                    listaClientes.innerHTML += row;
+                });
+            } else {
+                listaClientes.innerHTML = "<tr><td colspan='4'>No hay clientes registrados</td></tr>";
+            }
+        });
+    }
+
+    // 🔹 Función para cargar pedidos desde Firebase
+    function cargarPedidos() {
+        listaPedidos.innerHTML = "";
+        db.ref("pedidos").once("value", (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                Object.values(data).forEach((pedido) => {
+                    const row = `<tr>
+                        <td>${pedido.cliente}</td>
+                        <td>${pedido.producto}</td>
+                        <td>${pedido.estado}</td>
+                    </tr>`;
+                    listaPedidos.innerHTML += row;
+                });
+            } else {
+                listaPedidos.innerHTML = "<tr><td colspan='3'>No hay pedidos registrados</td></tr>";
+            }
+        });
+    }
+
+    // 🔹 Registrar cliente
+    if (clienteForm) {
+        clienteForm.addEventListener("submit", (e) => {
+            e.preventDefault();
+            const nombre = document.getElementById("nombre").value;
+            const direccion = document.getElementById("direccion").value;
+            const telefono = document.getElementById("telefono").value;
+            const dni = document.getElementById("dni").value;
+
+            db.ref("clientes").push({ nombre, direccion, telefono, dni })
+                .then(() => {
+                    alert("Cliente agregado");
+                    clienteForm.reset();
+                    cargarClientes();
+                })
+                .catch((error) => alert("Error: " + error.message));
+        });
+    }
+
+    // 🔹 Registrar pedido
+    if (pedidoForm) {
+        pedidoForm.addEventListener("submit", (e) => {
+            e.preventDefault();
+            const clientePedido = document.getElementById("clientePedido").value;
+            const producto = document.getElementById("producto").value;
+            const estado = document.getElementById("estado").value;
+
+            db.ref("pedidos").push({ cliente: clientePedido, producto, estado })
+                .then(() => {
+                    alert("Pedido agregado");
+                    pedidoForm.reset();
+                    cargarPedidos();
+                })
+                .catch((error) => alert("Error: " + error.message));
+        });
+    }
 });
