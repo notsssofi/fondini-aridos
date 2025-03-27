@@ -1,4 +1,3 @@
-/* Estilos generales */
 * {
     margin: 0;
     padding: 0;
@@ -10,15 +9,12 @@ body {
     background: url('excavadora.jpg') no-repeat center center fixed;
     background-size: cover;
     display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
     flex-direction: column;
+    align-items: center;
     padding: 20px;
     position: relative;
 }
 
-/* Capa oscura */
 body::before {
     content: "";
     position: absolute;
@@ -30,49 +26,31 @@ body::before {
     z-index: -1;
 }
 
-/* Contenedor */
-.container {
-    background: rgba(255, 255, 255, 0.1);
-    padding: 40px;
-    border-radius: 10px;
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
-    text-align: center;
-    width: 420px;
-}
-
-/* Títulos */
-h1 {
+header h1 {
     color: white;
-    font-size: 55px; /* Aumenté el tamaño del título */
+    font-size: 48px;
     font-weight: bold;
-    margin-bottom: 10px;
-}
-
-h2 {
-    color: white;
-    font-size: 30px; /* Aumenté el tamaño */
     margin-bottom: 20px;
 }
 
-/* Campos de entrada */
-input {
-    width: 100%;
-    padding: 14px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    font-size: 18px;
-    margin-bottom: 15px;
+h2, h3 {
+    color: white;
+    text-align: center;
 }
 
-/* Botón */
+.buttons-container {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
 button {
-    width: 100%;
     background-color: #ff7043;
     color: white;
-    padding: 14px;
+    padding: 12px 20px;
     border: none;
     border-radius: 5px;
-    font-size: 18px;
+    font-size: 16px;
     cursor: pointer;
     transition: background 0.3s;
 }
@@ -81,15 +59,36 @@ button:hover {
     background-color: #e64a19;
 }
 
-/* Link de crear cuenta */
-a {
-    color: #fff;
-    font-size: 16px;
-    text-decoration: none;
-    display: block;
-    margin-top: 15px;
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 20px 0;
 }
 
-a:hover {
-    text-decoration: underline;
+input {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.hidden {
+    display: none;
+}
+
+table {
+    width: 100%;
+    margin-top: 10px;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 10px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+th {
+    background-color: #ff7043;
+    color: white;
 }
