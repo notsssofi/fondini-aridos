@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Áridos Fondini - Gestión de Clientes y Pedidos</title>
+    <link rel="icon" href="data:,">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -11,28 +12,8 @@
         <h1>Áridos Fondini</h1>
     </header>
     
-    <section id="dashboard">
+    <section id="dashboard" class="hidden">
         <h2>Gestión de Clientes y Pedidos</h2>
-        <section id="login">
-        <h2>Iniciar Sesión</h2>
-        <form id="loginForm">
-            <input type="email" id="correoLogin" placeholder="Correo Electrónico" required>
-            <input type="password" id="password" placeholder="Contraseña" required>
-            <button type="submit">Ingresar</button>
-        </form>
-        <p><a href="#" id="crearCuentaLink">Crear cuenta</a></p>
-    </section>
-    
-    <section id="registro" style="display: none;">
-        <h2>Crear Cuenta</h2>
-        <form id="registroForm">
-            <input type="text" id="nombreCompleto" placeholder="Nombre Completo" required>
-            <input type="email" id="correo" placeholder="Correo Electrónico" required>
-            <input type="password" id="nuevaPassword" placeholder="Contraseña" required>
-            <button type="submit">Registrarse</button>
-        </form>
-        <p><a href="#" id="volverLogin">Volver al inicio de sesión</a></p>
-    </section>
         <div class="buttons-container">
             <button id="mostrarClientes">Clientes</button>
             <button id="mostrarPedidos">Pedidos</button>
@@ -68,6 +49,7 @@
                         <th>Dirección</th>
                         <th>Teléfono</th>
                         <th>DNI</th>
+                        <th>Acciones</th>
                     </tr>
                 </thead>
                 <tbody id="listaClientes"></tbody>
@@ -82,6 +64,7 @@
                         <th>Cliente</th>
                         <th>Producto</th>
                         <th>Estado</th>
+                        <th>Fecha</th>
                     </tr>
                 </thead>
                 <tbody id="listaPedidos"></tbody>
@@ -89,14 +72,33 @@
         </div>
     </section>
 
-    <!-- Firebase SDK (Versión Compat) -->
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+    <section id="login">
+        <h2>Iniciar Sesión</h2>
+        <form id="loginForm">
+            <input type="email" id="correoLogin" placeholder="Correo Electrónico" required>
+            <input type="password" id="password" placeholder="Contraseña" required>
+            <button type="submit">Ingresar</button>
+        </form>
+        <p><a href="#" id="crearCuentaLink">Crear cuenta</a></p>
+    </section>
+    
+    <section id="registro" class="hidden">
+        <h2>Crear Cuenta</h2>
+        <form id="registroForm">
+            <input type="text" id="nombreCompleto" placeholder="Nombre Completo" required>
+            <input type="email" id="correo" placeholder="Correo Electrónico" required>
+            <input type="password" id="nuevaPassword" placeholder="Contraseña" required>
+            <button type="submit">Registrarse</button>
+        </form>
+        <p><a href="#" id="volverLogin">Volver al inicio de sesión</a></p>
+    </section>
 
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
     
     <!-- Script Principal -->
-    <script src="app.js" defer></script>
-
+    <script src="app.js"></script>
 </body>
 </html>
