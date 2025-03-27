@@ -128,13 +128,3 @@ section {
     max-width: 1200px;
     margin: 20px auto;
 }
-
-#dni.invalid {
-    border-color: red;
-    background-color: #ffeeee;
-}
-
-#dni.valid {
-    border-color: green;
-    background-color: #eeffee;
-}
