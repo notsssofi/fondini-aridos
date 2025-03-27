@@ -234,7 +234,7 @@ pedidoForm.addEventListener("submit", (e) => {
         return;
     }
 
-    const pedidosRef = db.ref(pedidos/${clienteId});  // <-- Usar backticks aquí
+    const pedidosRef = db.ref(`pedidos/${clienteId}`);  // <-- Usar backticks aquí
     pedidosRef.push({ 
         producto, 
         estado, 
@@ -253,7 +253,7 @@ pedidoForm.addEventListener("submit", (e) => {
 
 // Cargar pedidos de un cliente específico - CORRECCIÓN
 window.cargarPedidosCliente = function(clienteId) {
-    const pedidosRef = db.ref(pedidos/${clienteId});  // <-- Usar backticks aquí
+    const pedidosRef = db.ref(`pedidos/${clienteId}`);  // <-- Usar backticks aquí
     pedidosRef.on("value", (snapshot) => {
         listaPedidos.innerHTML = "";
         const data = snapshot.val();
