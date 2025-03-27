@@ -251,72 +251,62 @@ pedidoForm.addEventListener("submit", (e) => {
     });
 });
 
-// Cargar pedidos de un cliente específico con validación
-window.cargarPedidosCliente = async function(clienteId) {
+// Agregar pedido con validación completa
+pedidoForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    
+    const clienteId = document.getElementById("clientePedido").value.trim();
+    const producto = document.getElementById("producto").value.trim();
+    const estado = document.getElementById("estado").value.trim();
+    
+    // Validar campos requeridos
+    if (!clienteId || !producto || !estado) {
+        alert("Todos los campos son obligatorios");
+        return;
+    }
+
     // Mostrar estado de carga
-    const originalText = btnMostrarPedidos.textContent;
-    btnMostrarPedidos.disabled = true;
-    btnMostrarPedidos.textContent = "Cargando...";
+    const submitBtn = pedidoForm.querySelector('button[type="submit"]');
+    const originalText = submitBtn.textContent;
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Validando...";
 
     try {
-        // Primero verificar si el cliente existe
+        // 1. Verificar si el cliente existe
         const clienteSnapshot = await db.ref(`clientes/${clienteId}`).once('value');
-        
         if (!clienteSnapshot.exists()) {
-            throw new Error(`El cliente con ID ${clienteId} no existe`);
+            throw new Error(`El cliente con ID ${clienteId} no existe. Registre al cliente primero.`);
         }
 
-        // Obtener datos del cliente para mostrar en la tabla
+        // 2. Obtener datos del cliente
         const cliente = clienteSnapshot.val();
-        const nombreCliente = cliente.nombre || 'Cliente desconocido';
-
-        // Ahora cargar los pedidos
+        
+        // 3. Crear el pedido solo si el cliente existe
         const pedidosRef = db.ref(`pedidos/${clienteId}`);
-        pedidosRef.on("value", (snapshot) => {
-            listaPedidos.innerHTML = "";
-            const data = snapshot.val();
-            
-            if (data) {
-                Object.values(data).forEach((pedido) => {
-                    const tr = document.createElement("tr");
-                    tr.innerHTML = `
-                        <td>${nombreCliente}</td>
-                        <td>${pedido.producto || ''}</td>
-                        <td>${pedido.estado || ''}</td>
-                        <td>${new Date(pedido.fecha).toLocaleString() || ''}</td>
-                    `;
-                    listaPedidos.appendChild(tr);
-                });
-            } else {
-                // Mostrar mensaje si no hay pedidos
-                const tr = document.createElement("tr");
-                tr.innerHTML = `
-                    <td colspan="4" style="text-align: center;">
-                        ${nombreCliente} no tiene pedidos registrados
-                    </td>
-                `;
-                listaPedidos.appendChild(tr);
-            }
-            
-            pedidosLista.classList.remove("hidden");
-            clientesLista.classList.add("hidden");
-            registroContainer.classList.add("hidden");
+        await pedidosRef.push({ 
+            producto, 
+            estado, 
+            fecha: new Date().toISOString(),
+            clienteNombre: cliente.nombre // Guardamos el nombre por referencia
         });
+        
+        alert(`Pedido creado exitosamente para ${cliente.nombre}`);
+        pedidoForm.reset();
+        cargarPedidosCliente(clienteId);
 
     } catch (error) {
-        console.error("Error al cargar pedidos:", error);
+        console.error("Error al crear pedido:", error);
         alert(error.message);
         
-        // Volver a mostrar la lista de clientes
+        // Mostrar la lista de clientes para que puedan registrar uno nuevo
         clientesLista.classList.remove("hidden");
         pedidosLista.classList.add("hidden");
         
     } finally {
-        // Restaurar el botón
-        btnMostrarPedidos.disabled = false;
-        btnMostrarPedidos.textContent = originalText;
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
     }
-};
+});
 // Cargar todos los pedidos (versión simplificada)
 function cargarPedidos() {
     const pedidosRef = db.ref('pedidos');
