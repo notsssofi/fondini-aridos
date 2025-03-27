@@ -14,36 +14,32 @@
     <section id="dashboard">
         <h2>Gestión de Clientes y Pedidos</h2>
         <div class="buttons-container">
-            <button id="mostrarClientes">Mostrar Clientes</button>
-            <button id="mostrarPedidos">Mostrar Pedidos</button>
-            <button id="nuevoRegistroBtn">Nuevo Cliente/Pedido</button>
+            <button id="mostrarClientes">Clientes</button>
+            <button id="mostrarPedidos">Pedidos</button>
+            <button id="nuevoRegistroBtn">Nuevo Registro</button>
             <button id="logoutBtn">Cerrar Sesión</button>
         </div>
         
-        <div id="registroContainer" style="display: none;">
-            <section id="clientes">
-                <h3>Registrar Cliente</h3>
-                <form id="clienteForm">
-                    <input type="text" id="nombre" placeholder="Nombre" required>
-                    <input type="text" id="direccion" placeholder="Dirección" required>
-                    <input type="text" id="telefono" placeholder="Teléfono" required>
-                    <input type="text" id="dni" placeholder="DNI" required>
-                    <button type="submit">Agregar Cliente</button>
-                </form>
-            </section>
+        <div id="registroContainer" class="hidden">
+            <h3>Registrar Cliente</h3>
+            <form id="clienteForm">
+                <input type="text" id="nombre" placeholder="Nombre" required>
+                <input type="text" id="direccion" placeholder="Dirección" required>
+                <input type="text" id="telefono" placeholder="Teléfono" required>
+                <input type="text" id="dni" placeholder="DNI" required>
+                <button type="submit">Agregar Cliente</button>
+            </form>
             
-            <section id="pedidos">
-                <h3>Registrar Pedido</h3>
-                <form id="pedidoForm">
-                    <input type="text" id="clientePedido" placeholder="Cliente" required>
-                    <input type="text" id="producto" placeholder="Producto" required>
-                    <input type="text" id="estado" placeholder="Estado" required>
-                    <button type="submit">Agregar Pedido</button>
-                </form>
-            </section>
+            <h3>Registrar Pedido</h3>
+            <form id="pedidoForm">
+                <input type="text" id="clientePedido" placeholder="Cliente" required>
+                <input type="text" id="producto" placeholder="Producto" required>
+                <input type="text" id="estado" placeholder="Estado" required>
+                <button type="submit">Agregar Pedido</button>
+            </form>
         </div>
         
-        <div id="clientesLista" style="display: none;">
+        <div id="clientesLista" class="hidden">
             <h3>Clientes</h3>
             <table>
                 <thead>
@@ -58,7 +54,7 @@
             </table>
         </div>
         
-        <div id="pedidosLista" style="display: none;">
+        <div id="pedidosLista" class="hidden">
             <h3>Pedidos</h3>
             <table>
                 <thead>
@@ -73,6 +69,14 @@
         </div>
     </section>
 
+    <!-- Firebase SDK (Versión Compat) -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+
+    
+    <!-- Script Principal -->
     <script src="app.js" defer></script>
+
 </body>
 </html>
