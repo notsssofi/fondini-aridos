@@ -11,35 +11,18 @@
         <h1>Áridos Fondini</h1>
     </header>
     
-    <section id="login">
-        <h2>Iniciar Sesión</h2>
-        <form id="loginForm">
-            <input type="email" id="correoLogin" placeholder="Correo Electrónico" required>
-            <input type="password" id="password" placeholder="Contraseña" required>
-            <button type="submit">Ingresar</button>
-        </form>
-        <p><a href="#" id="crearCuentaLink">Crear cuenta</a></p>
-    </section>
-    
-    <section id="registro" style="display: none;">
-        <h2>Crear Cuenta</h2>
-        <form id="registroForm">
-            <input type="text" id="nombreCompleto" placeholder="Nombre Completo" required>
-            <input type="email" id="correo" placeholder="Correo Electrónico" required>
-            <input type="password" id="nuevaPassword" placeholder="Contraseña" required>
-            <button type="submit">Registrarse</button>
-        </form>
-        <p><a href="#" id="volverLogin">Volver al inicio de sesión</a></p>
-    </section>
-
-    <section id="dashboard" style="display: none;">
+    <section id="dashboard">
         <h2>Gestión de Clientes y Pedidos</h2>
-        <button id="nuevoRegistroBtn">Nuevo Cliente/Pedido</button>
-        <button id="logoutBtn">Cerrar Sesión</button>
+        <div class="buttons-container">
+            <button id="mostrarClientes">Mostrar Clientes</button>
+            <button id="mostrarPedidos">Mostrar Pedidos</button>
+            <button id="nuevoRegistroBtn">Nuevo Cliente/Pedido</button>
+            <button id="logoutBtn">Cerrar Sesión</button>
+        </div>
         
         <div id="registroContainer" style="display: none;">
             <section id="clientes">
-                <h2>Clientes</h2>
+                <h3>Registrar Cliente</h3>
                 <form id="clienteForm">
                     <input type="text" id="nombre" placeholder="Nombre" required>
                     <input type="text" id="direccion" placeholder="Dirección" required>
@@ -47,30 +30,49 @@
                     <input type="text" id="dni" placeholder="DNI" required>
                     <button type="submit">Agregar Cliente</button>
                 </form>
-                <ul id="listaClientes"></ul>
             </section>
             
             <section id="pedidos">
-                <h2>Pedidos</h2>
+                <h3>Registrar Pedido</h3>
                 <form id="pedidoForm">
                     <input type="text" id="clientePedido" placeholder="Cliente" required>
                     <input type="text" id="producto" placeholder="Producto" required>
                     <input type="text" id="estado" placeholder="Estado" required>
                     <button type="submit">Agregar Pedido</button>
                 </form>
-                <ul id="listaPedidos"></ul>
             </section>
+        </div>
+        
+        <div id="clientesLista" style="display: none;">
+            <h3>Clientes</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Dirección</th>
+                        <th>Teléfono</th>
+                        <th>DNI</th>
+                    </tr>
+                </thead>
+                <tbody id="listaClientes"></tbody>
+            </table>
+        </div>
+        
+        <div id="pedidosLista" style="display: none;">
+            <h3>Pedidos</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Cliente</th>
+                        <th>Producto</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody id="listaPedidos"></tbody>
+            </table>
         </div>
     </section>
 
-    <!-- Firebase SDK (Versión Compat) -->
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
-
-    
-    <!-- Script Principal -->
     <script src="app.js" defer></script>
-
 </body>
 </html>
