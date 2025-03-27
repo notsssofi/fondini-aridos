@@ -78,63 +78,50 @@ document.getElementById("volverLogin").addEventListener("click", () => {
   registroSection.style.display = "none";
   loginSection.style.display = "block";
 });
-
 // 🔹 Agregar cliente
-document.getElementById("clienteForm").addEventListener("submit", (e) => {
+clienteForm.addEventListener("submit", (e) => {
   e.preventDefault();
   const nombre = document.getElementById("nombre").value;
   const direccion = document.getElementById("direccion").value;
   const telefono = document.getElementById("telefono").value;
   const dni = document.getElementById("dni").value;
 
-  const clientesRef = db.ref('clientes');
-  const newClienteRef = clientesRef.push();
-  newClienteRef.set({ nombre, direccion, telefono, dni })
-    .then(() => {
-      alert("Cliente agregado");
-      cargarClientes();
-    })
+  db.ref("clientes").push({ nombre, direccion, telefono, dni })
+    .then(() => alert("Cliente agregado"))
     .catch((error) => alert("Error: " + error.message));
 });
 
-// 🔹 Cargar clientes en la lista
-function cargarClientes() {
-  const clientesRef = db.ref('clientes');
-  clientesRef.on("value", (snapshot) => {
-    listaClientes.innerHTML = "";
-    const data = snapshot.val();
-    if (data) {
-      Object.entries(data).forEach(([id, cliente]) => {
-        const li = document.createElement("li");
-        li.innerHTML = `<strong>${cliente.nombre}</strong> - ${cliente.direccion} - ${cliente.telefono} 
-                        <button onclick="cargarPedidos('${id}')">Ver Pedidos</button>`;
-        listaClientes.appendChild(li);
-      });
-    }
-  });
-}
-
 // 🔹 Agregar pedido
-document.getElementById("pedidoForm").addEventListener("submit", (e) => {
+pedidoForm.addEventListener("submit", (e) => {
   e.preventDefault();
   const clientePedido = document.getElementById("clientePedido").value;
   const producto = document.getElementById("producto").value;
   const estado = document.getElementById("estado").value;
 
-  const pedidosRef = db.ref(`pedidos/${clientePedido}`);
-  const newPedidoRef = pedidosRef.push();
-  newPedidoRef.set({ producto, estado, fecha: new Date().toISOString() })
-    .then(() => {
-      alert("Pedido agregado");
-      cargarPedidos(clientePedido);
-    })
+  db.ref(`pedidos/${clientePedido}`).push({ producto, estado, fecha: new Date().toISOString() })
+    .then(() => alert("Pedido agregado"))
     .catch((error) => alert("Error: " + error.message));
 });
 
-// 🔹 Cargar pedidos en la lista
-function cargarPedidos(clienteId) {
-  const pedidosRef = db.ref(`pedidos/${clienteId}`);
-  pedidosRef.on("value", (snapshot) => {
+// 🔹 Mostrar clientes al presionar botón
+btnMostrarClientes.addEventListener("click", () => {
+  db.ref("clientes").once("value", (snapshot) => {
+    listaClientes.innerHTML = "";
+    const data = snapshot.val();
+    if (data) {
+      Object.entries(data).forEach(([id, cliente]) => {
+        const li = document.createElement("li");
+        li.innerHTML = `<strong>${cliente.nombre}</strong> - ${cliente.direccion} - ${cliente.telefono}`;
+        listaClientes.appendChild(li);
+      });
+    }
+  });
+});
+
+// 🔹 Mostrar pedidos al presionar botón
+btnMostrarPedidos.addEventListener("click", () => {
+  const clienteId = document.getElementById("clientePedido").value;
+  db.ref(`pedidos/${clienteId}`).once("value", (snapshot) => {
     listaPedidos.innerHTML = "";
     const data = snapshot.val();
     if (data) {
@@ -145,9 +132,4 @@ function cargarPedidos(clienteId) {
       });
     }
   });
-}
-
-// 🔹 Mostrar formulario de nuevo cliente/pedido
-document.getElementById("nuevoRegistroBtn").addEventListener("click", () => {
-  registroContainer.style.display = (registroContainer.style.display === "none") ? "block" : "none";
 });
