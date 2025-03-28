@@ -128,3 +128,25 @@ section {
     max-width: 1200px;
     margin: 20px auto;
 }
+
+/* Agregar esto a tu archivo styles.css */
+.cliente-header {
+    background-color: #ff7043;
+    color: white;
+    font-weight: bold;
+}
+
+.cliente-header td {
+    padding: 15px;
+    text-align: center;
+}
+
+table {
+    width: 100%;
+    table-layout: fixed; /* Para columnas de ancho consistente */
+}
+
+th:nth-child(1), td:nth-child(1) { width: 20%; } /* DNI */
+th:nth-child(2), td:nth-child(2) { width: 30%; } /* Producto */
+th:nth-child(3), td:nth-child(3) { width: 20%; } /* Cantidad */
+th:nth-child(4), td:nth-child(4) { width: 30%; } /* Fecha */
