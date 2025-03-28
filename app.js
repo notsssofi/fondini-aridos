@@ -251,30 +251,85 @@ pedidoForm.addEventListener("submit", (e) => {
     });
 });
 
-// Cargar pedidos de un cliente específico - CORRECCIÓN
-window.cargarPedidosCliente = function(clienteId) {
-    const pedidosRef = db.ref(`pedidos/${clienteId}`);  // <-- Usar backticks aquí
-    pedidosRef.on("value", (snapshot) => {
-        listaPedidos.innerHTML = "";
-        const data = snapshot.val();
-        
-        if (data) {
-            Object.values(data).forEach((pedido) => {
-                const tr = document.createElement("tr");
-                tr.innerHTML = `
-                    <td>${clienteId}</td>
-                    <td>${pedido.producto || ''}</td>
-                    <td>${pedido.estado || ''}</td>
-                    <td>${new Date(pedido.fecha).toLocaleString() || ''}</td>
-                `;
-                listaPedidos.appendChild(tr);
-            });
+// Cargar pedidos de un cliente específico (versión corregida)
+window.cargarPedidosCliente = async function(clienteId) {
+    try {
+        // Mostrar estado de carga
+        const loadingText = "Cargando pedidos...";
+        const originalText = btnMostrarPedidos.textContent;
+        btnMostrarPedidos.disabled = true;
+        btnMostrarPedidos.textContent = loadingText;
+
+        // 1. Verificar que el cliente existe
+        const clienteSnapshot = await db.ref(`clientes/${clienteId}`).once('value');
+        if (!clienteSnapshot.exists()) {
+            throw new Error("El cliente no existe");
         }
+
+        // 2. Obtener datos del cliente
+        const cliente = clienteSnapshot.val();
         
-        pedidosLista.classList.remove("hidden");
-        clientesLista.classList.add("hidden");
-        registroContainer.classList.add("hidden");
-    });
+        // 3. Cargar los pedidos del cliente
+        const pedidosRef = db.ref(`pedidos/${clienteId}`);
+        pedidosRef.on('value', (snapshot) => {
+            listaPedidos.innerHTML = "";
+            
+            // Encabezado con información del cliente
+            const headerRow = document.createElement('tr');
+            headerRow.className = 'cliente-header';
+            headerRow.innerHTML = `
+                <td colspan="4">
+                    <strong>Pedidos de:</strong> ${cliente.nombre} | 
+                    <strong>Tel:</strong> ${cliente.telefono} | 
+                    <strong>DNI:</strong> ${cliente.dni}
+                </td>
+            `;
+            listaPedidos.appendChild(headerRow);
+            
+            // Mostrar los pedidos
+            const pedidos = snapshot.val() || {};
+            
+            if (Object.keys(pedidos).length === 0) {
+                const emptyRow = document.createElement('tr');
+                emptyRow.innerHTML = '<td colspan="4" style="text-align: center;">No hay pedidos registrados</td>';
+                listaPedidos.appendChild(emptyRow);
+            } else {
+                Object.entries(pedidos).forEach(([pedidoId, pedido]) => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${pedido.producto || 'Sin especificar'}</td>
+                        <td>${pedido.estado || 'Pendiente'}</td>
+                        <td>${new Date(pedido.fecha).toLocaleString() || 'Fecha no disponible'}</td>
+                        <td>
+                            <button class="btn-accion" onclick="editarPedido('${clienteId}', '${pedidoId}')">Editar</button>
+                            <button class="btn-accion" onclick="eliminarPedido('${clienteId}', '${pedidoId}')">Eliminar</button>
+                        </td>
+                    `;
+                    listaPedidos.appendChild(tr);
+                });
+            }
+            
+            // Mostrar la sección de pedidos
+            pedidosLista.classList.remove('hidden');
+            clientesLista.classList.add('hidden');
+            registroContainer.classList.add('hidden');
+        });
+
+    } catch (error) {
+        console.error("Error al cargar pedidos:", error);
+        alert(`Error: ${error.message}`);
+        
+        // Volver a mostrar la lista de clientes
+        clientesLista.classList.remove('hidden');
+        pedidosLista.classList.add('hidden');
+        
+    } finally {
+        // Restaurar el botón
+        if (btnMostrarPedidos) {
+            btnMostrarPedidos.disabled = false;
+            btnMostrarPedidos.textContent = originalText;
+        }
+    }
 };
 
 // Cargar todos los pedidos (versión simplificada)
