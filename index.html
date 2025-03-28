@@ -30,15 +30,15 @@
                 <input type="text" id="dni" placeholder="DNI" required>
                 <button type="submit">Agregar Cliente</button>
             </form>
-            
-            <h3>Registrar Pedido</h3>
+
+         <h3>Registrar Pedido</h3>
             <form id="pedidoForm">
-                <input type="text" id="clientePedido" placeholder="Cliente" required>
+                <input type="text" id="clientePedido" placeholder="DNI del Cliente" required 
+                   pattern="\d{7,8}" title="Ingrese 7 u 8 dígitos del DNI" list="dnisAutocomplete">
                 <input type="text" id="producto" placeholder="Producto" required>
                 <input type="text" id="estado" placeholder="Cantidad" required>
                 <button type="submit">Agregar Pedido</button>
             </form>
-        </div>
         
         <div id="clientesLista" class="hidden">
             <h3>Clientes</h3>
