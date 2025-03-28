@@ -1,6 +1,6 @@
 // Configuración e inicialización de Firebase
 const firebaseConfig = {
-    apiKey: "AIzaSyAHTfYQXgWb3l5DqCar3ooOv2yzzsww9Ek",
+    apiKey: "AIzaSyBoOkpUMeYt5KVkP24eDgme2oy_L6xcNoc",
     authDomain: "bd-fondini-aridos.firebaseapp.com",
     databaseURL: "https://bd-fondini-aridos-default-rtdb.firebaseio.com",
     projectId: "bd-fondini-aridos",
