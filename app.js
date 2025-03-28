@@ -301,15 +301,9 @@ pedidoForm.addEventListener("submit", async (e) => {
     }
 });
 
-// Cargar pedidos de un cliente específico (versión corregida)
+// Cargar pedidos de un cliente específico (versión corregida según tus requerimientos)
 window.cargarPedidosCliente = async function(clienteId) {
     try {
-        // Mostrar estado de carga
-        const loadingText = "Cargando pedidos...";
-        const originalText = btnMostrarPedidos.textContent;
-        btnMostrarPedidos.disabled = true;
-        btnMostrarPedidos.textContent = loadingText;
-
         // 1. Verificar que el cliente existe
         const clienteSnapshot = await db.ref(`clientes/${clienteId}`).once('value');
         if (!clienteSnapshot.exists()) {
@@ -324,19 +318,18 @@ window.cargarPedidosCliente = async function(clienteId) {
         pedidosRef.on('value', (snapshot) => {
             listaPedidos.innerHTML = "";
             
-            // Encabezado con información del cliente
+            // Encabezado con información del cliente (sin DNI)
             const headerRow = document.createElement('tr');
             headerRow.className = 'cliente-header';
             headerRow.innerHTML = `
                 <td colspan="4">
                     <strong>Pedidos de:</strong> ${cliente.nombre} | 
-                    <strong>Tel:</strong> ${cliente.telefono} | 
-                    <strong>DNI:</strong> ${cliente.dni}
+                    <strong>Tel:</strong> ${cliente.telefono}
                 </td>
             `;
             listaPedidos.appendChild(headerRow);
             
-            // Mostrar los pedidos
+            // Mostrar los pedidos correctamente alineados
             const pedidos = snapshot.val() || {};
             
             if (Object.keys(pedidos).length === 0) {
@@ -347,13 +340,10 @@ window.cargarPedidosCliente = async function(clienteId) {
                 Object.entries(pedidos).forEach(([pedidoId, pedido]) => {
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
+                        <td>${cliente.dni || ''}</td> <!-- DNI del cliente -->
                         <td>${pedido.producto || 'Sin especificar'}</td>
                         <td>${pedido.estado || 'Pendiente'}</td>
                         <td>${new Date(pedido.fecha).toLocaleString() || 'Fecha no disponible'}</td>
-                        <td>
-                            <button class="btn-accion" onclick="editarPedido('${clienteId}', '${pedidoId}')">Editar</button>
-                            <button class="btn-accion" onclick="eliminarPedido('${clienteId}', '${pedidoId}')">Eliminar</button>
-                        </td>
                     `;
                     listaPedidos.appendChild(tr);
                 });
@@ -372,29 +362,30 @@ window.cargarPedidosCliente = async function(clienteId) {
         // Volver a mostrar la lista de clientes
         clientesLista.classList.remove('hidden');
         pedidosLista.classList.add('hidden');
-        
-    } finally {
-        // Restaurar el botón
-        if (btnMostrarPedidos) {
-            btnMostrarPedidos.disabled = false;
-            btnMostrarPedidos.textContent = originalText;
-        }
     }
 };
 
-// Cargar todos los pedidos (versión simplificada)
+// Cargar todos los pedidos (versión actualizada)
 function cargarPedidos() {
     const pedidosRef = db.ref('pedidos');
-    pedidosRef.on("value", (snapshot) => {
+    pedidosRef.on("value", async (snapshot) => {
         listaPedidos.innerHTML = "";
         const data = snapshot.val();
         
         if (data) {
+            // Primero obtener todos los clientes para mapear IDs a DNIs
+            const clientesSnapshot = await db.ref('clientes').once('value');
+            const clientes = clientesSnapshot.val() || {};
+            
+            // Procesar cada cliente
             Object.entries(data).forEach(([clienteId, pedidos]) => {
+                const cliente = clientes[clienteId] || {};
+                
+                // Procesar cada pedido del cliente
                 Object.values(pedidos).forEach((pedido) => {
                     const tr = document.createElement("tr");
                     tr.innerHTML = `
-                        <td>${clienteId}</td>
+                        <td>${cliente.dni || 'DNI no disponible'}</td>
                         <td>${pedido.producto || ''}</td>
                         <td>${pedido.estado || ''}</td>
                         <td>${new Date(pedido.fecha).toLocaleString() || ''}</td>
@@ -402,6 +393,10 @@ function cargarPedidos() {
                     listaPedidos.appendChild(tr);
                 });
             });
+        } else {
+            const tr = document.createElement("tr");
+            tr.innerHTML = '<td colspan="4" style="text-align: center;">No hay pedidos registrados</td>';
+            listaPedidos.appendChild(tr);
         }
     });
 }
