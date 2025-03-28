@@ -222,33 +222,83 @@ function cargarClientes() {
     });
 }
 
-// Agregar pedido - CORRECCIÓN
-pedidoForm.addEventListener("submit", (e) => {
+// Agregar pedido con validación por DNI
+pedidoForm.addEventListener("submit", async (e) => {
     e.preventDefault();
-    const clienteId = document.getElementById("clientePedido").value;
-    const producto = document.getElementById("producto").value;
-    const estado = document.getElementById("estado").value;
-
-    if (!clienteId) {
-        alert("Por favor, ingrese un ID de cliente válido");
+    
+    const dniCliente = document.getElementById("clientePedido").value.trim();
+    const producto = document.getElementById("producto").value.trim();
+    const estado = document.getElementById("estado").value.trim();
+    
+    // Validar campos requeridos
+    if (!dniCliente || !producto || !estado) {
+        alert("Todos los campos son obligatorios");
         return;
     }
 
-    const pedidosRef = db.ref(`pedidos/${clienteId}`);  // <-- Usar backticks aquí
-    pedidosRef.push({ 
-        producto, 
-        estado, 
-        fecha: new Date().toISOString() 
-    })
-    .then(() => {
-        alert("Pedido agregado");
+    // Validar formato de DNI
+    if (!/^\d{7,8}$/.test(dniCliente)) {
+        alert("El DNI debe contener 7 u 8 dígitos numéricos");
+        return;
+    }
+
+    // Mostrar estado de carga
+    const submitBtn = pedidoForm.querySelector('button[type="submit"]');
+    const originalText = submitBtn.textContent;
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Validando cliente...";
+
+    try {
+        // 1. Buscar cliente por DNI
+        const clientesSnapshot = await db.ref('clientes')
+            .orderByChild('dni')
+            .equalTo(dniCliente)
+            .once('value');
+
+        if (!clientesSnapshot.exists()) {
+            throw new Error(`No existe ningún cliente con DNI ${dniCliente}. Registre al cliente primero.`);
+        }
+
+        // 2. Obtener ID del cliente (tomamos el primero que coincida)
+        let clienteId = null;
+        let clienteNombre = "";
+        
+        clientesSnapshot.forEach((child) => {
+            clienteId = child.key;
+            clienteNombre = child.val().nombre;
+            return true; // Solo tomamos el primer resultado
+        });
+
+        // 3. Crear el pedido
+        submitBtn.textContent = "Creando pedido...";
+        const pedidosRef = db.ref(`pedidos/${clienteId}`);
+        
+        await pedidosRef.push({ 
+            producto, 
+            estado, 
+            fecha: new Date().toISOString(),
+            clienteDNI: dniCliente,
+            clienteNombre: clienteNombre
+        });
+        
+        alert(`Pedido creado exitosamente para ${clienteNombre} (DNI: ${dniCliente})`);
         pedidoForm.reset();
+        
+        // 4. Mostrar los pedidos del cliente
         cargarPedidosCliente(clienteId);
-    })
-    .catch((error) => {
-        console.error("Error al agregar pedido:", error);
-        alert("Error al agregar pedido: " + error.message);
-    });
+
+    } catch (error) {
+        console.error("Error al crear pedido:", error);
+        alert(error.message);
+        
+        // Mostrar la lista de clientes para registro
+        clientesLista.classList.remove("hidden");
+        pedidosLista.classList.add("hidden");
+        
+    } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
+    }
 });
 
 // Cargar pedidos de un cliente específico (versión corregida)
