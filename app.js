@@ -36,6 +36,13 @@ const registroForm = document.getElementById("registroForm");
 const clienteForm = document.getElementById("clienteForm");
 const pedidoForm = document.getElementById("pedidoForm");
 
+// Campos del formulario de cliente
+const nombreInput = document.getElementById("nombre");
+const emailInput = document.getElementById("email");
+const direccionInput = document.getElementById("direccion");
+const telefonoInput = document.getElementById("telefono");
+const dniInput = document.getElementById("dni");
+
 // Enlaces
 const crearCuentaLink = document.getElementById("crearCuentaLink");
 const volverLogin = document.getElementById("volverLogin");
@@ -140,10 +147,11 @@ clienteForm.addEventListener("submit", async (e) => {
     e.preventDefault();
     
     // Obtener valores del formulario
-    const nombre = document.getElementById("nombre").value.trim();
-    const direccion = document.getElementById("direccion").value.trim();
-    const telefono = document.getElementById("telefono").value.trim();
-    const dni = document.getElementById("dni").value.trim();
+    const nombre = nombreInput.value.trim();
+    const email = emailInput.value.trim();
+    const direccion = direccionInput.value.trim();
+    const telefono = telefonoInput.value.trim();
+    const dni = dniInput.value.trim();
 
     // Validación básica del DNI
     if (!/^\d{7,8}$/.test(dni)) {
@@ -151,7 +159,13 @@ clienteForm.addEventListener("submit", async (e) => {
         return;
     }
 
-    // Mostrar mensaje de carga
+    // Validar email
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        alert("Por favor ingrese un email válido");
+        return;
+    }
+
+    // Mostrar estado de carga
     const submitBtn = clienteForm.querySelector('button[type="submit"]');
     const originalText = submitBtn.textContent;
     submitBtn.disabled = true;
@@ -177,6 +191,7 @@ clienteForm.addEventListener("submit", async (e) => {
         // Si no existe, proceder con el registro
         const nuevoCliente = {
             nombre,
+            email,
             direccion,
             telefono,
             dni,
@@ -211,6 +226,7 @@ function cargarClientes() {
                 const tr = document.createElement("tr");
                 tr.innerHTML = `
                     <td>${cliente.nombre || ''}</td>
+                    <td>${cliente.email || ''}</td>
                     <td>${cliente.direccion || ''}</td>
                     <td>${cliente.telefono || ''}</td>
                     <td>${cliente.dni || ''}</td>
@@ -262,10 +278,12 @@ pedidoForm.addEventListener("submit", async (e) => {
         // 2. Obtener ID del cliente (tomamos el primero que coincida)
         let clienteId = null;
         let clienteNombre = "";
+        let clienteEmail = "";
         
         clientesSnapshot.forEach((child) => {
             clienteId = child.key;
             clienteNombre = child.val().nombre;
+            clienteEmail = child.val().email || '';
             return true; // Solo tomamos el primer resultado
         });
 
@@ -278,7 +296,8 @@ pedidoForm.addEventListener("submit", async (e) => {
             estado, 
             fecha: new Date().toISOString(),
             clienteDNI: dniCliente,
-            clienteNombre: clienteNombre
+            clienteNombre: clienteNombre,
+            clienteEmail: clienteEmail
         });
         
         alert(`Pedido creado exitosamente para ${clienteNombre} (DNI: ${dniCliente})`);
@@ -301,7 +320,7 @@ pedidoForm.addEventListener("submit", async (e) => {
     }
 });
 
-// Cargar pedidos de un cliente específico (versión corregida según tus requerimientos)
+// Cargar pedidos de un cliente específico
 window.cargarPedidosCliente = async function(clienteId) {
     try {
         // 1. Verificar que el cliente existe
@@ -318,34 +337,45 @@ window.cargarPedidosCliente = async function(clienteId) {
         pedidosRef.on('value', (snapshot) => {
             listaPedidos.innerHTML = "";
             
-            // Encabezado con información del cliente (sin DNI)
-            const headerRow = document.createElement('tr');
-            headerRow.className = 'cliente-header';
-            headerRow.innerHTML = `
-                <td colspan="4">
-                    <strong>Pedidos de:</strong> ${cliente.nombre} | 
-                    <strong>Tel:</strong> ${cliente.telefono}
-                </td>
+            // Crear tabla
+            const table = document.createElement('table');
+            table.innerHTML = `
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th>Cantidad</th>
+                        <th>Fecha</th>
+                    </tr>
+                </thead>
+                <tbody id="listaPedidosBody"></tbody>
             `;
-            listaPedidos.appendChild(headerRow);
+            listaPedidos.appendChild(table);
             
-            // Mostrar los pedidos correctamente alineados
+            // Encabezado con información del cliente
+            const header = document.createElement('div');
+            header.className = 'cliente-header';
+            header.innerHTML = `
+                <h4>Pedidos de: ${cliente.nombre} | Tel: ${cliente.telefono}</h4>
+                <p>Email: ${cliente.email || 'No especificado'} | DNI: ${cliente.dni || 'No especificado'}</p>
+            `;
+            listaPedidos.insertBefore(header, table);
+            
+            const tbody = document.getElementById("listaPedidosBody");
             const pedidos = snapshot.val() || {};
             
             if (Object.keys(pedidos).length === 0) {
-                const emptyRow = document.createElement('tr');
-                emptyRow.innerHTML = '<td colspan="4" style="text-align: center;">No hay pedidos registrados</td>';
-                listaPedidos.appendChild(emptyRow);
+                const tr = document.createElement('tr');
+                tr.innerHTML = '<td colspan="3" style="text-align: center;">No hay pedidos registrados</td>';
+                tbody.appendChild(tr);
             } else {
-                Object.entries(pedidos).forEach(([pedidoId, pedido]) => {
+                Object.values(pedidos).forEach((pedido) => {
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
-                        <td>${cliente.dni || ''}</td> <!-- DNI del cliente -->
                         <td>${pedido.producto || 'Sin especificar'}</td>
                         <td>${pedido.estado || 'Pendiente'}</td>
                         <td>${new Date(pedido.fecha).toLocaleString() || 'Fecha no disponible'}</td>
                     `;
-                    listaPedidos.appendChild(tr);
+                    tbody.appendChild(tr);
                 });
             }
             
@@ -367,36 +397,54 @@ window.cargarPedidosCliente = async function(clienteId) {
 
 // Cargar todos los pedidos (versión actualizada)
 function cargarPedidos() {
-    const pedidosRef = db.ref('pedidos');
-    pedidosRef.on("value", async (snapshot) => {
-        listaPedidos.innerHTML = "";
-        const data = snapshot.val();
+    // Primero obtener todos los clientes para mapear IDs a datos
+    db.ref('clientes').once('value').then((clientesSnapshot) => {
+        const clientes = clientesSnapshot.val() || {};
         
-        if (data) {
-            // Primero obtener todos los clientes para mapear IDs a DNIs
-            const clientesSnapshot = await db.ref('clientes').once('value');
-            const clientes = clientesSnapshot.val() || {};
+        // Luego obtener todos los pedidos
+        db.ref('pedidos').on("value", (pedidosSnapshot) => {
+            listaPedidos.innerHTML = "";
             
-            // Procesar cada cliente
-            Object.entries(data).forEach(([clienteId, pedidos]) => {
-                const cliente = clientes[clienteId] || {};
-                
-                // Procesar cada pedido del cliente
-                Object.values(pedidos).forEach((pedido) => {
-                    const tr = document.createElement("tr");
-                    tr.innerHTML = `
-                        <td>${cliente.dni || 'DNI no disponible'}</td>
-                        <td>${pedido.producto || ''}</td>
-                        <td>${pedido.estado || ''}</td>
-                        <td>${new Date(pedido.fecha).toLocaleString() || ''}</td>
-                    `;
-                    listaPedidos.appendChild(tr);
+            // Crear tabla
+            const table = document.createElement('table');
+            table.innerHTML = `
+                <thead>
+                    <tr>
+                        <th>Cliente</th>
+                        <th>DNI</th>
+                        <th>Producto</th>
+                        <th>Cantidad</th>
+                        <th>Fecha</th>
+                    </tr>
+                </thead>
+                <tbody id="listaPedidosBody"></tbody>
+            `;
+            listaPedidos.appendChild(table);
+            
+            const tbody = document.getElementById("listaPedidosBody");
+            const pedidosData = pedidosSnapshot.val();
+            
+            if (pedidosData) {
+                Object.entries(pedidosData).forEach(([clienteId, pedidos]) => {
+                    const cliente = clientes[clienteId] || {};
+                    
+                    Object.values(pedidos).forEach((pedido) => {
+                        const tr = document.createElement("tr");
+                        tr.innerHTML = `
+                            <td>${cliente.nombre || 'Cliente no encontrado'}</td>
+                            <td>${cliente.dni || 'DNI no disponible'}</td>
+                            <td>${pedido.producto || ''}</td>
+                            <td>${pedido.estado || ''}</td>
+                            <td>${new Date(pedido.fecha).toLocaleString() || ''}</td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
                 });
-            });
-        } else {
-            const tr = document.createElement("tr");
-            tr.innerHTML = '<td colspan="4" style="text-align: center;">No hay pedidos registrados</td>';
-            listaPedidos.appendChild(tr);
-        }
+            } else {
+                const tr = document.createElement("tr");
+                tr.innerHTML = '<td colspan="5" style="text-align: center;">No hay pedidos registrados</td>';
+                tbody.appendChild(tr);
+            }
+        });
     });
 }
