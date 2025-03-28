@@ -27,18 +27,19 @@
                 <input type="text" id="nombre" placeholder="Nombre" required>
                 <input type="text" id="direccion" placeholder="Dirección" required>
                 <input type="text" id="telefono" placeholder="Teléfono" required>
-                <input type="text" id="dni" placeholder="DNI" required>
+                <input type="text" id="dni" placeholder="DNI" required pattern="\d{7,8}" title="7 u 8 dígitos">
                 <button type="submit">Agregar Cliente</button>
             </form>
-
-         <h3>Registrar Pedido</h3>
+            
+            <h3>Registrar Pedido</h3>
             <form id="pedidoForm">
                 <input type="text" id="clientePedido" placeholder="DNI del Cliente" required 
-                   pattern="\d{7,8}" title="Ingrese 7 u 8 dígitos del DNI" list="dnisAutocomplete">
+                       pattern="\d{7,8}" title="Ingrese 7 u 8 dígitos del DNI" list="dnisAutocomplete">
                 <input type="text" id="producto" placeholder="Producto" required>
                 <input type="text" id="estado" placeholder="Cantidad" required>
                 <button type="submit">Agregar Pedido</button>
             </form>
+        </div> <!-- Este es el div que faltaba cerrar -->
         
         <div id="clientesLista" class="hidden">
             <h3>Clientes</h3>
@@ -61,7 +62,7 @@
             <table>
                 <thead>
                     <tr>
-                        <th>Cliente</th>
+                        <th>Cliente (DNI)</th>
                         <th>Producto</th>
                         <th>Cantidad</th>
                         <th>Fecha</th>
