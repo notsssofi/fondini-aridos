@@ -14,10 +14,39 @@
     
     <section id="dashboard" class="hidden">
         <h2>Gestión de Clientes y Pedidos</h2>
+        
+        <div class="menu-principal">
+            <div class="menu-columna">
+                <button class="menu-btn" id="nuevoClienteBtn">
+                    <span class="menu-icon">+</span>
+                    <span>Crear Nuevo Cliente</span>
+                </button>
+                <button class="menu-btn" id="nuevoPedidoBtn">
+                    <span class="menu-icon">+</span>
+                    <span>Crear Nuevo Pedido</span>
+                </button>
+                <button class="menu-btn" id="mostrarClientes">
+                    <span class="menu-icon">👥</span>
+                    <span>Ver Clientes</span>
+                </button>
+            </div>
+            <div class="menu-columna">
+                <button class="menu-btn" id="mostrarPedidos">
+                    <span class="menu-icon">📋</span>
+                    <span>Ver Pedidos</span>
+                </button>
+                <button class="menu-btn" id="calculadoraBtn">
+                    <span class="menu-icon">🧮</span>
+                    <span>Calculadora</span>
+                </button>
+                <button class="menu-btn" id="configuracionBtn">
+                    <span class="menu-icon">⚙️</span>
+                    <span>Configuración</span>
+                </button>
+            </div>
+        </div>
+        
         <div class="buttons-container">
-            <button id="mostrarClientes">Clientes</button>
-            <button id="mostrarPedidos">Pedidos</button>
-            <button id="nuevoRegistroBtn">Nuevo Registro</button>
             <button id="logoutBtn">Cerrar Sesión</button>
         </div>
         
@@ -66,22 +95,20 @@
     </section>
 
     <section id="login">
-
         <h1 class="login-title">ÁRIDOS FONDINI</h1>
-
-    <div class="login-container">
-        <h2>Acceso al Sistema</h2>
-        <form id="loginForm">
-            <div class="input-group">
-                <input type="email" id="correoLogin" placeholder="Correo Electrónico" required>
-            </div>
-            <div class="input-group">
-                <input type="password" id="password" placeholder="Contraseña" required>
-            </div>
-            <button type="submit">Ingresar</button>
-        </form>
-    </div>
-</section>
+        <div class="login-container">
+            <h2>Acceso al Sistema</h2>
+            <form id="loginForm">
+                <div class="input-group">
+                    <input type="email" id="correoLogin" placeholder="Correo Electrónico" required>
+                </div>
+                <div class="input-group">
+                    <input type="password" id="password" placeholder="Contraseña" required>
+                </div>
+                <button type="submit">Ingresar</button>
+            </form>
+        </div>
+    </section>
 
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
