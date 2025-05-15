@@ -18,27 +18,23 @@ const db = firebase.database();
 const DOM = {
     sections: {
         login: document.getElementById("login"),
-        dashboard: document.getElementById("dashboard"),
-        registroContainer: document.getElementById("registroContainer"),
-        clientesLista: document.getElementById("clientesLista"),
-        pedidosLista: document.getElementById("pedidosLista"),
-        pedidosContent: document.getElementById("pedidosContent")
-    },
-    lists: {
-        clientes: document.getElementById("listaClientes"),
-        pedidos: document.getElementById("listaPedidos")
+        mainMenu: document.getElementById("main-menu"),
+        nuevoClienteView: document.getElementById("nuevo-cliente-view"),
+        nuevoPedidoView: document.getElementById("nuevo-pedido-view"),
+        clientesView: document.getElementById("clientes-view"),
+        pedidosView: document.getElementById("pedidos-view")
     },
     buttons: {
-        mostrarClientes: document.getElementById("mostrarClientes"),
-        mostrarPedidos: document.getElementById("mostrarPedidos"),
+        login: document.getElementById("loginForm"),
+        logout: document.getElementById("logoutBtn"),
         nuevoCliente: document.getElementById("nuevoClienteBtn"),
         nuevoPedido: document.getElementById("nuevoPedidoBtn"),
-        calculadora: document.getElementById("calculadoraBtn"),
-        configuracion: document.getElementById("configuracionBtn"),
-        logout: document.getElementById("logoutBtn")
+        buscarCliente: document.getElementById("buscarClienteBtn"),
+        verClientes: document.getElementById("verClientesBtn"),
+        verPedidos: document.getElementById("verPedidosBtn"),
+        configuracion: document.getElementById("configuracionBtn")
     },
     forms: {
-        login: document.getElementById("loginForm"),
         cliente: document.getElementById("clienteForm"),
         pedido: document.getElementById("pedidoForm")
     },
@@ -53,6 +49,10 @@ const DOM = {
         estado: document.getElementById("estado"),
         correoLogin: document.getElementById("correoLogin"),
         password: document.getElementById("password")
+    },
+    lists: {
+        clientes: document.getElementById("listaClientes"),
+        pedidosContent: document.getElementById("pedidosContent")
     }
 };
 
@@ -68,13 +68,13 @@ auth.onAuthStateChanged((user) => {
     
     if (user) {
         // Usuario autenticado
-        showSection(DOM.sections.dashboard);
+        showSection(DOM.sections.mainMenu);
         hideSection(DOM.sections.login);
-        cargarClientes();
     } else {
         // Usuario no autenticado
         showSection(DOM.sections.login);
-        hideSection(DOM.sections.dashboard);
+        hideSection(DOM.sections.mainMenu);
+        hideAllViews();
     }
 });
 
@@ -87,65 +87,70 @@ function hideSection(section) {
     section.classList.add("hidden");
 }
 
-function toggleSection(section) {
-    section.classList.toggle("hidden");
+function hideAllViews() {
+    Object.values(DOM.sections).forEach(section => {
+        if (section.id !== "login" && section.id !== "main-menu") {
+            hideSection(section);
+        }
+    });
 }
 
 function resetForms() {
     Object.values(DOM.forms).forEach(form => form.reset());
 }
 
-// Event Listeners para el menú principal
+function showView(view) {
+    hideAllViews();
+    showSection(view);
+}
+
+// Event Listeners para navegación
 DOM.buttons.nuevoCliente.addEventListener("click", () => {
-    showSection(DOM.sections.registroContainer);
-    hideSection(DOM.sections.clientesLista);
-    hideSection(DOM.sections.pedidosLista);
-    DOM.forms.cliente.scrollIntoView({ behavior: 'smooth' });
+    showView(DOM.sections.nuevoClienteView);
 });
 
 DOM.buttons.nuevoPedido.addEventListener("click", () => {
-    showSection(DOM.sections.registroContainer);
-    hideSection(DOM.sections.clientesLista);
-    hideSection(DOM.sections.pedidosLista);
-    DOM.forms.pedido.scrollIntoView({ behavior: 'smooth' });
+    showView(DOM.sections.nuevoPedidoView);
 });
 
-DOM.buttons.calculadora.addEventListener("click", () => {
-    alert("Funcionalidad de calculadora en desarrollo");
-    // Implementar calculadora aquí
+DOM.buttons.verClientes.addEventListener("click", () => {
+    showView(DOM.sections.clientesView);
+    cargarClientes();
+});
+
+DOM.buttons.verPedidos.addEventListener("click", () => {
+    showView(DOM.sections.pedidosView);
+    cargarPedidos();
+});
+
+DOM.buttons.buscarCliente.addEventListener("click", () => {
+    alert("Funcionalidad de búsqueda en desarrollo");
 });
 
 DOM.buttons.configuracion.addEventListener("click", () => {
-    alert("Funcionalidad de configuración en desarrollo");
-    // Implementar configuración aquí
+    alert("Configuración del sistema en desarrollo");
 });
 
-// Event Listeners originales
+// Botones de volver
+document.querySelectorAll(".back-btn").forEach(btn => {
+    btn.addEventListener("click", (e) => {
+        e.preventDefault();
+        showView(DOM.sections.mainMenu);
+    });
+});
+
+// Cerrar sesión
 DOM.buttons.logout.addEventListener("click", () => {
     auth.signOut()
         .then(() => console.log("Sesión cerrada"))
         .catch((error) => console.error("Error al cerrar sesión:", error));
 });
 
-DOM.buttons.mostrarClientes.addEventListener("click", () => {
-    showSection(DOM.sections.clientesLista);
-    hideSection(DOM.sections.pedidosLista);
-    hideSection(DOM.sections.registroContainer);
-    cargarClientes();
-});
-
-DOM.buttons.mostrarPedidos.addEventListener("click", () => {
-    showSection(DOM.sections.pedidosLista);
-    hideSection(DOM.sections.clientesLista);
-    hideSection(DOM.sections.registroContainer);
-    cargarPedidos();
-});
-
 // Inicio de sesión
-DOM.forms.login.addEventListener("submit", (e) => {
+DOM.buttons.login.addEventListener("submit", (e) => {
     e.preventDefault();
     const { correoLogin, password } = DOM.inputs;
-    const submitBtn = DOM.forms.login.querySelector('button[type="submit"]');
+    const submitBtn = DOM.buttons.login.querySelector('button[type="submit"]');
     const originalText = submitBtn.textContent;
     
     submitBtn.disabled = true;
@@ -217,7 +222,7 @@ DOM.forms.cliente.addEventListener("submit", async (e) => {
         
         alert("Cliente registrado exitosamente!");
         resetForms();
-        cargarClientes();
+        showView(DOM.sections.mainMenu);
 
     } catch (error) {
         console.error("Error al registrar cliente:", error);
@@ -287,13 +292,11 @@ DOM.forms.pedido.addEventListener("submit", async (e) => {
         
         alert(`Pedido creado exitosamente para ${clienteNombre} (DNI: ${clientePedido.value})`);
         resetForms();
-        cargarPedidosCliente(clienteId);
+        showView(DOM.sections.mainMenu);
 
     } catch (error) {
         console.error("Error al crear pedido:", error);
         alert(error.message);
-        showSection(DOM.sections.clientesLista);
-        hideSection(DOM.sections.pedidosLista);
     } finally {
         submitBtn.disabled = false;
         submitBtn.textContent = originalText;
@@ -316,10 +319,14 @@ function cargarClientes() {
                     <td>${cliente.direccion || ''}</td>
                     <td>${cliente.telefono || ''}</td>
                     <td>${cliente.dni || ''}</td>
-                    <td><button onclick="cargarPedidosCliente('${id}')">Ver Pedidos</button></td>
+                    <td><button class="action-btn" onclick="cargarPedidosCliente('${id}')">Ver Pedidos</button></td>
                 `;
                 DOM.lists.clientes.appendChild(tr);
             });
+        } else {
+            const tr = document.createElement("tr");
+            tr.innerHTML = '<td colspan="6" style="text-align: center;">No hay clientes registrados</td>';
+            DOM.lists.clientes.appendChild(tr);
         }
     });
 }
@@ -339,16 +346,16 @@ window.cargarPedidosCliente = async function(clienteId) {
         // Cargar pedidos del cliente
         const pedidosRef = db.ref(`pedidos/${clienteId}`);
         pedidosRef.on('value', (snapshot) => {
-            DOM.sections.pedidosContent.innerHTML = "";
+            DOM.lists.pedidosContent.innerHTML = "";
             
             // Encabezado con información del cliente
             const header = document.createElement('div');
             header.className = 'cliente-header';
             header.innerHTML = `
-                <h4>Pedidos de: ${cliente.nombre} | Tel: ${cliente.telefono}</h4>
+                <h3>Pedidos de: ${cliente.nombre} | Tel: ${cliente.telefono}</h3>
                 <p>Email: ${cliente.email || 'No especificado'} | DNI: ${cliente.dni || 'No especificado'}</p>
             `;
-            DOM.sections.pedidosContent.appendChild(header);
+            DOM.lists.pedidosContent.appendChild(header);
             
             // Tabla de pedidos
             const table = document.createElement('table');
@@ -362,7 +369,7 @@ window.cargarPedidosCliente = async function(clienteId) {
                 </thead>
                 <tbody id="listaPedidosBody"></tbody>
             `;
-            DOM.sections.pedidosContent.appendChild(table);
+            DOM.lists.pedidosContent.appendChild(table);
             
             const tbody = document.getElementById("listaPedidosBody");
             const pedidos = snapshot.val() || {};
@@ -382,18 +389,13 @@ window.cargarPedidosCliente = async function(clienteId) {
                     tbody.appendChild(tr);
                 });
             }
-            
-            // Mostrar la sección de pedidos
-            showSection(DOM.sections.pedidosLista);
-            hideSection(DOM.sections.clientesLista);
-            hideSection(DOM.sections.registroContainer);
         });
+
+        showView(DOM.sections.pedidosView);
 
     } catch (error) {
         console.error("Error al cargar pedidos:", error);
         alert(`Error: ${error.message}`);
-        showSection(DOM.sections.clientesLista);
-        hideSection(DOM.sections.pedidosLista);
     }
 };
 
@@ -405,7 +407,7 @@ function cargarPedidos() {
         
         // Obtener todos los pedidos
         db.ref('pedidos').on("value", (pedidosSnapshot) => {
-            DOM.sections.pedidosContent.innerHTML = "";
+            DOM.lists.pedidosContent.innerHTML = "<h3>TODOS LOS PEDIDOS</h3>";
             
             // Tabla de pedidos
             const table = document.createElement('table');
@@ -421,7 +423,7 @@ function cargarPedidos() {
                 </thead>
                 <tbody id="listaPedidosBody"></tbody>
             `;
-            DOM.sections.pedidosContent.appendChild(table);
+            DOM.lists.pedidosContent.appendChild(table);
             
             const tbody = document.getElementById("listaPedidosBody");
             const pedidosData = pedidosSnapshot.val();
