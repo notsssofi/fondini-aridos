@@ -185,6 +185,64 @@ section {
     font-size: 14px;
 }
 
+/* Estilos para el Login Mejorado */
+.login-container {
+    background-color: rgba(0, 0, 0, 0.7);
+    border-radius: 15px;
+    padding: 30px;
+    width: 100%;
+    max-width: 400px;
+    margin: 50px auto;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+}
+
+.login-container h2 {
+    font-size: 28px;
+    margin-bottom: 20px;
+    letter-spacing: 1px;
+    color: #fff;
+    text-align: center;
+}
+
+.input-group {
+    margin-bottom: 20px;
+    position: relative;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 15px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.9);
+    border: none;
+    font-size: 16px;
+    transition: all 0.3s ease;
+}
+
+.input-group input:focus {
+    background: white;
+    box-shadow: 0 0 8px rgba(255, 112, 67, 0.6);
+}
+
+#loginForm button {
+    width: 100%;
+    padding: 15px;
+    font-size: 18px;
+    font-weight: bold;
+    letter-spacing: 1px;
+    margin-top: 10px;
+    background-color: #ff7043;
+    transition: all 0.3s ease;
+}
+
+#loginForm button:hover {
+    background-color: #e64a19;
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(230, 74, 25, 0.4);
+}
+
 /* Animaciones */
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(10px); }
@@ -210,6 +268,11 @@ section {
     table {
         display: block;
         overflow-x: auto;
+    }
+    
+    .login-container {
+        width: 90%;
+        padding: 20px;
     }
 }
 
