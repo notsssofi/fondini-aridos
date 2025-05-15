@@ -3,114 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Áridos Fondini - Sistema de Gestión</title>
+    <title>Áridos Fondini - Gestión de Clientes y Pedidos</title>
     <link rel="icon" href="data:,">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <!-- Pantalla de Login -->
-    <section id="login" class="full-screen">
-        <div class="login-container">
-            <h1 class="login-title">ÁRIDOS FONDINI</h1>
-            <h2>Acceso al Sistema</h2>
-            <form id="loginForm">
-                <div class="input-group">
-                    <input type="email" id="correoLogin" placeholder="Correo Electrónico" required>
-                </div>
-                <div class="input-group">
-                    <input type="password" id="password" placeholder="Contraseña" required>
-                </div>
-                <button type="submit">Ingresar</button>
+    <header>
+        <h1>Áridos Fondini</h1>
+    </header>
+    
+    <section id="dashboard" class="hidden">
+        <h2>Gestión de Clientes y Pedidos</h2>
+        <div class="buttons-container">
+            <button id="mostrarClientes">Clientes</button>
+            <button id="mostrarPedidos">Pedidos</button>
+            <button id="nuevoRegistroBtn">Nuevo Registro</button>
+            <button id="logoutBtn">Cerrar Sesión</button>
+        </div>
+        
+        <div id="registroContainer" class="hidden">
+            <h3>Registrar Cliente</h3>
+            <form id="clienteForm">
+                <input type="text" id="nombre" placeholder="Nombre" required>
+                <input type="email" id="email" placeholder="Email" required>
+                <input type="text" id="direccion" placeholder="Dirección" required>
+                <input type="text" id="telefono" placeholder="Teléfono" required>
+                <input type="text" id="dni" placeholder="DNI" required pattern="\d{7,8}" title="7 u 8 dígitos">
+                <button type="submit">Agregar Cliente</button>
+            </form>
+            
+            <h3>Registrar Pedido</h3>
+            <form id="pedidoForm">
+                <input type="text" id="clientePedido" placeholder="DNI del Cliente" required 
+                       pattern="\d{7,8}" title="Ingrese 7 u 8 dígitos del DNI">
+                <input type="text" id="producto" placeholder="Producto" required>
+                <input type="text" id="estado" placeholder="Cantidad" required>
+                <button type="submit">Agregar Pedido</button>
             </form>
         </div>
-    </section>
-
-    <!-- Menú Principal (oculto inicialmente) -->
-    <section id="main-menu" class="hidden full-screen">
-        <header class="menu-header">
-            <h1>ÁRIDOS FONDINI</h1>
-            <h2>Gestión Comercial</h2>
-        </header>
-
-        <div class="menu-grid">
-            <!-- Columna 1 -->
-            <div class="menu-column">
-                <button class="menu-btn big-btn" id="nuevoClienteBtn">
-                    <span class="btn-icon">+</span>
-                    <span class="btn-text">CREAR NUEVO CLIENTE</span>
-                </button>
-                
-                <button class="menu-btn big-btn" id="nuevoPedidoBtn">
-                    <span class="btn-icon">+</span>
-                    <span class="btn-text">CREAR NUEVO PEDIDO</span>
-                </button>
-                
-                <button class="menu-btn big-btn" id="buscarClienteBtn">
-                    <span class="btn-icon">🔍</span>
-                    <span class="btn-text">BUSCAR CLIENTE</span>
-                </button>
-            </div>
-
-            <!-- Columna 2 -->
-            <div class="menu-column">
-                <button class="menu-btn big-btn" id="verClientesBtn">
-                    <span class="btn-icon">👥</span>
-                    <span class="btn-text">VER CLIENTES</span>
-                </button>
-                
-                <button class="menu-btn big-btn" id="verPedidosBtn">
-                    <span class="btn-icon">📋</span>
-                    <span class="btn-text">VER PEDIDOS</span>
-                </button>
-                
-                <button class="menu-btn big-btn" id="configuracionBtn">
-                    <span class="btn-icon">⚙️</span>
-                    <span class="btn-text">CONFIGURACIÓN</span>
-                </button>
-            </div>
-        </div>
-
-        <div class="logout-container">
-            <button id="logoutBtn" class="logout-btn">CERRAR SESIÓN</button>
-        </div>
-    </section>
-
-    <!-- Ventanas independientes (todas ocultas inicialmente) -->
-    <section id="nuevo-cliente-view" class="hidden full-screen view-container">
-        <div class="view-header">
-            <h2>CREAR NUEVO CLIENTE</h2>
-            <button class="back-btn">← VOLVER AL MENÚ</button>
-        </div>
-        <form id="clienteForm" class="form-container">
-            <input type="text" id="nombre" placeholder="Nombre" required>
-            <input type="email" id="email" placeholder="Email" required>
-            <input type="text" id="direccion" placeholder="Dirección" required>
-            <input type="text" id="telefono" placeholder="Teléfono" required>
-            <input type="text" id="dni" placeholder="DNI" required pattern="\d{7,8}" title="7 u 8 dígitos">
-            <button type="submit" class="submit-btn">GUARDAR CLIENTE</button>
-        </form>
-    </section>
-
-    <section id="nuevo-pedido-view" class="hidden full-screen view-container">
-        <div class="view-header">
-            <h2>CREAR NUEVO PEDIDO</h2>
-            <button class="back-btn">← VOLVER AL MENÚ</button>
-        </div>
-        <form id="pedidoForm" class="form-container">
-            <input type="text" id="clientePedido" placeholder="DNI del Cliente" required 
-                   pattern="\d{7,8}" title="Ingrese 7 u 8 dígitos del DNI">
-            <input type="text" id="producto" placeholder="Producto" required>
-            <input type="text" id="estado" placeholder="Cantidad" required>
-            <button type="submit" class="submit-btn">GUARDAR PEDIDO</button>
-        </form>
-    </section>
-
-    <section id="clientes-view" class="hidden full-screen view-container">
-        <div class="view-header">
-            <h2>LISTA DE CLIENTES</h2>
-            <button class="back-btn">← VOLVER AL MENÚ</button>
-        </div>
-        <div class="table-container">
+        
+        <div id="clientesLista" class="hidden">
+            <h3>Clientes</h3>
             <table>
                 <thead>
                     <tr>
@@ -125,15 +58,30 @@
                 <tbody id="listaClientes"></tbody>
             </table>
         </div>
+        
+        <div id="pedidosLista" class="hidden">
+            <h3>Pedidos</h3>
+            <div id="pedidosContent"></div>
+        </div>
     </section>
 
-    <section id="pedidos-view" class="hidden full-screen view-container">
-        <div class="view-header">
-            <h2>LISTA DE PEDIDOS</h2>
-            <button class="back-btn">← VOLVER AL MENÚ</button>
-        </div>
-        <div class="table-container" id="pedidosContent"></div>
-    </section>
+    <section id="login">
+
+        <h1 class="login-title">ÁRIDOS FONDINI</h1>
+
+    <div class="login-container">
+        <h2>Acceso al Sistema</h2>
+        <form id="loginForm">
+            <div class="input-group">
+                <input type="email" id="correoLogin" placeholder="Correo Electrónico" required>
+            </div>
+            <div class="input-group">
+                <input type="password" id="password" placeholder="Contraseña" required>
+            </div>
+            <button type="submit">Ingresar</button>
+        </form>
+    </div>
+</section>
 
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
