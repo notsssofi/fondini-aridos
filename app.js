@@ -18,7 +18,6 @@ const db = firebase.database();
 const DOM = {
     sections: {
         login: document.getElementById("login"),
-        registro: document.getElementById("registro"),
         dashboard: document.getElementById("dashboard"),
         registroContainer: document.getElementById("registroContainer"),
         clientesLista: document.getElementById("clientesLista"),
@@ -37,7 +36,6 @@ const DOM = {
     },
     forms: {
         login: document.getElementById("loginForm"),
-        registro: document.getElementById("registroForm"),
         cliente: document.getElementById("clienteForm"),
         pedido: document.getElementById("pedidoForm")
     },
@@ -50,15 +48,8 @@ const DOM = {
         clientePedido: document.getElementById("clientePedido"),
         producto: document.getElementById("producto"),
         estado: document.getElementById("estado"),
-        nombreCompleto: document.getElementById("nombreCompleto"),
-        correo: document.getElementById("correo"),
-        nuevaPassword: document.getElementById("nuevaPassword"),
         correoLogin: document.getElementById("correoLogin"),
         password: document.getElementById("password")
-    },
-    links: {
-        crearCuenta: document.getElementById("crearCuentaLink"),
-        volverLogin: document.getElementById("volverLogin")
     }
 };
 
@@ -76,12 +67,10 @@ auth.onAuthStateChanged((user) => {
         // Usuario autenticado
         showSection(DOM.sections.dashboard);
         hideSection(DOM.sections.login);
-        hideSection(DOM.sections.registro);
         cargarClientes();
     } else {
         // Usuario no autenticado
         showSection(DOM.sections.login);
-        hideSection(DOM.sections.registro);
         hideSection(DOM.sections.dashboard);
     }
 });
@@ -104,18 +93,6 @@ function resetForms() {
 }
 
 // Event Listeners
-DOM.links.crearCuenta.addEventListener("click", (e) => {
-    e.preventDefault();
-    hideSection(DOM.sections.login);
-    showSection(DOM.sections.registro);
-});
-
-DOM.links.volverLogin.addEventListener("click", (e) => {
-    e.preventDefault();
-    hideSection(DOM.sections.registro);
-    showSection(DOM.sections.login);
-});
-
 DOM.buttons.logout.addEventListener("click", () => {
     auth.signOut()
         .then(() => console.log("Sesión cerrada"))
@@ -142,32 +119,15 @@ DOM.buttons.nuevoRegistro.addEventListener("click", () => {
     hideSection(DOM.sections.pedidosLista);
 });
 
-// Registro de usuario
-DOM.forms.registro.addEventListener("submit", (e) => {
-    e.preventDefault();
-    const { nombreCompleto, correo, nuevaPassword } = DOM.inputs;
-    
-    auth.createUserWithEmailAndPassword(correo.value, nuevaPassword.value)
-        .then((userCredential) => {
-            return db.ref('users/' + userCredential.user.uid).set({ 
-                nombre: nombreCompleto.value, 
-                email: correo.value 
-            });
-        })
-        .then(() => {
-            alert("Cuenta creada con éxito");
-            resetForms();
-        })
-        .catch((error) => {
-            console.error("Error al crear cuenta:", error);
-            alert("Error al crear cuenta: " + error.message);
-        });
-});
-
 // Inicio de sesión
 DOM.forms.login.addEventListener("submit", (e) => {
     e.preventDefault();
     const { correoLogin, password } = DOM.inputs;
+    const submitBtn = DOM.forms.login.querySelector('button[type="submit"]');
+    const originalText = submitBtn.textContent;
+    
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Verificando...";
 
     auth.signInWithEmailAndPassword(correoLogin.value, password.value)
         .then(() => {
@@ -177,6 +137,10 @@ DOM.forms.login.addEventListener("submit", (e) => {
         .catch((error) => {
             console.error("Error al iniciar sesión:", error);
             alert("Error al iniciar sesión: " + error.message);
+        })
+        .finally(() => {
+            submitBtn.disabled = false;
+            submitBtn.textContent = originalText;
         });
 });
 
