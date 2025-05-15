@@ -31,7 +31,10 @@ const DOM = {
     buttons: {
         mostrarClientes: document.getElementById("mostrarClientes"),
         mostrarPedidos: document.getElementById("mostrarPedidos"),
-        nuevoRegistro: document.getElementById("nuevoRegistroBtn"),
+        nuevoCliente: document.getElementById("nuevoClienteBtn"),
+        nuevoPedido: document.getElementById("nuevoPedidoBtn"),
+        calculadora: document.getElementById("calculadoraBtn"),
+        configuracion: document.getElementById("configuracionBtn"),
         logout: document.getElementById("logoutBtn")
     },
     forms: {
@@ -92,7 +95,32 @@ function resetForms() {
     Object.values(DOM.forms).forEach(form => form.reset());
 }
 
-// Event Listeners
+// Event Listeners para el menú principal
+DOM.buttons.nuevoCliente.addEventListener("click", () => {
+    showSection(DOM.sections.registroContainer);
+    hideSection(DOM.sections.clientesLista);
+    hideSection(DOM.sections.pedidosLista);
+    DOM.forms.cliente.scrollIntoView({ behavior: 'smooth' });
+});
+
+DOM.buttons.nuevoPedido.addEventListener("click", () => {
+    showSection(DOM.sections.registroContainer);
+    hideSection(DOM.sections.clientesLista);
+    hideSection(DOM.sections.pedidosLista);
+    DOM.forms.pedido.scrollIntoView({ behavior: 'smooth' });
+});
+
+DOM.buttons.calculadora.addEventListener("click", () => {
+    alert("Funcionalidad de calculadora en desarrollo");
+    // Implementar calculadora aquí
+});
+
+DOM.buttons.configuracion.addEventListener("click", () => {
+    alert("Funcionalidad de configuración en desarrollo");
+    // Implementar configuración aquí
+});
+
+// Event Listeners originales
 DOM.buttons.logout.addEventListener("click", () => {
     auth.signOut()
         .then(() => console.log("Sesión cerrada"))
@@ -111,12 +139,6 @@ DOM.buttons.mostrarPedidos.addEventListener("click", () => {
     hideSection(DOM.sections.clientesLista);
     hideSection(DOM.sections.registroContainer);
     cargarPedidos();
-});
-
-DOM.buttons.nuevoRegistro.addEventListener("click", () => {
-    toggleSection(DOM.sections.registroContainer);
-    hideSection(DOM.sections.clientesLista);
-    hideSection(DOM.sections.pedidosLista);
 });
 
 // Inicio de sesión
