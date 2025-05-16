@@ -22,7 +22,9 @@ const DOM = {
     registroContainer: document.getElementById("registroContainer"),
     clientesLista: document.getElementById("clientesLista"),
     pedidosLista: document.getElementById("pedidosLista"),
-    pedidosContent: document.getElementById("pedidosContent")
+    pedidosContent: document.getElementById("pedidosContent"),
+    calculadora: document.getElementById("calculadora")
+
   },
   lists: {
     clientes: document.getElementById("listaClientes"),
