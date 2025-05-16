@@ -1,6 +1,6 @@
 // Configuración de Firebase
 const firebaseConfig = {
-    apiKey: "AIzaSyBoOkpUMeYt5KVkP24eDgme2oy_L6xcNoc",
+    apiKey: "AIzaSyAHTfYQXgWb3l5DqCar3ooOv2yzzsww9Ek",
     authDomain: "bd-fondini-aridos.firebaseapp.com",
     databaseURL: "https://bd-fondini-aridos-default-rtdb.firebaseio.com",
     projectId: "bd-fondini-aridos",
