@@ -274,6 +274,7 @@ window.cargarPedidosCliente = function (clienteId) {
     const cliente = clienteSnap.val();
     if (!cliente) return alert("Cliente no encontrado");
 
+
     db.ref(`pedidos/${clienteId}`).once('value').then(pedidosSnap => {
       showSection(DOM.sections.pedidosLista);
       hideSection(DOM.sections.clientesLista);
@@ -315,14 +316,14 @@ window.cargarPedidosCliente = function (clienteId) {
         return;
       }
 
-      Object.entries(pedidos).forEach(([pedidoId, pedido]) => {
+     Object.entries(pedidos).forEach(([pedidoId, pedido]) => {
         const tr = document.createElement("tr");
         tr.innerHTML = `
           <td>${pedido.producto}</td>
           <td>${pedido.estado}</td>
           <td>${new Date(pedido.fecha).toLocaleString()}</td>
           <td>
-            <button onclick="confirmarPedido('${clienteId}', '${pedidoId}', '${cliente.email}', ${JSON.stringify(pedido).replace(/'/g, "\\'")})">
+            <button class="btn-confirmar" onclick="confirmarPedido('${cliente.email}', '${pedido.producto}', '${pedido.estado}')">
               Confirmar Pedido
             </button>
           </td>
@@ -471,8 +472,13 @@ window.calcularPresupuesto = function () {
   `;
 };
 
-// Función para enviar correo de confirmación
 function enviarCorreo(emailDestino, pedidoInfo) {
+  // Verificar que el email sea válido
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailDestino)) {
+    alert("El email del cliente no es válido");
+    return;
+  }
+
   const data = {
     personalizations: [{ to: [{ email: emailDestino }] }],
     from: { email: "sofiagomezfernandez2@gmail.com" },
@@ -487,6 +493,8 @@ function enviarCorreo(emailDestino, pedidoInfo) {
     ]
   };
 
+  console.log("Intentando enviar correo a:", emailDestino); // Para depuración
+
   fetch("https://api.sendgrid.com/v3/mail/send", {
     method: "POST",
     headers: {
@@ -496,24 +504,41 @@ function enviarCorreo(emailDestino, pedidoInfo) {
     body: JSON.stringify(data)
   })
   .then(response => {
-    if (response.status === 202) {
-      alert("Correo de confirmación enviado con éxito");
+    console.log("Respuesta de SendGrid:", response); // Para depuración
+    if (response.ok) {
+      return response.json().then(data => {
+        alert("Correo de confirmación enviado con éxito");
+        return data;
+      }).catch(() => {
+        // Si no hay cuerpo JSON en la respuesta
+        alert("Correo de confirmación enviado con éxito");
+      });
     } else {
-      alert("Error al enviar correo: " + response.status);
+      return response.json().then(err => {
+        alert(`Error al enviar correo: ${err.errors ? err.errors[0].message : response.status}`);
+        throw new Error(err.errors ? err.errors[0].message : response.status);
+      }).catch(() => {
+        alert(`Error al enviar correo: ${response.status}`);
+        throw new Error(response.status);
+      });
     }
   })
   .catch(error => {
-    alert("Error en la petición: " + error.message);
+    console.error("Error en la petición:", error);
+    alert("Error en la conexión: " + error.message);
   });
 }
-
-window.confirmarPedido = function(clienteId, pedidoId, clienteEmail, pedidoInfo) {
+window.confirmarPedido = function(clienteEmail, producto, estado) {
   if (!clienteEmail) {
     alert("Este cliente no tiene un email registrado. No se puede enviar la confirmación.");
     return;
   }
   
   if (confirm(`¿Enviar correo de confirmación a ${clienteEmail}?`)) {
+    const pedidoInfo = {
+      producto: producto,
+      estado: estado
+    };
     enviarCorreo(clienteEmail, pedidoInfo);
   }
 };
