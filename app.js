@@ -423,6 +423,7 @@ window.eliminarPedido = function(clienteId, pedidoId) {
       })
       .catch(err => alert("Error: " + err.message));
   }
+  };
 
 // Calculadora Presupuesto
 function calcularPresupuesto() {
@@ -443,7 +444,6 @@ function calcularPresupuesto() {
     <strong>Total con IVA (21%): $${totalConIVA.toFixed(2)}</strong>
   `;
 }
-};
 
 const btnCalculadora = document.getElementById("btnCalculadora");
 if (btnCalculadora) {
