@@ -18,6 +18,7 @@
             <button id="mostrarClientes">Clientes</button>
             <button id="mostrarPedidos">Pedidos</button>
             <button id="nuevoRegistroBtn">Nuevo Registro</button>
+            <button id="btnCalculadora">Calculadora</button>
             <button id="logoutBtn">Cerrar Sesión</button>
         </div>
         
@@ -85,6 +86,16 @@
         </form>
         <p><a href="#" id="volverLogin">Volver al inicio de sesión</a></p>
     </section>
+
+    <section id="calculadora" class="hidden">
+      <h3>Calculadora de Presupuesto</h3>
+      <input type="number" id="materiales" placeholder="Costo de materiales ($)">
+      <input type="number" id="transporte" placeholder="Costo de transporte ($)">
+      <input type="number" id="margen" placeholder="Margen de ganancia (%)">
+      <button onclick="calcularPresupuesto()">Calcular Total</button>
+      <div id="resultado"></div>
+    </section>
+
 
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
