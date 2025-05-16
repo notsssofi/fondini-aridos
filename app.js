@@ -1,12 +1,12 @@
 // Configuración de Firebase
 const firebaseConfig = {
-    apiKey: "AIzaSyAHTfYQXgWb3l5DqCar3ooOv2yzzsww9Ek",
-    authDomain: "bd-fondini-aridos.firebaseapp.com",
-    databaseURL: "https://bd-fondini-aridos-default-rtdb.firebaseio.com",
-    projectId: "bd-fondini-aridos",
-    storageBucket: "bd-fondini-aridos.firebasestorage.app",
-    messagingSenderId: "1038135881192",
-    appId: "1:1038135881192:web:215908840951025da9485d"
+  apiKey: "AIzaSyAHTfYQXgWb3l5DqCar3ooOv2yzzsww9Ek",
+  authDomain: "bd-fondini-aridos.firebaseapp.com",
+  databaseURL: "https://bd-fondini-aridos-default-rtdb.firebaseio.com",
+  projectId: "bd-fondini-aridos",
+  storageBucket: "bd-fondini-aridos.firebasestorage.app",
+  messagingSenderId: "1038135881192",
+  appId: "1:1038135881192:web:215908840951025da9485d"
 };
 
 // Inicializar Firebase
