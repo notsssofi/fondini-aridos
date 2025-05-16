@@ -1,4 +1,4 @@
-// Firebase
+// Firebase Configuration
 const firebaseConfig = {
   apiKey: "AIzaSyAHTfYQXgWb3l5DqCar3ooOv2yzzsww9Ek",
   authDomain: "bd-fondini-aridos.firebaseapp.com",
@@ -13,7 +13,7 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.database();
 
-// DOM
+// DOM Elements
 const DOM = {
   sections: {
     login: document.getElementById("login"),
@@ -62,6 +62,7 @@ const DOM = {
   }
 };
 
+// Helper Functions
 function showSection(section) {
   Object.values(DOM.sections).forEach(sec => sec.classList.add("hidden"));
   section.classList.remove("hidden");
@@ -71,13 +72,13 @@ function resetForms() {
   Object.values(DOM.forms).forEach(f => f.reset());
 }
 
-// Auth
+// Auth State Listener
 auth.onAuthStateChanged(user => {
   if (user) showSection(DOM.sections.menu);
   else showSection(DOM.sections.login);
 });
 
-// Registro/Login
+// Registration
 DOM.forms.registro.addEventListener("submit", async (e) => {
   e.preventDefault();
   const { nombreCompleto, correo, nuevaPassword } = DOM.inputs;
@@ -96,6 +97,7 @@ DOM.forms.registro.addEventListener("submit", async (e) => {
   }
 });
 
+// Login
 DOM.forms.login.addEventListener("submit", async (e) => {
   e.preventDefault();
   const { correoLogin, password } = DOM.inputs;
@@ -109,23 +111,26 @@ DOM.forms.login.addEventListener("submit", async (e) => {
   }
 });
 
-// Navegación
+// Navigation
 DOM.links.crearCuenta.addEventListener("click", e => {
   e.preventDefault();
   showSection(DOM.sections.registro);
 });
+
 DOM.links.volverLogin.addEventListener("click", e => {
   e.preventDefault();
   showSection(DOM.sections.login);
 });
+
 DOM.buttons.logout.addEventListener("click", () => {
   auth.signOut().then(() => showSection(DOM.sections.login));
 });
+
 DOM.buttons.volverMenuDesdeRegistro.addEventListener("click", () => showSection(DOM.sections.menu));
 DOM.buttons.volverMenuDesdeClientes.addEventListener("click", () => showSection(DOM.sections.menu));
 DOM.buttons.volverMenuDesdePedidos.addEventListener("click", () => showSection(DOM.sections.menu));
 
-// Menú
+// Menu Actions
 document.querySelectorAll(".menu-card").forEach(btn => {
   btn.addEventListener("click", () => {
     const action = btn.dataset.action;
@@ -150,7 +155,7 @@ document.querySelectorAll(".menu-card").forEach(btn => {
   });
 });
 
-// Crear cliente
+// Client Management
 DOM.forms.cliente.addEventListener("submit", async (e) => {
   e.preventDefault();
   const { nombre, email, direccion, telefono, dni } = DOM.inputs;
@@ -175,7 +180,6 @@ DOM.forms.cliente.addEventListener("submit", async (e) => {
   }
 });
 
-// Mostrar clientes
 function cargarClientes() {
   db.ref('clientes').once('value').then(snapshot => {
     const data = snapshot.val();
@@ -197,14 +201,51 @@ function cargarClientes() {
     DOM.lists.clientes.innerHTML = '<tr><td colspan="6">Error al cargar clientes</td></tr>';
   });
 }
-// Función corregida para cargar todos los pedidos
+
+// Order Management - CORREGIDO PARA TU ESTRUCTURA DE DATOS
+DOM.forms.pedido.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const { clientePedido, producto, estado } = DOM.inputs;
+  
+  try {
+    // Buscar cliente por DNI
+    const snap = await db.ref('clientes').orderByChild('dni').equalTo(clientePedido.value).once('value');
+    if (!snap.exists()) {
+      alert("Cliente no encontrado");
+      return;
+    }
+    
+    // Obtener datos del cliente
+    const clienteId = Object.keys(snap.val())[0];
+    const cliente = snap.val()[clienteId];
+    
+    // Crear el pedido con la estructura que estás usando
+    await db.ref('pedidos').push({
+      clienteDNI: cliente.dni,
+      clienteEmail: cliente.email,
+      clienteNombre: cliente.nombre,
+      producto: producto.value,
+      estado: estado.value,
+      fecha: new Date().toISOString()
+    });
+    
+    alert("Pedido registrado correctamente");
+    resetForms();
+    cargarPedidos();
+  } catch (error) {
+    console.error("Error al registrar pedido:", error);
+    alert("Ocurrió un error al registrar el pedido: " + error.message);
+  }
+});
+
+// Cargar todos los pedidos - CORREGIDO
 function cargarPedidos() {
-  db.ref('pedidos').once('value').then(pedidosSnap => {
+  db.ref('pedidos').once('value').then(snapshot => {
+    const pedidos = snapshot.val();
     const tbody = document.getElementById("listaPedidosBody");
     tbody.innerHTML = "";
 
-    const pedidos = pedidosSnap.val();
-    if (!pedidos || Object.keys(pedidos).length === 0) {
+    if (!pedidos) {
       tbody.innerHTML = '<tr><td colspan="5">No hay pedidos registrados</td></tr>';
       return;
     }
@@ -226,48 +267,13 @@ function cargarPedidos() {
   });
 }
 
-// Función corregida para crear pedidos
-DOM.forms.pedido.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const { clientePedido, producto, estado } = DOM.inputs;
-  
-  try {
-    // Buscar cliente por DNI para obtener sus datos
-    const snap = await db.ref('clientes').orderByChild('dni').equalTo(clientePedido.value).once('value');
-    if (!snap.exists()) {
-      alert("Cliente no encontrado");
-      return;
-    }
-    
-    // Obtener datos del cliente
-    const clienteData = Object.values(snap.val())[0];
-    
-    // Crear el pedido con la nueva estructura
-    await db.ref('pedidos').push({
-      clienteDNI: clienteData.dni,
-      clienteEmail: clienteData.email,
-      clienteNombre: clienteData.nombre,
-      producto: producto.value,
-      estado: estado.value,
-      fecha: new Date().toISOString()
-    });
-    
-    alert("Pedido registrado correctamente");
-    resetForms();
-    cargarPedidos(); // Actualizar la lista de pedidos
-  } catch (error) {
-    console.error("Error al registrar pedido:", error);
-    alert("Ocurrió un error al registrar el pedido");
-  }
-});
-
-// Función corregida para ver pedidos de un cliente
+// Cargar pedidos de un cliente específico - CORREGIDO
 window.cargarPedidosCliente = function (clienteId) {
-  // Primero obtenemos los datos del cliente
   db.ref(`clientes/${clienteId}`).once('value').then(cSnap => {
     const cliente = cSnap.val();
-    
-    // Luego buscamos los pedidos de este cliente por DNI
+    if (!cliente) return alert("Cliente no encontrado");
+
+    // Buscar pedidos por DNI del cliente
     db.ref('pedidos').orderByChild('clienteDNI').equalTo(cliente.dni).once('value').then(pSnap => {
       const pedidos = pSnap.val();
       const tbody = document.getElementById("listaPedidosBody");
