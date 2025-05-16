@@ -8,13 +8,11 @@
 body {
   background: url('excavadora.jpg') no-repeat center center fixed;
   background-size: cover;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
   padding: 20px;
   position: relative;
   min-height: 100vh;
 }
+
 
 body::before {
   content: "";
@@ -215,14 +213,11 @@ section {
   background-color: #e64a19;
 }
 
-#pedidosLista table {
-  border: 2px solid limegreen;
-  min-height: 100px;
+#pedidosLista {
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.05);
 }
 
-#listaPedidosBody {
-  border: 1px dashed red;
-}
 
 
 /* Responsive ajustes */
