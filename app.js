@@ -246,8 +246,8 @@ function cargarPedidos() {
         Object.values(pedidos).forEach(pedido => {
           const tr = document.createElement("tr");
           tr.innerHTML = `
-            <td>${cliente.nombre || "Desconocido"}</td>
-            <td>${cliente.dni || ""}</td>
+            <td>${cliente.nombre || 'Desconocido'}</td>
+            <td>${cliente.dni || ''}</td>
             <td>${pedido.producto}</td>
             <td>${pedido.estado}</td>
             <td>${new Date(pedido.fecha).toLocaleString()}</td>`;
@@ -257,3 +257,4 @@ function cargarPedidos() {
     });
   });
 }
+
