@@ -498,7 +498,7 @@ function enviarCorreo(emailDestino, pedidoInfo) {
   fetch("https://api.sendgrid.com/v3/mail/send", {
     method: "POST",
     headers: {
-      "Authorization": "Bearer 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",
+      "Authorization": "Bearer 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",
       "Content-Type": "application/json"
     },
     body: JSON.stringify(data)
