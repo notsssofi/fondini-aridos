@@ -425,3 +425,24 @@ window.eliminarPedido = function(clienteId, pedidoId) {
   }
 };
 
+
+async function eliminarPedidosHuerfanos() {
+  const clientesSnap = await db.ref('clientes').once('value');
+  const clientes = clientesSnap.val() || {};
+
+  const pedidosSnap = await db.ref('pedidos').once('value');
+  const pedidosData = pedidosSnap.val() || {};
+
+  let borrados = 0;
+
+  for (const clienteId in pedidosData) {
+    if (!clientes[clienteId]) {
+      await db.ref(`pedidos/${clienteId}`).remove();
+      console.log(`Pedidos de clienteId ${clienteId} eliminados`);
+      borrados++;
+    }
+  }
+
+  alert(`Pedidos huérfanos eliminados: ${borrados}`);
+}
+
