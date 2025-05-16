@@ -271,11 +271,17 @@ window.eliminarCliente = function(id) {
 
 
 window.cargarPedidosCliente = function (clienteId) {
- db.ref(`clientes/${clienteId}`).once('value').then(clienteSnap => {
+  db.ref(`clientes/${clienteId}`).once('value').then(clienteSnap => {
     const cliente = clienteSnap.val();
     if (!cliente) return alert("Cliente no encontrado");
 
-db.ref(`pedidos/${clienteId}`).once('value').then(pedidosSnap => {
+    db.ref(`pedidos/${clienteId}`).once('value').then(pedidosSnap => {
+      // Mostrar sólo la sección de pedidos
+      showSection(DOM.sections.pedidosLista);
+      hideSection(DOM.sections.clientesLista);
+      hideSection(DOM.sections.registroContainer);
+      hideSection(DOM.sections.calculadora);
+
       DOM.sections.pedidosContent.innerHTML = "";
       const pedidos = pedidosSnap.val();
 
@@ -284,6 +290,7 @@ db.ref(`pedidos/${clienteId}`).once('value').then(pedidosSnap => {
       header.innerHTML = `
         <h4>Pedidos de: ${cliente.nombre} | Tel: ${cliente.telefono}</h4>
         <p>Email: ${cliente.email} | DNI: ${cliente.dni}</p>
+        <button onclick="cargarClientes()">Volver a Clientes</button>
       `;
       DOM.sections.pedidosContent.appendChild(header);
 
@@ -320,7 +327,8 @@ db.ref(`pedidos/${clienteId}`).once('value').then(pedidosSnap => {
       });
     });
   });
-}
+};
+
 
 DOM.forms.pedido.addEventListener("submit", async (e) => {
   e.preventDefault();
