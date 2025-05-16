@@ -184,8 +184,8 @@ e.preventDefault();
 const { nombre, email, direccion, telefono, dni } = DOM.inputs;
 const editId = DOM.forms.cliente.getAttribute("data-edit-id");
 
-if (!/^\[0-9]{7,8}\$/.test(dni.value)) return alert("DNI inválido");
-if (!/^\[^\s@]+@\[^\s@]+.\[^\s@]+\$/.test(email.value)) return alert("Email inválido");
+if (!/^[0-9]{7,8}$/.test(dni.value)) return alert("DNI inválido");
+if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)) return alert("Email inválido");
 
 const clienteData = {
 nombre: nombre.value,
@@ -407,7 +407,7 @@ db.ref('pedidos').once('value').then(pedidosSnap => {
         <td>
           <button onclick="editarPedido('${clienteId}', '${pedidoId}')">Editar</button>
           <button onclick="eliminarPedido('${clienteId}', '${pedidoId}')">Eliminar</button>
-          ${cliente.email ? <button onclick="confirmarPedido('${clienteId}', '${pedidoId}', '${cliente.email}', '${cliente.nombre}')">Confirmar Pedido</button> : ''}
+${cliente.email ? `<button onclick="confirmarPedido('${clienteId}', '${pedidoId}', '${cliente.email}', '${cliente.nombre}')">Confirmar Pedido</button>` : ''}
         </td>
       `;
       tbody.appendChild(tr);
@@ -470,8 +470,10 @@ const ganancia = subtotal \* (margen / 100);
 const totalSinIVA = subtotal + ganancia;
 const totalConIVA = totalSinIVA \* (1 + iva);
 
-document.getElementById("resultado").innerHTML = `     Subtotal: $${subtotal.toFixed(2)}<br>
-    Ganancia (${margen}%): $${ganancia.toFixed(2)}<br>
-    Total sin IVA: $${totalSinIVA.toFixed(2)}<br>     <strong>Total con IVA (21%): $${totalConIVA.toFixed(2)}</strong>
-  `;
+document.getElementById("resultado").innerHTML = `
+  Subtotal: $${subtotal.toFixed(2)}<br>
+  Ganancia (${margen}%): $${ganancia.toFixed(2)}<br>
+  Total sin IVA: $${totalSinIVA.toFixed(2)}<br>
+  <strong>Total con IVA (21%): $${totalConIVA.toFixed(2)}</strong>
+`;
 };
