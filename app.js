@@ -224,9 +224,9 @@ DOM.forms.pedido.addEventListener("submit", async (e) => {
       clienteDNI: cliente.dni,
       clienteEmail: cliente.email,
       clienteNombre: cliente.nombre,
-      producto: producto.value,
       estado: estado.value,
-      fecha: new Date().toISOString()
+      fecha: new Date().toISOString(),
+      producto: producto.value
     });
     
     alert("Pedido registrado correctamente");
