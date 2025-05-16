@@ -223,11 +223,11 @@ function cargarClientes() {
 }
 
 window.cargarPedidosCliente = function (clienteId) {
-  db.ref(clientes/${clienteId}).once('value').then(clienteSnap => {
+ db.ref(`clientes/${clienteId}`).once('value').then(clienteSnap => {
     const cliente = clienteSnap.val();
     if (!cliente) return alert("Cliente no encontrado");
 
-    db.ref(pedidos/${clienteId}).once('value').then(pedidosSnap => {
+db.ref(`pedidos/${clienteId}`).once('value').then(pedidosSnap => {
       DOM.sections.pedidosContent.innerHTML = "";
       const pedidos = pedidosSnap.val();
 
@@ -301,7 +301,7 @@ DOM.forms.pedido.addEventListener("submit", async (e) => {
     clienteEmail: cliente.email || ''
   };
 
-  await db.ref(pedidos/${clienteId}).push(nuevoPedido);
+  await db.ref(`pedidos/${clienteId}`).push(nuevoPedido);
   alert("Pedido creado exitosamente");
   resetForms();
   cargarPedidosCliente(clienteId);
