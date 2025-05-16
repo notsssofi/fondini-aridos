@@ -81,22 +81,32 @@ auth.onAuthStateChanged(user => {
 DOM.forms.registro.addEventListener("submit", async (e) => {
   e.preventDefault();
   const { nombreCompleto, correo, nuevaPassword } = DOM.inputs;
-  const cred = await auth.createUserWithEmailAndPassword(correo.value, nuevaPassword.value);
-  await db.ref(`users/${cred.user.uid}`).set({
-    nombre: nombreCompleto.value,
-    email: correo.value
-  });
-  alert("Cuenta creada");
-  resetForms();
-  showSection(DOM.sections.login);
+  try {
+    const cred = await auth.createUserWithEmailAndPassword(correo.value, nuevaPassword.value);
+    await db.ref(`users/${cred.user.uid}`).set({
+      nombre: nombreCompleto.value,
+      email: correo.value
+    });
+    alert("Cuenta creada exitosamente");
+    resetForms();
+    showSection(DOM.sections.login);
+  } catch (error) {
+    console.error("Error al registrar:", error);
+    alert("Error al crear la cuenta: " + error.message);
+  }
 });
 
 DOM.forms.login.addEventListener("submit", async (e) => {
   e.preventDefault();
   const { correoLogin, password } = DOM.inputs;
-  await auth.signInWithEmailAndPassword(correoLogin.value, password.value);
-  resetForms();
-  showSection(DOM.sections.menu);
+  try {
+    await auth.signInWithEmailAndPassword(correoLogin.value, password.value);
+    resetForms();
+    showSection(DOM.sections.menu);
+  } catch (error) {
+    console.error("Error al iniciar sesión:", error);
+    alert("Error al iniciar sesión: " + error.message);
+  }
 });
 
 // Navegación
@@ -144,36 +154,48 @@ document.querySelectorAll(".menu-card").forEach(btn => {
 DOM.forms.cliente.addEventListener("submit", async (e) => {
   e.preventDefault();
   const { nombre, email, direccion, telefono, dni } = DOM.inputs;
-  const snap = await db.ref('clientes').orderByChild('dni').equalTo(dni.value).once('value');
-  if (snap.exists()) return alert("DNI existente");
-  await db.ref('clientes').push({
-    nombre: nombre.value,
-    email: email.value,
-    direccion: direccion.value,
-    telefono: telefono.value,
-    dni: dni.value,
-    fecha: new Date().toISOString()
-  });
-  alert("Cliente agregado");
-  resetForms();
-  cargarClientes();
+  try {
+    const snap = await db.ref('clientes').orderByChild('dni').equalTo(dni.value).once('value');
+    if (snap.exists()) return alert("Ya existe un cliente con este DNI");
+    
+    await db.ref('clientes').push({
+      nombre: nombre.value,
+      email: email.value,
+      direccion: direccion.value,
+      telefono: telefono.value,
+      dni: dni.value,
+      fecha: new Date().toISOString()
+    });
+    alert("Cliente agregado exitosamente");
+    resetForms();
+    cargarClientes();
+  } catch (error) {
+    console.error("Error al agregar cliente:", error);
+    alert("Error al agregar cliente: " + error.message);
+  }
 });
 
 // Crear pedido
 DOM.forms.pedido.addEventListener("submit", async (e) => {
   e.preventDefault();
   const { clientePedido, producto, estado } = DOM.inputs;
-  const snap = await db.ref('clientes').orderByChild('dni').equalTo(clientePedido.value).once('value');
-  if (!snap.exists()) return alert("Cliente no encontrado");
-  const clienteId = Object.keys(snap.val())[0];
-  await db.ref(`pedidos/${clienteId}`).push({
-    producto: producto.value,
-    estado: estado.value,
-    fecha: new Date().toISOString()
-  });
-  alert("Pedido registrado");
-  resetForms();
-  cargarPedidosCliente(clienteId);
+  try {
+    const snap = await db.ref('clientes').orderByChild('dni').equalTo(clientePedido.value).once('value');
+    if (!snap.exists()) return alert("Cliente no encontrado");
+    
+    const clienteId = Object.keys(snap.val())[0];
+    await db.ref(`pedidos/${clienteId}`).push({
+      producto: producto.value,
+      estado: estado.value,
+      fecha: new Date().toISOString()
+    });
+    alert("Pedido registrado correctamente");
+    resetForms();
+    cargarPedidos();
+  } catch (error) {
+    console.error("Error al registrar pedido:", error);
+    alert("Error al registrar pedido: " + error.message);
+  }
 });
 
 // Mostrar clientes
@@ -190,24 +212,29 @@ function cargarClientes() {
           <td><button onclick="cargarPedidosCliente('${id}')">Ver Pedidos</button></td>`;
         DOM.lists.clientes.appendChild(tr);
       });
+    } else {
+      DOM.lists.clientes.innerHTML = '<tr><td colspan="6">No hay clientes registrados</td></tr>';
     }
+  }).catch(error => {
+    console.error("Error al cargar clientes:", error);
+    DOM.lists.clientes.innerHTML = '<tr><td colspan="6">Error al cargar clientes</td></tr>';
   });
 }
 
 // Ver pedidos de un cliente
 window.cargarPedidosCliente = function (clienteId) {
-  db.ref(`clientes/${clienteId}`).once('value').then(cSnap => {
+  Promise.all([
+    db.ref(`clientes/${clienteId}`).once('value'),
+    db.ref(`pedidos/${clienteId}`).once('value')
+  ]).then(([cSnap, pSnap]) => {
     const cliente = cSnap.val();
-    db.ref(`pedidos/${clienteId}`).once('value').then(pSnap => {
-      const pedidos = pSnap.val();
-      const tbody = document.getElementById("listaPedidosBody");
-      tbody.innerHTML = "";
+    const pedidos = pSnap.val();
+    const tbody = document.getElementById("listaPedidosBody");
+    tbody.innerHTML = "";
 
-      if (!pedidos) {
-        tbody.innerHTML = '<tr><td colspan="5">No hay pedidos</td></tr>';
-        return;
-      }
-
+    if (!pedidos) {
+      tbody.innerHTML = '<tr><td colspan="5">No hay pedidos para este cliente</td></tr>';
+    } else {
       Object.values(pedidos).forEach(p => {
         const tr = document.createElement("tr");
         tr.innerHTML = `
@@ -218,43 +245,52 @@ window.cargarPedidosCliente = function (clienteId) {
           <td>${new Date(p.fecha).toLocaleString()}</td>`;
         tbody.appendChild(tr);
       });
+    }
 
-      showSection(DOM.sections.dashboard);
-      DOM.sections.registroContainer.classList.add("hidden");
-      DOM.sections.clientesLista.classList.add("hidden");
-      DOM.sections.pedidosLista.classList.remove("hidden");
-    });
+    showSection(DOM.sections.dashboard);
+    DOM.sections.registroContainer.classList.add("hidden");
+    DOM.sections.clientesLista.classList.add("hidden");
+    DOM.sections.pedidosLista.classList.remove("hidden");
+  }).catch(error => {
+    console.error("Error al cargar pedidos del cliente:", error);
+    const tbody = document.getElementById("listaPedidosBody");
+    tbody.innerHTML = '<tr><td colspan="5">Error al cargar pedidos</td></tr>';
   });
 };
 
 // Ver todos los pedidos
 function cargarPedidos() {
-  db.ref('clientes').once('value').then(clientesSnap => {
+  Promise.all([
+    db.ref('clientes').once('value'),
+    db.ref('pedidos').once('value')
+  ]).then(([clientesSnap, pedidosSnap]) => {
     const clientes = clientesSnap.val() || {};
-    db.ref('pedidos').once('value').then(pedidosSnap => {
-      const tbody = document.getElementById("listaPedidosBody");
-      tbody.innerHTML = "";
+    const pedidos = pedidosSnap.val() || {};
+    const tbody = document.getElementById("listaPedidosBody");
+    tbody.innerHTML = "";
 
-      const data = pedidosSnap.val();
-      if (!data) {
-        tbody.innerHTML = '<tr><td colspan="5">No hay pedidos</td></tr>';
-        return;
-      }
+    if (!pedidos || Object.keys(pedidos).length === 0) {
+      tbody.innerHTML = '<tr><td colspan="5">No hay pedidos registrados</td></tr>';
+      return;
+    }
 
-      Object.entries(data).forEach(([clienteId, pedidos]) => {
-        const cliente = clientes[clienteId] || {};
-        Object.values(pedidos).forEach(pedido => {
-          const tr = document.createElement("tr");
-          tr.innerHTML = `
-            <td>${cliente.nombre || 'Desconocido'}</td>
-            <td>${cliente.dni || ''}</td>
-            <td>${pedido.producto}</td>
-            <td>${pedido.estado}</td>
-            <td>${new Date(pedido.fecha).toLocaleString()}</td>`;
-          tbody.appendChild(tr);
-        });
+    Object.entries(pedidos).forEach(([clienteId, pedidosCliente]) => {
+      const cliente = clientes[clienteId] || {};
+      
+      Object.values(pedidosCliente).forEach(pedido => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${cliente.nombre || 'Cliente no encontrado'}</td>
+          <td>${cliente.dni || ''}</td>
+          <td>${pedido.producto}</td>
+          <td>${pedido.estado}</td>
+          <td>${new Date(pedido.fecha).toLocaleString()}</td>`;
+        tbody.appendChild(tr);
       });
     });
+  }).catch(error => {
+    console.error("Error al cargar pedidos:", error);
+    const tbody = document.getElementById("listaPedidosBody");
+    tbody.innerHTML = '<tr><td colspan="5">Error al cargar los pedidos</td></tr>';
   });
 }
-
