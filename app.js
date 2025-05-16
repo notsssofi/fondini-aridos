@@ -26,7 +26,10 @@ const DOM = {
     pedidosContent: document.getElementById("pedidosContent")
   },
   buttons: {
-    logout: document.getElementById("logoutBtn")
+    logout: document.getElementById("logoutBtn"),
+    volverMenuDesdeRegistro: document.getElementById("volverMenuDesdeRegistro"),
+    volverMenuDesdeClientes: document.getElementById("volverMenuDesdeClientes"),
+    volverMenuDesdePedidos: document.getElementById("volverMenuDesdePedidos")
   },
   forms: {
     login: document.getElementById("loginForm"),
@@ -59,13 +62,11 @@ const DOM = {
   }
 };
 
-// Función para mostrar una sección y ocultar las demás
 function showSection(section) {
   Object.values(DOM.sections).forEach(sec => sec.classList.add("hidden"));
   section.classList.remove("hidden");
 }
 
-// Función para resetear todos los formularios
 function resetForms() {
   Object.values(DOM.forms).forEach(form => form.reset());
 }
@@ -74,7 +75,6 @@ const AppState = {
   currentUser: null
 };
 
-// Monitorea el estado de autenticación
 auth.onAuthStateChanged(user => {
   AppState.currentUser = user;
   if (user) {
@@ -84,7 +84,6 @@ auth.onAuthStateChanged(user => {
   }
 });
 
-// Registro de nuevo usuario
 DOM.forms.registro.addEventListener("submit", (e) => {
   e.preventDefault();
   const { nombreCompleto, correo, nuevaPassword } = DOM.inputs;
@@ -107,7 +106,6 @@ DOM.forms.registro.addEventListener("submit", (e) => {
     });
 });
 
-// Inicio de sesión
 DOM.forms.login.addEventListener("submit", (e) => {
   e.preventDefault();
   const { correoLogin, password } = DOM.inputs;
@@ -124,7 +122,6 @@ DOM.forms.login.addEventListener("submit", (e) => {
     });
 });
 
-// Navegación entre login y registro
 DOM.links.crearCuenta.addEventListener("click", (e) => {
   e.preventDefault();
   showSection(DOM.sections.registro);
@@ -135,7 +132,6 @@ DOM.links.volverLogin.addEventListener("click", (e) => {
   showSection(DOM.sections.login);
 });
 
-// Cierre de sesión
 DOM.buttons.logout.addEventListener("click", () => {
   auth.signOut()
     .then(() => {
@@ -145,7 +141,20 @@ DOM.buttons.logout.addEventListener("click", () => {
     .catch(error => console.error("Error al cerrar sesión:", error));
 });
 
-// Evento de menú principal
+// Botones para volver al menú desde distintas vistas
+DOM.buttons.volverMenuDesdeRegistro.addEventListener("click", () => {
+  showSection(DOM.sections.menu);
+});
+
+DOM.buttons.volverMenuDesdeClientes.addEventListener("click", () => {
+  showSection(DOM.sections.menu);
+});
+
+DOM.buttons.volverMenuDesdePedidos.addEventListener("click", () => {
+  showSection(DOM.sections.menu);
+});
+
+// Menú principal
 const menuButtons = document.querySelectorAll(".menu-card");
 menuButtons.forEach(button => {
   button.addEventListener("click", () => {
@@ -178,74 +187,3 @@ menuButtons.forEach(button => {
     }
   });
 });
-
-// Función para cargar la lista de clientes desde Firebase
-function cargarClientes() {
-  db.ref('clientes').once('value').then(snapshot => {
-    DOM.lists.clientes.innerHTML = "";
-    const data = snapshot.val();
-    if (data) {
-      Object.entries(data).forEach(([id, cliente]) => {
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td>${cliente.nombre}</td>
-          <td>${cliente.email}</td>
-          <td>${cliente.direccion}</td>
-          <td>${cliente.telefono}</td>
-          <td>${cliente.dni}</td>
-          <td><button onclick="cargarPedidosCliente('${id}')">Ver Pedidos</button></td>
-        `;
-        DOM.lists.clientes.appendChild(tr);
-      });
-    }
-  });
-}
-
-// Función para cargar todos los pedidos desde Firebase
-function cargarPedidos() {
-  db.ref('clientes').once('value').then(clientesSnap => {
-    const clientes = clientesSnap.val() || {};
-    db.ref('pedidos').once('value').then(pedidosSnap => {
-      DOM.sections.pedidosContent.innerHTML = "";
-      const pedidosData = pedidosSnap.val();
-
-      const table = document.createElement("table");
-      table.innerHTML = `
-        <thead>
-          <tr>
-            <th>Cliente</th>
-            <th>DNI</th>
-            <th>Producto</th>
-            <th>Cantidad</th>
-            <th>Fecha</th>
-          </tr>
-        </thead>
-        <tbody id="listaPedidosBody"></tbody>
-      `;
-      DOM.sections.pedidosContent.appendChild(table);
-
-      const tbody = document.getElementById("listaPedidosBody");
-      if (!pedidosData) {
-        const tr = document.createElement("tr");
-        tr.innerHTML = '<td colspan="5">No hay pedidos registrados</td>';
-        tbody.appendChild(tr);
-        return;
-      }
-
-      Object.entries(pedidosData).forEach(([clienteId, pedidos]) => {
-        const cliente = clientes[clienteId] || {};
-        Object.values(pedidos).forEach(pedido => {
-          const tr = document.createElement("tr");
-          tr.innerHTML = `
-            <td>${cliente.nombre || 'Cliente desconocido'}</td>
-            <td>${cliente.dni || ''}</td>
-            <td>${pedido.producto}</td>
-            <td>${pedido.estado}</td>
-            <td>${new Date(pedido.fecha).toLocaleString()}</td>
-          `;
-          tbody.appendChild(tr);
-        });
-      });
-    });
-  });
-} 
