@@ -168,38 +168,37 @@ DOM.buttons.nuevoRegistro.addEventListener("click", () => {
 DOM.forms.cliente.addEventListener("submit", async (e) => {
   e.preventDefault();
   const { nombre, email, direccion, telefono, dni } = DOM.inputs;
+  const editId = DOM.forms.cliente.getAttribute("data-edit-id");
 
-  if (!/^[0-9]{7,8}$/.test(dni.value)) {
-    alert("DNI inválido. Debe tener entre 7 y 8 dígitos numéricos.");
-    return;
-  }
+  if (!/^[0-9]{7,8}$/.test(dni.value)) return alert("DNI inválido");
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)) return alert("Email inválido");
 
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)) {
-    alert("Email inválido");
-    return;
-  }
-
-  const snapshot = await db.ref('clientes').orderByChild('dni').equalTo(dni.value).once('value');
-
-  if (snapshot.exists()) {
-    alert("Ya existe un cliente con ese DNI");
-    return;
-  }
-
-  const nuevoCliente = {
+  const clienteData = {
     nombre: nombre.value,
     email: email.value,
     direccion: direccion.value,
     telefono: telefono.value,
-    dni: dni.value,
-    fechaRegistro: new Date().toISOString()
+    dni: dni.value
   };
 
-  await db.ref('clientes').push(nuevoCliente);
-  alert("Cliente registrado exitosamente");
+  if (editId) {
+    await db.ref(`clientes/${editId}`).update(clienteData);
+    alert("Cliente actualizado");
+    DOM.forms.cliente.removeAttribute("data-edit-id");
+    DOM.inputs.dni.disabled = false;
+  } else {
+    const snapshot = await db.ref('clientes').orderByChild('dni').equalTo(dni.value).once('value');
+    if (snapshot.exists()) return alert("Ya existe un cliente con ese DNI");
+
+    clienteData.fechaRegistro = new Date().toISOString();
+    await db.ref('clientes').push(clienteData);
+    alert("Cliente registrado exitosamente");
+  }
+
   resetForms();
   cargarClientes();
 });
+
 
 function cargarClientes() {
   db.ref('clientes').once('value').then(snapshot => {
@@ -214,13 +213,47 @@ function cargarClientes() {
           <td>${cliente.direccion}</td>
           <td>${cliente.telefono}</td>
           <td>${cliente.dni}</td>
-          <td><button onclick="cargarPedidosCliente('${id}')">Ver Pedidos</button></td>
+          <td>
+            <button onclick="cargarPedidosCliente('${id}')">Ver Pedidos</button>
+            <button onclick="editarCliente('${id}')">Editar</button>
+            <button onclick="eliminarCliente('${id}')">Eliminar</button>
+          </td>
         `;
         DOM.lists.clientes.appendChild(tr);
       });
     }
   });
 }
+
+window.editarCliente = function(id) {
+  db.ref(`clientes/${id}`).once('value').then(snapshot => {
+    const cliente = snapshot.val();
+    if (!cliente) return alert("Cliente no encontrado");
+
+    DOM.inputs.nombre.value = cliente.nombre;
+    DOM.inputs.email.value = cliente.email;
+    DOM.inputs.direccion.value = cliente.direccion;
+    DOM.inputs.telefono.value = cliente.telefono;
+    DOM.inputs.dni.value = cliente.dni;
+    DOM.inputs.dni.disabled = true;
+
+    DOM.forms.cliente.setAttribute("data-edit-id", id);
+    DOM.sections.registroContainer.classList.remove("hidden");
+  });
+};
+
+window.eliminarCliente = function(id) {
+  if (confirm("¿Estás seguro de eliminar este cliente y sus pedidos?")) {
+    db.ref(`clientes/${id}`).remove()
+      .then(() => db.ref(`pedidos/${id}`).remove())
+      .then(() => {
+        alert("Cliente y pedidos eliminados");
+        cargarClientes();
+      })
+      .catch(err => alert("Error: " + err.message));
+  }
+};
+
 
 window.cargarPedidosCliente = function (clienteId) {
  db.ref(`clientes/${clienteId}`).once('value').then(clienteSnap => {
@@ -277,22 +310,18 @@ db.ref(`pedidos/${clienteId}`).once('value').then(pedidosSnap => {
 DOM.forms.pedido.addEventListener("submit", async (e) => {
   e.preventDefault();
   const { clientePedido, producto, estado } = DOM.inputs;
+  const editId = DOM.forms.pedido.getAttribute("data-edit-id");
+  const clienteIdFromAttr = DOM.forms.pedido.getAttribute("data-cliente-id");
 
-  if (!/^[0-9]{7,8}$/.test(clientePedido.value)) {
-    alert("DNI inválido");
-    return;
-  }
+  if (!/^[0-9]{7,8}$/.test(clientePedido.value)) return alert("DNI inválido");
 
   const clientesSnap = await db.ref('clientes').orderByChild('dni').equalTo(clientePedido.value).once('value');
-  if (!clientesSnap.exists()) {
-    alert("Cliente no encontrado. Primero regístrelo.");
-    return;
-  }
+  if (!clientesSnap.exists()) return alert("Cliente no encontrado");
 
   const clienteId = Object.keys(clientesSnap.val())[0];
   const cliente = clientesSnap.val()[clienteId];
 
-  const nuevoPedido = {
+  const pedidoData = {
     producto: producto.value,
     estado: estado.value,
     fecha: new Date().toISOString(),
@@ -301,11 +330,20 @@ DOM.forms.pedido.addEventListener("submit", async (e) => {
     clienteEmail: cliente.email || ''
   };
 
-  await db.ref(`pedidos/${clienteId}`).push(nuevoPedido);
-  alert("Pedido creado exitosamente");
+  if (editId) {
+    await db.ref(`pedidos/${clienteIdFromAttr}/${editId}`).update(pedidoData);
+    alert("Pedido actualizado");
+    DOM.forms.pedido.removeAttribute("data-edit-id");
+    DOM.forms.pedido.removeAttribute("data-cliente-id");
+  } else {
+    await db.ref(`pedidos/${clienteId}`).push(pedidoData);
+    alert("Pedido creado exitosamente");
+  }
+
   resetForms();
   cargarPedidosCliente(clienteId);
 });
+
 
 function cargarPedidos() {
   db.ref('clientes').once('value').then(clientesSnap => {
@@ -354,3 +392,30 @@ function cargarPedidos() {
     });
   });
 }
+
+window.editarPedido = function(clienteId, pedidoId) {
+  db.ref(`pedidos/${clienteId}/${pedidoId}`).once('value').then(snapshot => {
+    const pedido = snapshot.val();
+    if (!pedido) return alert("Pedido no encontrado");
+
+    DOM.inputs.clientePedido.value = pedido.clienteDNI;
+    DOM.inputs.producto.value = pedido.producto;
+    DOM.inputs.estado.value = pedido.estado;
+
+    DOM.forms.pedido.setAttribute("data-edit-id", pedidoId);
+    DOM.forms.pedido.setAttribute("data-cliente-id", clienteId);
+    DOM.sections.registroContainer.classList.remove("hidden");
+  });
+};
+
+window.eliminarPedido = function(clienteId, pedidoId) {
+  if (confirm("¿Eliminar este pedido?")) {
+    db.ref(`pedidos/${clienteId}/${pedidoId}`).remove()
+      .then(() => {
+        alert("Pedido eliminado");
+        cargarPedidosCliente(clienteId);
+      })
+      .catch(err => alert("Error: " + err.message));
+  }
+};
+
