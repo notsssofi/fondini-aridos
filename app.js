@@ -34,7 +34,8 @@ const DOM = {
     mostrarClientes: document.getElementById("mostrarClientes"),
     mostrarPedidos: document.getElementById("mostrarPedidos"),
     nuevoRegistro: document.getElementById("nuevoRegistroBtn"),
-    logout: document.getElementById("logoutBtn")
+    logout: document.getElementById("logoutBtn"),
+    calculadora: document.getElementById("btnCalculadora")
   },
   forms: {
     login: document.getElementById("loginForm"),
@@ -151,6 +152,7 @@ DOM.buttons.mostrarClientes.addEventListener("click", () => {
   showSection(DOM.sections.clientesLista);
   hideSection(DOM.sections.pedidosLista);
   hideSection(DOM.sections.registroContainer);
+  hideSection(DOM.sections.calculadora);
   cargarClientes();
 });
 
@@ -158,6 +160,7 @@ DOM.buttons.mostrarPedidos.addEventListener("click", () => {
   showSection(DOM.sections.pedidosLista);
   hideSection(DOM.sections.clientesLista);
   hideSection(DOM.sections.registroContainer);
+  hideSection(DOM.sections.calculadora);
   cargarPedidos();
 });
 
@@ -165,7 +168,17 @@ DOM.buttons.nuevoRegistro.addEventListener("click", () => {
   DOM.sections.registroContainer.classList.toggle("hidden");
   hideSection(DOM.sections.clientesLista);
   hideSection(DOM.sections.pedidosLista);
+  hideSection(DOM.sections.calculadora);
 });
+
+if (DOM.buttons.calculadora) {
+  DOM.buttons.calculadora.addEventListener("click", () => {
+    showSection(DOM.sections.calculadora);
+    hideSection(DOM.sections.clientesLista);
+    hideSection(DOM.sections.pedidosLista);
+    hideSection(DOM.sections.registroContainer);
+  });
+}
 
 DOM.forms.cliente.addEventListener("submit", async (e) => {
   e.preventDefault();
@@ -427,8 +440,7 @@ window.eliminarPedido = function(clienteId, pedidoId) {
   }
   };
 
-// Calculadora Presupuesto
-function calcularPresupuesto() {
+window.calcularPresupuesto = function () {
   const materiales = parseFloat(document.getElementById("materiales").value) || 0;
   const transporte = parseFloat(document.getElementById("transporte").value) || 0;
   const margen = parseFloat(document.getElementById("margen").value) || 0;
@@ -445,14 +457,4 @@ function calcularPresupuesto() {
     Total sin IVA: $${totalSinIVA.toFixed(2)}<br>
     <strong>Total con IVA (21%): $${totalConIVA.toFixed(2)}</strong>
   `;
-}
-
-const btnCalculadora = document.getElementById("btnCalculadora");
-if (btnCalculadora) {
-  btnCalculadora.addEventListener("click", () => {
-    showSection(document.getElementById("calculadora"));
-    hideSection(DOM.sections.clientesLista);
-    hideSection(DOM.sections.pedidosLista);
-    hideSection(DOM.sections.registroContainer);
-  });
-}
+};
