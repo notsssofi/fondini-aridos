@@ -423,4 +423,34 @@ window.eliminarPedido = function(clienteId, pedidoId) {
       })
       .catch(err => alert("Error: " + err.message));
   }
+
+// Calculadora Presupuesto
+function calcularPresupuesto() {
+  const materiales = parseFloat(document.getElementById("materiales").value) || 0;
+  const transporte = parseFloat(document.getElementById("transporte").value) || 0;
+  const margen = parseFloat(document.getElementById("margen").value) || 0;
+  const iva = 0.21;
+
+  const subtotal = materiales + transporte;
+  const ganancia = subtotal * (margen / 100);
+  const totalSinIVA = subtotal + ganancia;
+  const totalConIVA = totalSinIVA * (1 + iva);
+
+  document.getElementById("resultado").innerHTML = `
+    Subtotal: $${subtotal.toFixed(2)}<br>
+    Ganancia (${margen}%): $${ganancia.toFixed(2)}<br>
+    Total sin IVA: $${totalSinIVA.toFixed(2)}<br>
+    <strong>Total con IVA (21%): $${totalConIVA.toFixed(2)}</strong>
+  `;
+}
 };
+
+const btnCalculadora = document.getElementById("btnCalculadora");
+if (btnCalculadora) {
+  btnCalculadora.addEventListener("click", () => {
+    showSection(document.getElementById("calculadora"));
+    hideSection(DOM.sections.clientesLista);
+    hideSection(DOM.sections.pedidosLista);
+    hideSection(DOM.sections.registroContainer);
+  });
+}
