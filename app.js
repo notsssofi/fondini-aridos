@@ -266,8 +266,9 @@ function cargarPedidos() {
       tbody.appendChild(tr);
     });
 
-    // Asegurar visibilidad de sección
-    showSection(DOM.sections.dashboard);
+    // ✅ Forzar visibilidad de la sección
+    DOM.sections.dashboard.classList.remove("hidden");
+    DOM.sections.menu.classList.add("hidden");
     DOM.sections.registroContainer.classList.add("hidden");
     DOM.sections.clientesLista.classList.add("hidden");
     DOM.sections.pedidosLista.classList.remove("hidden");
@@ -277,6 +278,7 @@ function cargarPedidos() {
     tbody.innerHTML = '<tr><td colspan="5">Error al cargar los pedidos</td></tr>';
   });
 }
+
 
 
 // Cargar pedidos de un cliente específico - CORREGIDO
