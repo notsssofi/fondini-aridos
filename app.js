@@ -269,14 +269,12 @@ window.eliminarCliente = function(id) {
   }
 };
 
-
 window.cargarPedidosCliente = function (clienteId) {
   db.ref(`clientes/${clienteId}`).once('value').then(clienteSnap => {
     const cliente = clienteSnap.val();
     if (!cliente) return alert("Cliente no encontrado");
 
     db.ref(`pedidos/${clienteId}`).once('value').then(pedidosSnap => {
-      // Mostrar sólo la sección de pedidos
       showSection(DOM.sections.pedidosLista);
       hideSection(DOM.sections.clientesLista);
       hideSection(DOM.sections.registroContainer);
@@ -301,6 +299,7 @@ window.cargarPedidosCliente = function (clienteId) {
             <th>Producto</th>
             <th>Cantidad</th>
             <th>Fecha</th>
+            <th>Acciones</th>
           </tr>
         </thead>
         <tbody id="listaPedidosBody"></tbody>
@@ -311,17 +310,22 @@ window.cargarPedidosCliente = function (clienteId) {
 
       if (!pedidos) {
         const tr = document.createElement("tr");
-        tr.innerHTML = '<td colspan="3">No hay pedidos registrados</td>';
+        tr.innerHTML = '<td colspan="4">No hay pedidos registrados</td>';
         tbody.appendChild(tr);
         return;
       }
 
-      Object.values(pedidos).forEach(pedido => {
+      Object.entries(pedidos).forEach(([pedidoId, pedido]) => {
         const tr = document.createElement("tr");
         tr.innerHTML = `
           <td>${pedido.producto}</td>
           <td>${pedido.estado}</td>
           <td>${new Date(pedido.fecha).toLocaleString()}</td>
+          <td>
+            <button onclick="confirmarPedido('${clienteId}', '${pedidoId}', '${cliente.email}', ${JSON.stringify(pedido).replace(/'/g, "\\'")})">
+              Confirmar Pedido
+            </button>
+          </td>
         `;
         tbody.appendChild(tr);
       });
@@ -465,4 +469,51 @@ window.calcularPresupuesto = function () {
     Total sin IVA: $${totalSinIVA.toFixed(2)}<br>
     <strong>Total con IVA (21%): $${totalConIVA.toFixed(2)}</strong>
   `;
+};
+
+// Función para enviar correo de confirmación
+function enviarCorreo(emailDestino, pedidoInfo) {
+  const data = {
+    personalizations: [{ to: [{ email: emailDestino }] }],
+    from: { email: "sofiagomezfernandez2@gmail.com" },
+    subject: "Confirmación de Pedido - Fondini Áridos",
+    content: [
+      {
+        type: "text/plain",
+        value: `Gracias por su pedido de ${pedidoInfo.producto} (Cantidad: ${pedidoInfo.estado}). 
+        Su pedido será entregado en los próximos 2 días. 
+        ¡Gracias por confiar en nosotros!`
+      }
+    ]
+  };
+
+  fetch("https://api.sendgrid.com/v3/mail/send", {
+    method: "POST",
+    headers: {
+      "Authorization": "Bearer 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",
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(data)
+  })
+  .then(response => {
+    if (response.status === 202) {
+      alert("Correo de confirmación enviado con éxito");
+    } else {
+      alert("Error al enviar correo: " + response.status);
+    }
+  })
+  .catch(error => {
+    alert("Error en la petición: " + error.message);
+  });
+}
+
+window.confirmarPedido = function(clienteId, pedidoId, clienteEmail, pedidoInfo) {
+  if (!clienteEmail) {
+    alert("Este cliente no tiene un email registrado. No se puede enviar la confirmación.");
+    return;
+  }
+  
+  if (confirm(`¿Enviar correo de confirmación a ${clienteEmail}?`)) {
+    enviarCorreo(clienteEmail, pedidoInfo);
+  }
 };
