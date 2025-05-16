@@ -197,7 +197,7 @@ DOM.forms.cliente.addEventListener("submit", async (e) => {
   };
 
   if (editId) {
-    await db.ref(`clientes/${editId}`).update(clienteData);
+    await db.ref(clientes/${editId}).update(clienteData);
     alert("Cliente actualizado");
     DOM.forms.cliente.removeAttribute("data-edit-id");
     DOM.inputs.dni.disabled = false;
@@ -241,7 +241,7 @@ function cargarClientes() {
 }
 
 window.editarCliente = function(id) {
-  db.ref(`clientes/${id}`).once('value').then(snapshot => {
+  db.ref(clientes/${id}).once('value').then(snapshot => {
     const cliente = snapshot.val();
     if (!cliente) return alert("Cliente no encontrado");
 
@@ -259,8 +259,8 @@ window.editarCliente = function(id) {
 
 window.eliminarCliente = function(id) {
   if (confirm("¿Estás seguro de eliminar este cliente y sus pedidos?")) {
-    db.ref(`clientes/${id}`).remove()
-      .then(() => db.ref(`pedidos/${id}`).remove())
+    db.ref(clientes/${id}).remove()
+      .then(() => db.ref(pedidos/${id}).remove())
       .then(() => {
         alert("Cliente y pedidos eliminados");
         cargarClientes();
@@ -269,13 +269,14 @@ window.eliminarCliente = function(id) {
   }
 };
 
+
 window.cargarPedidosCliente = function (clienteId) {
-  db.ref(`clientes/${clienteId}`).once('value').then(clienteSnap => {
+  db.ref(clientes/${clienteId}).once('value').then(clienteSnap => {
     const cliente = clienteSnap.val();
     if (!cliente) return alert("Cliente no encontrado");
 
-
-    db.ref(`pedidos/${clienteId}`).once('value').then(pedidosSnap => {
+    db.ref(pedidos/${clienteId}).once('value').then(pedidosSnap => {
+      // Mostrar sólo la sección de pedidos
       showSection(DOM.sections.pedidosLista);
       hideSection(DOM.sections.clientesLista);
       hideSection(DOM.sections.registroContainer);
@@ -300,7 +301,6 @@ window.cargarPedidosCliente = function (clienteId) {
             <th>Producto</th>
             <th>Cantidad</th>
             <th>Fecha</th>
-            <th>Acciones</th>
           </tr>
         </thead>
         <tbody id="listaPedidosBody"></tbody>
@@ -311,22 +311,17 @@ window.cargarPedidosCliente = function (clienteId) {
 
       if (!pedidos) {
         const tr = document.createElement("tr");
-        tr.innerHTML = '<td colspan="4">No hay pedidos registrados</td>';
+        tr.innerHTML = '<td colspan="3">No hay pedidos registrados</td>';
         tbody.appendChild(tr);
         return;
       }
 
-     Object.entries(pedidos).forEach(([pedidoId, pedido]) => {
+      Object.values(pedidos).forEach(pedido => {
         const tr = document.createElement("tr");
         tr.innerHTML = `
           <td>${pedido.producto}</td>
           <td>${pedido.estado}</td>
           <td>${new Date(pedido.fecha).toLocaleString()}</td>
-          <td>
-            <button class="btn-confirmar" onclick="confirmarPedido('${cliente.email}', '${pedido.producto}', '${pedido.estado}')">
-              Confirmar Pedido
-            </button>
-          </td>
         `;
         tbody.appendChild(tr);
       });
@@ -359,12 +354,12 @@ DOM.forms.pedido.addEventListener("submit", async (e) => {
   };
 
   if (editId) {
-    await db.ref(`pedidos/${clienteIdFromAttr}/${editId}`).update(pedidoData);
+    await db.ref(pedidos/${clienteIdFromAttr}/${editId}).update(pedidoData);
     alert("Pedido actualizado");
     DOM.forms.pedido.removeAttribute("data-edit-id");
     DOM.forms.pedido.removeAttribute("data-cliente-id");
   } else {
-    await db.ref(`pedidos/${clienteId}`).push(pedidoData);
+    await db.ref(pedidos/${clienteId}).push(pedidoData);
     alert("Pedido creado exitosamente");
   }
 
@@ -428,7 +423,7 @@ function cargarPedidos() {
 }
 
 window.editarPedido = function(clienteId, pedidoId) {
-  db.ref(`pedidos/${clienteId}/${pedidoId}`).once('value').then(snapshot => {
+  db.ref(pedidos/${clienteId}/${pedidoId}).once('value').then(snapshot => {
     const pedido = snapshot.val();
     if (!pedido) return alert("Pedido no encontrado");
 
@@ -444,7 +439,7 @@ window.editarPedido = function(clienteId, pedidoId) {
 
 window.eliminarPedido = function(clienteId, pedidoId) {
   if (confirm("¿Eliminar este pedido?")) {
-    db.ref(`pedidos/${clienteId}/${pedidoId}`).remove()
+    db.ref(pedidos/${clienteId}/${pedidoId}).remove()
       .then(() => {
         alert("Pedido eliminado");
         cargarPedidosCliente(clienteId);
@@ -470,75 +465,4 @@ window.calcularPresupuesto = function () {
     Total sin IVA: $${totalSinIVA.toFixed(2)}<br>
     <strong>Total con IVA (21%): $${totalConIVA.toFixed(2)}</strong>
   `;
-};
-
-function enviarCorreo(emailDestino, pedidoInfo) {
-  // Verificar que el email sea válido
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailDestino)) {
-    alert("El email del cliente no es válido");
-    return;
-  }
-
-  const data = {
-    personalizations: [{ to: [{ email: emailDestino }] }],
-    from: { email: "marisolfondini@gmail.com" },
-    subject: "Confirmación de Pedido - Fondini Áridos",
-    content: [
-      {
-        type: "text/plain",
-        value: `Gracias por su pedido de ${pedidoInfo.producto} (Cantidad: ${pedidoInfo.estado}). 
-        Su pedido será entregado en los próximos 2 días. 
-        ¡Gracias por confiar en nosotros!`
-      }
-    ]
-  };
-
-  console.log("Intentando enviar correo a:", emailDestino); // Para depuración
-
-  fetch("https://api.sendgrid.com/v3/mail/send", {
-    method: "POST",
-    headers: {
-      "Authorization": "Bearer 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",
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify(data)
-  })
-  .then(response => {
-    console.log("Respuesta de SendGrid:", response); // Para depuración
-    if (response.ok) {
-      return response.json().then(data => {
-        alert("Correo de confirmación enviado con éxito");
-        return data;
-      }).catch(() => {
-        // Si no hay cuerpo JSON en la respuesta
-        alert("Correo de confirmación enviado con éxito");
-      });
-    } else {
-      return response.json().then(err => {
-        alert(`Error al enviar correo: ${err.errors ? err.errors[0].message : response.status}`);
-        throw new Error(err.errors ? err.errors[0].message : response.status);
-      }).catch(() => {
-        alert(`Error al enviar correo: ${response.status}`);
-        throw new Error(response.status);
-      });
-    }
-  })
-  .catch(error => {
-    console.error("Error en la petición:", error);
-    alert("Error en la conexión: " + error.message);
-  });
-}
-window.confirmarPedido = function(clienteEmail, producto, estado) {
-  if (!clienteEmail) {
-    alert("Este cliente no tiene un email registrado. No se puede enviar la confirmación.");
-    return;
-  }
-  
-  if (confirm(`¿Enviar correo de confirmación a ${clienteEmail}?`)) {
-    const pedidoInfo = {
-      producto: producto,
-      estado: estado
-    };
-    enviarCorreo(clienteEmail, pedidoInfo);
-  }
 };
