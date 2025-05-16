@@ -1,4 +1,4 @@
-// app.js completo y comentado
+// app.js completo y corregido
 
 // Configuración de Firebase
 const firebaseConfig = {
@@ -86,6 +86,7 @@ auth.onAuthStateChanged(user => {
   }
 });
 
+// Login/registro
 DOM.forms.registro.addEventListener("submit", (e) => {
   e.preventDefault();
   const { nombreCompleto, correo, nuevaPassword } = DOM.inputs;
@@ -144,6 +145,7 @@ menuButtons.forEach(button => {
   button.addEventListener("click", () => {
     const action = button.dataset.action;
     showSection(DOM.sections.dashboard);
+    DOM.sections.menu.classList.add("hidden");
 
     switch (action) {
       case "crear-cliente":
@@ -172,8 +174,8 @@ menuButtons.forEach(button => {
   });
 });
 
-// Funciones recuperar clientes/pedidos
-document.getElementById("clienteForm").addEventListener("submit", async (e) => {
+// Registro cliente
+DOM.forms.cliente.addEventListener("submit", async (e) => {
   e.preventDefault();
   const { nombre, email, direccion, telefono, dni } = DOM.inputs;
   const snapshot = await db.ref('clientes').orderByChild('dni').equalTo(dni.value).once('value');
@@ -240,11 +242,17 @@ window.cargarPedidosCliente = function(clienteId) {
         tr.innerHTML = `<td>${pedido.producto}</td><td>${pedido.estado}</td><td>${new Date(pedido.fecha).toLocaleString()}</td>`;
         tbody.appendChild(tr);
       });
+
+      showSection(DOM.sections.dashboard);
+      DOM.sections.registroContainer.classList.add("hidden");
+      DOM.sections.clientesLista.classList.add("hidden");
+      DOM.sections.pedidosLista.classList.remove("hidden");
     });
   });
 }
 
-document.getElementById("pedidoForm").addEventListener("submit", async (e) => {
+// Registro pedido
+DOM.forms.pedido.addEventListener("submit", async (e) => {
   e.preventDefault();
   const { clientePedido, producto, estado } = DOM.inputs;
   const snap = await db.ref('clientes').orderByChild('dni').equalTo(clientePedido.value).once('value');
