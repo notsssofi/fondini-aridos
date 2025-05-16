@@ -443,42 +443,6 @@ window.eliminarPedido = function(clienteId, pedidoId) {
   }
 };
 
-// Función para confirmar pedido por correo
-window.confirmarPedido = async function(clienteId, pedidoId, clienteEmail, clienteNombre) {
-  if (confirm(`¿Enviar confirmación de pedido a ${clienteNombre} (${clienteEmail})?`)) {
-    try {
-      // Cargar EmailJS SDK dinámicamente
-      await loadScript('https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js');
-      
-      // Inicializar EmailJS con tu User ID
-      emailjs.init('TU_USER_ID_DE_EMAILJS');
-      
-      const templateParams = {
-        to_email: clienteEmail,
-        to_name: clienteNombre,
-        message: '¡GRACIAS POR TU PEDIDO! Tu pedido será entregado en los próximos dos días. ¡Gracias por Confiar en Nosotros!'
-      };
-      
-      await emailjs.send(
-        'TU_SERVICE_ID_DE_EMAILJS',
-        'TU_TEMPLATE_ID_DE_EMAILJS',
-        templateParams
-      );
-      
-      alert('Correo de confirmación enviado con éxito');
-      
-      // Opcional: marcar el pedido como confirmado en la base de datos
-      await db.ref('pedidos/' + clienteId + '/' + pedidoId).update({
-        confirmado: true,
-        fechaConfirmacion: new Date().toISOString()
-      });
-    } catch (error) {
-      console.error('Error al enviar correo:', error);
-      alert('Error al enviar correo de confirmación: ' + error.text);
-    }
-  }
-};
-
 // Función auxiliar para cargar scripts dinámicamente
 function loadScript(src) {
   return new Promise((resolve, reject) => {
