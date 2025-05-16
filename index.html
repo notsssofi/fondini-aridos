@@ -51,7 +51,6 @@
 
   <!-- Dashboard con formularios y listas -->
   <section id="dashboard" class="hidden">
-
     <!-- Registro -->
     <div id="registroContainer" class="hidden">
       <h3>Registrar Cliente</h3>
@@ -68,7 +67,7 @@
       <form id="pedidoForm">
         <input type="text" id="clientePedido" placeholder="DNI del Cliente" required pattern="\d{7,8}" />
         <input type="text" id="producto" placeholder="Producto" required />
-        <input type="text" id="estado" placeholder="Cantidad" required />
+        <input type="text" id="estado" placeholder="Estado" required />
         <button type="submit">Agregar Pedido</button>
       </form>
 
@@ -94,26 +93,26 @@
       <button id="volverMenuDesdeClientes">Volver al Menú</button>
     </div>
 
-   <!-- Pedidos -->
-<div id="pedidosLista" class="hidden">
-  <h3>Pedidos</h3>
-  <div id="pedidosContent">
-    <table>
-      <thead>
-        <tr>
-          <th>Cliente</th>
-          <th>DNI</th>
-          <th>Producto</th>
-          <th>Cantidad</th>
-          <th>Fecha</th>
-        </tr>
-      </thead>
-      <tbody id="listaPedidosBody"></tbody>
-    </table>
-  </div>
-  <button id="volverMenuDesdePedidos">Volver al Menú</button>
-</div>
-
+    <!-- Pedidos -->
+    <div id="pedidosLista" class="hidden">
+      <h3>Pedidos</h3>
+      <div id="pedidosContent">
+        <table>
+          <thead>
+            <tr>
+              <th>Cliente</th>
+              <th>DNI</th>
+              <th>Producto</th>
+              <th>Estado</th>
+              <th>Fecha</th>
+            </tr>
+          </thead>
+          <tbody id="listaPedidosBody"></tbody>
+        </table>
+      </div>
+      <button id="volverMenuDesdePedidos">Volver al Menú</button>
+    </div>
+  </section>
 
   <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
