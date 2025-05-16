@@ -483,8 +483,8 @@ window.confirmarPedido = async function(clienteId, pedidoId, clienteEmail, clien
         emailjsConfig.serviceId,
         emailjsConfig.templateId,
         {
-          to_name: clienteNombre,
           to_email: clienteEmail,
+          to_name: clienteNombre,
           message: '¡GRACIAS POR TU PEDIDO! Tu pedido será entregado en los próximos dos días. ¡Gracias por Confiar en Nosotros!'
         }
       );
