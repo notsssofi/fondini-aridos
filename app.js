@@ -454,6 +454,64 @@ function loadScript(src) {
   });
 }
 
+// Configuración de EmailJS (usa tus credenciales reales)
+const emailjsConfig = {
+  serviceId: 'service_18ztxhn',
+  templateId: 'template_k55fuhb',
+  userId: 'HziRIGf46_g54AL-a'
+};
+
+// Función para enviar confirmación de pedido
+window.confirmarPedido = async function(clienteId, pedidoId, clienteEmail, clienteNombre) {
+  if (!clienteEmail) {
+    alert("Este cliente no tiene email registrado");
+    return;
+  }
+
+  if (confirm(`¿Enviar confirmación de pedido a ${clienteNombre} (${clienteEmail})?`)) {
+    try {
+      // Inicializar EmailJS (solo una vez)
+      if (typeof emailjs === 'undefined') {
+        await loadScript('https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js');
+      }
+      emailjs.init(emailjsConfig.userId);
+      
+      // Enviar el correo
+      const response = await emailjs.send(
+        emailjsConfig.serviceId,
+        emailjsConfig.templateId,
+        {
+          to_name: clienteNombre,
+          to_email: clienteEmail,
+          message: '¡GRACIAS POR TU PEDIDO! Tu pedido será entregado en los próximos dos días. ¡Gracias por Confiar en Nosotros!'
+        }
+      );
+      
+      alert('Correo de confirmación enviado con éxito');
+      
+      // Opcional: marcar el pedido como confirmado en la base de datos
+      await db.ref('pedidos/' + clienteId + '/' + pedidoId).update({
+        confirmado: true,
+        fechaConfirmacion: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error('Error al enviar correo:', error);
+      alert('Error al enviar correo de confirmación: ' + error.text);
+    }
+  }
+};
+
+// Función auxiliar para cargar scripts dinámicamente
+function loadScript(src) {
+  return new Promise((resolve, reject) => {
+    const script = document.createElement('script');
+    script.src = src;
+    script.onload = resolve;
+    script.onerror = reject;
+    document.head.appendChild(script);
+  });
+}
+
 window.calcularPresupuesto = function () {
   const materiales = parseFloat(document.getElementById("materiales").value) || 0;
   const transporte = parseFloat(document.getElementById("transporte").value) || 0;
