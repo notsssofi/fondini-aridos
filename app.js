@@ -1,12 +1,12 @@
 // Configuración de Firebase
 const firebaseConfig = {
-  apiKey: "AIzaSyAHTfYQXgWb3l5DqCar3ooOv2yzzsww9Ek",
-  authDomain: "bd-fondini-aridos.firebaseapp.com",
-  databaseURL: "https://bd-fondini-aridos-default-rtdb.firebaseio.com",
-  projectId: "bd-fondini-aridos",
-  storageBucket: "bd-fondini-aridos.firebasestorage.app",
-  messagingSenderId: "1038135881192",
-  appId: "1:1038135881192:web:215908840951025da9485d"
+apiKey: "AIzaSyAHTfYQXgWb3l5DqCar3ooOv2yzzsww9Ek",
+authDomain: "bd-fondini-aridos.firebaseapp.com",
+databaseURL: "[https://bd-fondini-aridos-default-rtdb.firebaseio.com](https://bd-fondini-aridos-default-rtdb.firebaseio.com)",
+projectId: "bd-fondini-aridos",
+storageBucket: "bd-fondini-aridos.firebasestorage.app",
+messagingSenderId: "1038135881192",
+appId: "1:1038135881192\:web:215908840951025da9485d"
 };
 
 firebase.initializeApp(firebaseConfig);
@@ -15,520 +15,463 @@ const db = firebase.database();
 
 // Selección de elementos del DOM
 const DOM = {
-  sections: {
-    login: document.getElementById("login"),
-    registro: document.getElementById("registro"),
-    dashboard: document.getElementById("dashboard"),
-    registroContainer: document.getElementById("registroContainer"),
-    clientesLista: document.getElementById("clientesLista"),
-    pedidosLista: document.getElementById("pedidosLista"),
-    pedidosContent: document.getElementById("pedidosContent"),
-    calculadora: document.getElementById("calculadora")
-  },
-  lists: {
-    clientes: document.getElementById("listaClientes"),
-    pedidos: document.getElementById("listaPedidos")
-  },
-  buttons: {
-    mostrarClientes: document.getElementById("mostrarClientes"),
-    mostrarPedidos: document.getElementById("mostrarPedidos"),
-    nuevoRegistro: document.getElementById("nuevoRegistroBtn"),
-    logout: document.getElementById("logoutBtn"),
-    calculadora: document.getElementById("btnCalculadora")
-  },
-  forms: {
-    login: document.getElementById("loginForm"),
-    registro: document.getElementById("registroForm"),
-    cliente: document.getElementById("clienteForm"),
-    pedido: document.getElementById("pedidoForm")
-  },
-  inputs: {
-    nombre: document.getElementById("nombre"),
-    email: document.getElementById("email"),
-    direccion: document.getElementById("direccion"),
-    telefono: document.getElementById("telefono"),
-    dni: document.getElementById("dni"),
-    clientePedido: document.getElementById("clientePedido"),
-    producto: document.getElementById("producto"),
-    estado: document.getElementById("estado"),
-    nombreCompleto: document.getElementById("nombreCompleto"),
-    correo: document.getElementById("correo"),
-    nuevaPassword: document.getElementById("nuevaPassword"),
-    correoLogin: document.getElementById("correoLogin"),
-    password: document.getElementById("password")
-  },
-  links: {
-    crearCuenta: document.getElementById("crearCuentaLink"),
-    volverLogin: document.getElementById("volverLogin")
-  }
+sections: {
+login: document.getElementById("login"),
+registro: document.getElementById("registro"),
+dashboard: document.getElementById("dashboard"),
+registroContainer: document.getElementById("registroContainer"),
+clientesLista: document.getElementById("clientesLista"),
+pedidosLista: document.getElementById("pedidosLista"),
+pedidosContent: document.getElementById("pedidosContent"),
+calculadora: document.getElementById("calculadora")
+},
+lists: {
+clientes: document.getElementById("listaClientes"),
+pedidos: document.getElementById("listaPedidos")
+},
+buttons: {
+mostrarClientes: document.getElementById("mostrarClientes"),
+mostrarPedidos: document.getElementById("mostrarPedidos"),
+nuevoRegistro: document.getElementById("nuevoRegistroBtn"),
+logout: document.getElementById("logoutBtn"),
+calculadora: document.getElementById("btnCalculadora")
+},
+forms: {
+login: document.getElementById("loginForm"),
+registro: document.getElementById("registroForm"),
+cliente: document.getElementById("clienteForm"),
+pedido: document.getElementById("pedidoForm")
+},
+inputs: {
+nombre: document.getElementById("nombre"),
+email: document.getElementById("email"),
+direccion: document.getElementById("direccion"),
+telefono: document.getElementById("telefono"),
+dni: document.getElementById("dni"),
+clientePedido: document.getElementById("clientePedido"),
+producto: document.getElementById("producto"),
+estado: document.getElementById("estado"),
+nombreCompleto: document.getElementById("nombreCompleto"),
+correo: document.getElementById("correo"),
+nuevaPassword: document.getElementById("nuevaPassword"),
+correoLogin: document.getElementById("correoLogin"),
+password: document.getElementById("password")
+},
+links: {
+crearCuenta: document.getElementById("crearCuentaLink"),
+volverLogin: document.getElementById("volverLogin")
+}
 };
 
 function showSection(section) {
-  section.classList.remove("hidden");
+section.classList.remove("hidden");
 }
 
 function hideSection(section) {
-  section.classList.add("hidden");
+section.classList.add("hidden");
 }
 
 function resetForms() {
-  Object.values(DOM.forms).forEach(form => form.reset());
+Object.values(DOM.forms).forEach(form => form.reset());
 }
 
 const AppState = {
-  currentUser: null
+currentUser: null
 };
 
 auth.onAuthStateChanged(user => {
-  AppState.currentUser = user;
-  if (user) {
-    showSection(DOM.sections.dashboard);
-    hideSection(DOM.sections.login);
-    hideSection(DOM.sections.registro);
-    cargarClientes();
-  } else {
-    showSection(DOM.sections.login);
-    hideSection(DOM.sections.dashboard);
-    hideSection(DOM.sections.registro);
-  }
+AppState.currentUser = user;
+if (user) {
+showSection(DOM.sections.dashboard);
+hideSection(DOM.sections.login);
+hideSection(DOM.sections.registro);
+cargarClientes();
+} else {
+showSection(DOM.sections.login);
+hideSection(DOM.sections.dashboard);
+hideSection(DOM.sections.registro);
+}
 });
 
 DOM.forms.registro.addEventListener("submit", (e) => {
-  e.preventDefault();
-  const { nombreCompleto, correo, nuevaPassword } = DOM.inputs;
+e.preventDefault();
+const { nombreCompleto, correo, nuevaPassword } = DOM.inputs;
 
-  auth.createUserWithEmailAndPassword(correo.value, nuevaPassword.value)
-    .then(userCredential => {
-      return db.ref('users/' + userCredential.user.uid).set({
-        nombre: nombreCompleto.value,
-        email: correo.value
-      });
-    })
-    .then(() => {
-      alert("Cuenta creada con éxito");
-      resetForms();
-    })
-    .catch(error => {
-      console.error("Error al crear cuenta:", error);
-      alert("Error al crear cuenta: " + error.message);
-    });
+auth.createUserWithEmailAndPassword(correo.value, nuevaPassword.value)
+.then(userCredential => {
+return db.ref('users/' + userCredential.user.uid).set({
+nombre: nombreCompleto.value,
+email: correo.value
+});
+})
+.then(() => {
+alert("Cuenta creada con éxito");
+resetForms();
+})
+.catch(error => {
+console.error("Error al crear cuenta:", error);
+alert("Error al crear cuenta: " + error.message);
+});
 });
 
 DOM.forms.login.addEventListener("submit", (e) => {
-  e.preventDefault();
-  const { correoLogin, password } = DOM.inputs;
+e.preventDefault();
+const { correoLogin, password } = DOM.inputs;
 
-  auth.signInWithEmailAndPassword(correoLogin.value, password.value)
-    .then(() => {
-      console.log("Sesión iniciada");
-      resetForms();
-    })
-    .catch(error => {
-      console.error("Error al iniciar sesión:", error);
-      alert("Error al iniciar sesión: " + error.message);
-    });
+auth.signInWithEmailAndPassword(correoLogin.value, password.value)
+.then(() => {
+console.log("Sesión iniciada");
+resetForms();
+})
+.catch(error => {
+console.error("Error al iniciar sesión:", error);
+alert("Error al iniciar sesión: " + error.message);
+});
 });
 
 DOM.links.crearCuenta.addEventListener("click", (e) => {
-  e.preventDefault();
-  showSection(DOM.sections.registro);
-  hideSection(DOM.sections.login);
+e.preventDefault();
+showSection(DOM.sections.registro);
+hideSection(DOM.sections.login);
 });
 
 DOM.links.volverLogin.addEventListener("click", (e) => {
-  e.preventDefault();
-  showSection(DOM.sections.login);
-  hideSection(DOM.sections.registro);
+e.preventDefault();
+showSection(DOM.sections.login);
+hideSection(DOM.sections.registro);
 });
 
 DOM.buttons.logout.addEventListener("click", () => {
-  auth.signOut()
-    .then(() => console.log("Sesión cerrada"))
-    .catch(error => console.error("Error al cerrar sesión:", error));
+auth.signOut()
+.then(() => console.log("Sesión cerrada"))
+.catch(error => console.error("Error al cerrar sesión:", error));
 });
 
 DOM.buttons.mostrarClientes.addEventListener("click", () => {
-  showSection(DOM.sections.clientesLista);
-  hideSection(DOM.sections.pedidosLista);
-  hideSection(DOM.sections.registroContainer);
-  hideSection(DOM.sections.calculadora);
-  cargarClientes();
+showSection(DOM.sections.clientesLista);
+hideSection(DOM.sections.pedidosLista);
+hideSection(DOM.sections.registroContainer);
+hideSection(DOM.sections.calculadora);
+cargarClientes();
 });
 
 DOM.buttons.mostrarPedidos.addEventListener("click", () => {
+showSection(DOM.sections.pedidosLista);
+hideSection(DOM.sections.clientesLista);
+hideSection(DOM.sections.registroContainer);
+hideSection(DOM.sections.calculadora);
+cargarPedidos();
+});
+
+DOM.buttons.nuevoRegistro.addEventListener("click", () => {
+DOM.sections.registroContainer.classList.toggle("hidden");
+hideSection(DOM.sections.clientesLista);
+hideSection(DOM.sections.pedidosLista);
+hideSection(DOM.sections.calculadora);
+});
+
+if (DOM.buttons.calculadora) {
+DOM.buttons.calculadora.addEventListener("click", () => {
+showSection(DOM.sections.calculadora);
+hideSection(DOM.sections.clientesLista);
+hideSection(DOM.sections.pedidosLista);
+hideSection(DOM.sections.registroContainer);
+});
+}
+
+DOM.forms.cliente.addEventListener("submit", async (e) => {
+e.preventDefault();
+const { nombre, email, direccion, telefono, dni } = DOM.inputs;
+const editId = DOM.forms.cliente.getAttribute("data-edit-id");
+
+if (!/^\[0-9]{7,8}\$/.test(dni.value)) return alert("DNI inválido");
+if (!/^\[^\s@]+@\[^\s@]+.\[^\s@]+\$/.test(email.value)) return alert("Email inválido");
+
+const clienteData = {
+nombre: nombre.value,
+email: email.value,
+direccion: direccion.value,
+telefono: telefono.value,
+dni: dni.value
+};
+
+if (editId) {
+await db.ref('clientes/' + editId).update(clienteData);
+alert("Cliente actualizado");
+DOM.forms.cliente.removeAttribute("data-edit-id");
+DOM.inputs.dni.disabled = false;
+} else {
+const snapshot = await db.ref('clientes').orderByChild('dni').equalTo(dni.value).once('value');
+if (snapshot.exists()) return alert("Ya existe un cliente con ese DNI");
+
+
+clienteData.fechaRegistro = new Date().toISOString();
+await db.ref('clientes').push(clienteData);
+alert("Cliente registrado exitosamente");
+
+
+}
+
+resetForms();
+cargarClientes();
+});
+
+function cargarClientes() {
+db.ref('clientes').once('value').then(snapshot => {
+DOM.lists.clientes.innerHTML = "";
+const data = snapshot.val();
+if (data) {
+Object.entries(data).forEach((\[id, cliente]) => {
+const tr = document.createElement("tr");
+tr.innerHTML = `           <td>${cliente.nombre}</td>           <td>${cliente.email}</td>           <td>${cliente.direccion}</td>           <td>${cliente.telefono}</td>           <td>${cliente.dni}</td>           <td>             <button onclick="cargarPedidosCliente('${id}')">Ver Pedidos</button>             <button onclick="editarCliente('${id}')">Editar</button>             <button onclick="eliminarCliente('${id}')">Eliminar</button>           </td>
+        `;
+DOM.lists.clientes.appendChild(tr);
+});
+}
+});
+}
+
+window\.editarCliente = function(id) {
+db.ref('clientes/' + id).once('value').then(snapshot => {
+const cliente = snapshot.val();
+if (!cliente) return alert("Cliente no encontrado");
+
+
+DOM.inputs.nombre.value = cliente.nombre;
+DOM.inputs.email.value = cliente.email;
+DOM.inputs.direccion.value = cliente.direccion;
+DOM.inputs.telefono.value = cliente.telefono;
+DOM.inputs.dni.value = cliente.dni;
+DOM.inputs.dni.disabled = true;
+
+DOM.forms.cliente.setAttribute("data-edit-id", id);
+DOM.sections.registroContainer.classList.remove("hidden");
+
+
+});
+};
+
+window\.eliminarCliente = function(id) {
+if (confirm("¿Estás seguro de eliminar este cliente y sus pedidos?")) {
+db.ref('clientes/' + id).remove()
+.then(() => db.ref('pedidos/' + id).remove())
+.then(() => {
+alert("Cliente y pedidos eliminados");
+cargarClientes();
+})
+.catch(err => alert("Error: " + err.message));
+}
+};
+
+window\.cargarPedidosCliente = function (clienteId) {
+db.ref('clientes/' + clienteId).once('value').then(clienteSnap => {
+const cliente = clienteSnap.val();
+if (!cliente) return alert("Cliente no encontrado");
+
+
+db.ref('pedidos/' + clienteId).once('value').then(pedidosSnap => {
   showSection(DOM.sections.pedidosLista);
   hideSection(DOM.sections.clientesLista);
   hideSection(DOM.sections.registroContainer);
   hideSection(DOM.sections.calculadora);
-  cargarPedidos();
-});
 
-DOM.buttons.nuevoRegistro.addEventListener("click", () => {
-  DOM.sections.registroContainer.classList.toggle("hidden");
-  hideSection(DOM.sections.clientesLista);
-  hideSection(DOM.sections.pedidosLista);
-  hideSection(DOM.sections.calculadora);
-});
+  DOM.sections.pedidosContent.innerHTML = "";
+  const pedidos = pedidosSnap.val();
 
-if (DOM.buttons.calculadora) {
-  DOM.buttons.calculadora.addEventListener("click", () => {
-    showSection(DOM.sections.calculadora);
-    hideSection(DOM.sections.clientesLista);
-    hideSection(DOM.sections.pedidosLista);
-    hideSection(DOM.sections.registroContainer);
-  });
-}
-
-DOM.forms.cliente.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const { nombre, email, direccion, telefono, dni } = DOM.inputs;
-  const editId = DOM.forms.cliente.getAttribute("data-edit-id");
-
-  if (!/^[0-9]{7,8}$/.test(dni.value)) return alert("DNI inválido");
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)) return alert("Email inválido");
-
-  const clienteData = {
-    nombre: nombre.value,
-    email: email.value,
-    direccion: direccion.value,
-    telefono: telefono.value,
-    dni: dni.value
-  };
-
-  if (editId) {
-    await db.ref('clientes/' + editId).update(clienteData);
-    alert("Cliente actualizado");
-    DOM.forms.cliente.removeAttribute("data-edit-id");
-    DOM.inputs.dni.disabled = false;
-  } else {
-    const snapshot = await db.ref('clientes').orderByChild('dni').equalTo(dni.value).once('value');
-    if (snapshot.exists()) return alert("Ya existe un cliente con ese DNI");
-
-    clienteData.fechaRegistro = new Date().toISOString();
-    await db.ref('clientes').push(clienteData);
-    alert("Cliente registrado exitosamente");
-  }
-
-  resetForms();
-  cargarClientes();
-});
-
-function cargarClientes() {
-  db.ref('clientes').once('value').then(snapshot => {
-    DOM.lists.clientes.innerHTML = "";
-    const data = snapshot.val();
-    if (data) {
-      Object.entries(data).forEach(([id, cliente]) => {
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td>${cliente.nombre}</td>
-          <td>${cliente.email}</td>
-          <td>${cliente.direccion}</td>
-          <td>${cliente.telefono}</td>
-          <td>${cliente.dni}</td>
-          <td>
-            <button onclick="cargarPedidosCliente('${id}')">Ver Pedidos</button>
-            <button onclick="editarCliente('${id}')">Editar</button>
-            <button onclick="eliminarCliente('${id}')">Eliminar</button>
-          </td>
-        `;
-        DOM.lists.clientes.appendChild(tr);
-      });
-    }
-  });
-}
-
-window.editarCliente = function(id) {
-  db.ref('clientes/' + id).once('value').then(snapshot => {
-    const cliente = snapshot.val();
-    if (!cliente) return alert("Cliente no encontrado");
-
-    DOM.inputs.nombre.value = cliente.nombre;
-    DOM.inputs.email.value = cliente.email;
-    DOM.inputs.direccion.value = cliente.direccion;
-    DOM.inputs.telefono.value = cliente.telefono;
-    DOM.inputs.dni.value = cliente.dni;
-    DOM.inputs.dni.disabled = true;
-
-    DOM.forms.cliente.setAttribute("data-edit-id", id);
-    DOM.sections.registroContainer.classList.remove("hidden");
-  });
-};
-
-window.eliminarCliente = function(id) {
-  if (confirm("¿Estás seguro de eliminar este cliente y sus pedidos?")) {
-    db.ref('clientes/' + id).remove()
-      .then(() => db.ref('pedidos/' + id).remove())
-      .then(() => {
-        alert("Cliente y pedidos eliminados");
-        cargarClientes();
-      })
-      .catch(err => alert("Error: " + err.message));
-  }
-};
-
-window.cargarPedidosCliente = function (clienteId) {
-  db.ref('clientes/' + clienteId).once('value').then(clienteSnap => {
-    const cliente = clienteSnap.val();
-    if (!cliente) return alert("Cliente no encontrado");
-
-    db.ref('pedidos/' + clienteId).once('value').then(pedidosSnap => {
-      showSection(DOM.sections.pedidosLista);
-      hideSection(DOM.sections.clientesLista);
-      hideSection(DOM.sections.registroContainer);
-      hideSection(DOM.sections.calculadora);
-
-      DOM.sections.pedidosContent.innerHTML = "";
-      const pedidos = pedidosSnap.val();
-
-      const header = document.createElement("div");
-      header.className = "cliente-header";
-      header.innerHTML = `
-        <h4>Pedidos de: ${cliente.nombre} | Tel: ${cliente.telefono}</h4>
-        <p>Email: ${cliente.email} | DNI: ${cliente.dni}</p>
-        <button onclick="cargarClientes()">Volver a Clientes</button>
-      `;
-      DOM.sections.pedidosContent.appendChild(header);
-
-      const table = document.createElement("table");
-      table.innerHTML = `
-        <thead>
-          <tr>
-            <th>Producto</th>
-            <th>Cantidad</th>
-            <th>Fecha</th>
-          </tr>
-        </thead>
-        <tbody id="listaPedidosBody"></tbody>
-      `;
-      DOM.sections.pedidosContent.appendChild(table);
-
-      const tbody = document.getElementById("listaPedidosBody");
-
-      if (!pedidos) {
-        const tr = document.createElement("tr");
-        tr.innerHTML = '<td colspan="3">No hay pedidos registrados</td>';
-        tbody.appendChild(tr);
-        return;
-      }
-
-      // Dentro de window.cargarPedidosCliente, modifica la creación de la fila:
-Object.values(pedidos).forEach(pedido => {
-  const tr = document.createElement("tr");
-  tr.innerHTML = `
-    <td>${pedido.producto}</td>
-    <td>${pedido.estado}</td>
-    <td>${new Date(pedido.fecha).toLocaleString()}</td>
-    <td>
-      <button onclick="confirmarPedido('${clienteId}', '${Object.keys(pedidos)[0]}', '${cliente.email}', '${cliente.nombre}')">Confirmar Pedido</button>
-    </td>
+  const header = document.createElement("div");
+  header.className = "cliente-header";
+  header.innerHTML = `
+    <h4>Pedidos de: ${cliente.nombre} | Tel: ${cliente.telefono}</h4>
+    <p>Email: ${cliente.email} | DNI: ${cliente.dni}</p>
+    <button onclick="cargarClientes()">Volver a Clientes</button>
   `;
-  tbody.appendChild(tr);
-});
-    });
-  });
-};
+  DOM.sections.pedidosContent.appendChild(header);
 
-DOM.forms.pedido.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const { clientePedido, producto, estado } = DOM.inputs;
-  const editId = DOM.forms.pedido.getAttribute("data-edit-id");
-  const clienteIdFromAttr = DOM.forms.pedido.getAttribute("data-cliente-id");
-
-  if (!/^[0-9]{7,8}$/.test(clientePedido.value)) return alert("DNI inválido");
-
-  const clientesSnap = await db.ref('clientes').orderByChild('dni').equalTo(clientePedido.value).once('value');
-  if (!clientesSnap.exists()) return alert("Cliente no encontrado");
-
-  const clienteId = Object.keys(clientesSnap.val())[0];
-  const cliente = clientesSnap.val()[clienteId];
-
-  const pedidoData = {
-    producto: producto.value,
-    estado: estado.value,
-    fecha: new Date().toISOString(),
-    clienteDNI: cliente.dni,
-    clienteNombre: cliente.nombre,
-    clienteEmail: cliente.email || ''
-  };
-
-  if (editId) {
-    await db.ref('pedidos/' + clienteIdFromAttr + '/' + editId).update(pedidoData);
-    alert("Pedido actualizado");
-    DOM.forms.pedido.removeAttribute("data-edit-id");
-    DOM.forms.pedido.removeAttribute("data-cliente-id");
-  } else {
-    await db.ref('pedidos/' + clienteId).push(pedidoData);
-    alert("Pedido creado exitosamente");
-  }
-
-  resetForms();
-  cargarPedidosCliente(clienteId);
-});
-
-function cargarPedidos() {
-  db.ref('clientes').once('value').then(clientesSnap => {
-    const clientes = clientesSnap.val() || {};
-
-    db.ref('pedidos').once('value').then(pedidosSnap => {
-      DOM.sections.pedidosContent.innerHTML = "";
-      const pedidosData = pedidosSnap.val();
-
-      const table = document.createElement("table");
-      table.innerHTML = `
-        <thead>
-          <tr>
-            <th>Cliente</th>
-            <th>DNI</th>
-            <th>Producto</th>
-            <th>Cantidad</th>
-            <th>Fecha</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody id="listaPedidosBody"></tbody>
-      `;
-      DOM.sections.pedidosContent.appendChild(table);
-
-      const tbody = document.getElementById("listaPedidosBody");
-      if (!pedidosData) {
-        const tr = document.createElement("tr");
-        tr.innerHTML = '<td colspan="6">No hay pedidos registrados</td>';
-        tbody.appendChild(tr);
-        return;
-      }
-
-      // Dentro de la función cargarPedidos, modifica la creación de la fila:
-Object.entries(pedidos).forEach(([pedidoId, pedido]) => {
-  const tr = document.createElement("tr");
-  tr.innerHTML = `
-    <td>${cliente.nombre || 'Cliente desconocido'}</td>
-    <td>${cliente.dni || ''}</td>
-    <td>${pedido.producto}</td>
-    <td>${pedido.estado}</td>
-    <td>${new Date(pedido.fecha).toLocaleString()}</td>
-    <td>
-      <button onclick="editarPedido('${clienteId}', '${pedidoId}')">Editar</button>
-      <button onclick="eliminarPedido('${clienteId}', '${pedidoId}')">Eliminar</button>
-      ${cliente.email ? `<button onclick="confirmarPedido('${clienteId}', '${pedidoId}', '${cliente.email}', '${cliente.nombre}')">Confirmar Pedido</button>` : ''}
-    </td>
+  const table = document.createElement("table");
+  table.innerHTML = `
+    <thead>
+      <tr>
+        <th>Producto</th>
+        <th>Cantidad</th>
+        <th>Fecha</th>
+      </tr>
+    </thead>
+    <tbody id="listaPedidosBody"></tbody>
   `;
-  tbody.appendChild(tr);
-});
-    });
-  });
-}
+  DOM.sections.pedidosContent.appendChild(table);
 
-window.editarPedido = function(clienteId, pedidoId) {
-  db.ref('pedidos/' + clienteId + '/' + pedidoId).once('value').then(snapshot => {
-    const pedido = snapshot.val();
-    if (!pedido) return alert("Pedido no encontrado");
+  const tbody = document.getElementById("listaPedidosBody");
 
-    DOM.inputs.clientePedido.value = pedido.clienteDNI;
-    DOM.inputs.producto.value = pedido.producto;
-    DOM.inputs.estado.value = pedido.estado;
-
-    DOM.forms.pedido.setAttribute("data-edit-id", pedidoId);
-    DOM.forms.pedido.setAttribute("data-cliente-id", clienteId);
-    DOM.sections.registroContainer.classList.remove("hidden");
-  });
-};
-
-window.eliminarPedido = function(clienteId, pedidoId) {
-  if (confirm("¿Eliminar este pedido?")) {
-    db.ref('pedidos/' + clienteId + '/' + pedidoId).remove()
-      .then(() => {
-        alert("Pedido eliminado");
-        cargarPedidosCliente(clienteId);
-      })
-      .catch(err => alert("Error: " + err.message));
-  }
-};
-
-// Función auxiliar para cargar scripts dinámicamente
-function loadScript(src) {
-  return new Promise((resolve, reject) => {
-    const script = document.createElement('script');
-    script.src = src;
-    script.onload = resolve;
-    script.onerror = reject;
-    document.head.appendChild(script);
-  });
-}
-
-// Configuración de EmailJS (usa tus credenciales reales)
-const emailjsConfig = {
-  serviceId: 'service_18ztxhn',
-  templateId: 'template_k55fuhb',
-  userId: 'HziRIGf46_g54AL-a'
-};
-
-// Función para enviar confirmación de pedido
-window.confirmarPedido = async function(clienteId, pedidoId, clienteEmail, clienteNombre) {
-  if (!clienteEmail) {
-    alert("Este cliente no tiene email registrado");
+  if (!pedidos) {
+    const tr = document.createElement("tr");
+    tr.innerHTML = '<td colspan="3">No hay pedidos registrados</td>';
+    tbody.appendChild(tr);
     return;
   }
 
-  if (confirm(`¿Enviar confirmación de pedido a ${clienteNombre} (${clienteEmail})?`)) {
-    try {
-      // Inicializar EmailJS (solo una vez)
-      if (typeof emailjs === 'undefined') {
-        await loadScript('https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js');
-      }
-      emailjs.init(emailjsConfig.userId);
-      
-      // Enviar el correo
-      const response = await emailjs.send(
-        emailjsConfig.serviceId,
-        emailjsConfig.templateId,
-        {
-          to_email: clienteEmail,
-          to_name: clienteNombre,
-          message: '¡GRACIAS POR TU PEDIDO! Tu pedido será entregado en los próximos dos días. ¡Gracias por Confiar en Nosotros!'
-        }
-      );
-      
-      alert('Correo de confirmación enviado con éxito');
-      
-      // Opcional: marcar el pedido como confirmado en la base de datos
-      await db.ref('pedidos/' + clienteId + '/' + pedidoId).update({
-        confirmado: true,
-        fechaConfirmacion: new Date().toISOString()
-      });
-    } catch (error) {
-      console.error('Error al enviar correo:', error);
-      alert('Error al enviar correo de confirmación: ' + error.text);
-    }
+  Object.values(pedidos).forEach(pedido => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${pedido.producto}</td>
+      <td>${pedido.estado}</td>
+      <td>${new Date(pedido.fecha).toLocaleString()}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+});
+
+
+});
+};
+
+DOM.forms.pedido.addEventListener("submit", async (e) => {
+e.preventDefault();
+const { clientePedido, producto, estado } = DOM.inputs;
+const editId = DOM.forms.pedido.getAttribute("data-edit-id");
+const clienteIdFromAttr = DOM.forms.pedido.getAttribute("data-cliente-id");
+
+if (!/^\[0-9]{7,8}\$/.test(clientePedido.value)) return alert("DNI inválido");
+
+const clientesSnap = await db.ref('clientes').orderByChild('dni').equalTo(clientePedido.value).once('value');
+if (!clientesSnap.exists()) return alert("Cliente no encontrado");
+
+const clienteId = Object.keys(clientesSnap.val())\[0];
+const cliente = clientesSnap.val()\[clienteId];
+
+const pedidoData = {
+producto: producto.value,
+estado: estado.value,
+fecha: new Date().toISOString(),
+clienteDNI: cliente.dni,
+clienteNombre: cliente.nombre,
+clienteEmail: cliente.email || ''
+};
+
+if (editId) {
+await db.ref('pedidos/' + clienteIdFromAttr + '/' + editId).update(pedidoData);
+alert("Pedido actualizado");
+DOM.forms.pedido.removeAttribute("data-edit-id");
+DOM.forms.pedido.removeAttribute("data-cliente-id");
+} else {
+await db.ref('pedidos/' + clienteId).push(pedidoData);
+alert("Pedido creado exitosamente");
+}
+
+resetForms();
+cargarPedidosCliente(clienteId);
+});
+
+function cargarPedidos() {
+db.ref('clientes').once('value').then(clientesSnap => {
+const clientes = clientesSnap.val() || {};
+
+
+db.ref('pedidos').once('value').then(pedidosSnap => {
+  DOM.sections.pedidosContent.innerHTML = "";
+  const pedidosData = pedidosSnap.val();
+
+  const table = document.createElement("table");
+  table.innerHTML = `
+    <thead>
+      <tr>
+        <th>Cliente</th>
+        <th>DNI</th>
+        <th>Producto</th>
+        <th>Cantidad</th>
+        <th>Fecha</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody id="listaPedidosBody"></tbody>
+  `;
+  DOM.sections.pedidosContent.appendChild(table);
+
+  const tbody = document.getElementById("listaPedidosBody");
+  if (!pedidosData) {
+    const tr = document.createElement("tr");
+    tr.innerHTML = '<td colspan="6">No hay pedidos registrados</td>';
+    tbody.appendChild(tr);
+    return;
   }
+
+  Object.entries(pedidosData).forEach(([clienteId, pedidos]) => {
+    const cliente = clientes[clienteId] || {};
+    Object.entries(pedidos).forEach(([pedidoId, pedido]) => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${cliente.nombre || 'Cliente desconocido'}</td>
+        <td>${cliente.dni || ''}</td>
+        <td>${pedido.producto}</td>
+        <td>${pedido.estado}</td>
+        <td>${new Date(pedido.fecha).toLocaleString()}</td>
+        <td>
+          <button onclick="editarPedido('${clienteId}', '${pedidoId}')">Editar</button>
+          <button onclick="eliminarPedido('${clienteId}', '${pedidoId}')">Eliminar</button>
+          ${cliente.email ? <button onclick="confirmarPedido('${clienteId}', '${pedidoId}', '${cliente.email}', '${cliente.nombre}')">Confirmar Pedido</button> : ''}
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+  });
+});
+
+
+});
+}
+
+window\.editarPedido = function(clienteId, pedidoId) {
+db.ref('pedidos/' + clienteId + '/' + pedidoId).once('value').then(snapshot => {
+const pedido = snapshot.val();
+if (!pedido) return alert("Pedido no encontrado");
+
+
+DOM.inputs.clientePedido.value = pedido.clienteDNI;
+DOM.inputs.producto.value = pedido.producto;
+DOM.inputs.estado.value = pedido.estado;
+
+DOM.forms.pedido.setAttribute("data-edit-id", pedidoId);
+DOM.forms.pedido.setAttribute("data-cliente-id", clienteId);
+DOM.sections.registroContainer.classList.remove("hidden");
+
+
+});
+};
+
+window\.eliminarPedido = function(clienteId, pedidoId) {
+if (confirm("¿Eliminar este pedido?")) {
+db.ref('pedidos/' + clienteId + '/' + pedidoId).remove()
+.then(() => {
+alert("Pedido eliminado");
+cargarPedidosCliente(clienteId);
+})
+.catch(err => alert("Error: " + err.message));
+}
 };
 
 // Función auxiliar para cargar scripts dinámicamente
 function loadScript(src) {
-  return new Promise((resolve, reject) => {
-    const script = document.createElement('script');
-    script.src = src;
-    script.onload = resolve;
-    script.onerror = reject;
-    document.head.appendChild(script);
-  });
+return new Promise((resolve, reject) => {
+const script = document.createElement('script');
+script.src = src;
+script.onload = resolve;
+script.onerror = reject;
+document.head.appendChild(script);
+});
 }
 
-window.calcularPresupuesto = function () {
-  const materiales = parseFloat(document.getElementById("materiales").value) || 0;
-  const transporte = parseFloat(document.getElementById("transporte").value) || 0;
-  const margen = parseFloat(document.getElementById("margen").value) || 0;
-  const iva = 0.21;
+window\.calcularPresupuesto = function () {
+const materiales = parseFloat(document.getElementById("materiales").value) || 0;
+const transporte = parseFloat(document.getElementById("transporte").value) || 0;
+const margen = parseFloat(document.getElementById("margen").value) || 0;
+const iva = 0.21;
 
-  const subtotal = materiales + transporte;
-  const ganancia = subtotal * (margen / 100);
-  const totalSinIVA = subtotal + ganancia;
-  const totalConIVA = totalSinIVA * (1 + iva);
+const subtotal = materiales + transporte;
+const ganancia = subtotal \* (margen / 100);
+const totalSinIVA = subtotal + ganancia;
+const totalConIVA = totalSinIVA \* (1 + iva);
 
-  document.getElementById("resultado").innerHTML = `
-    Subtotal: $${subtotal.toFixed(2)}<br>
+document.getElementById("resultado").innerHTML = `     Subtotal: $${subtotal.toFixed(2)}<br>
     Ganancia (${margen}%): $${ganancia.toFixed(2)}<br>
-    Total sin IVA: $${totalSinIVA.toFixed(2)}<br>
-    <strong>Total con IVA (21%): $${totalConIVA.toFixed(2)}</strong>
+    Total sin IVA: $${totalSinIVA.toFixed(2)}<br>     <strong>Total con IVA (21%): $${totalConIVA.toFixed(2)}</strong>
   `;
 };
