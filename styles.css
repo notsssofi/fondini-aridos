@@ -215,6 +215,16 @@ section {
   background-color: #e64a19;
 }
 
+#pedidosLista table {
+  border: 2px solid limegreen;
+  min-height: 100px;
+}
+
+#listaPedidosBody {
+  border: 1px dashed red;
+}
+
+
 /* Responsive ajustes */
 @media (max-width: 768px) {
   header h1 {
