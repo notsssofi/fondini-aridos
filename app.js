@@ -481,7 +481,7 @@ function enviarCorreo(emailDestino, pedidoInfo) {
 
   const data = {
     personalizations: [{ to: [{ email: emailDestino }] }],
-    from: { email: "sofiagomezfernandez2@gmail.com" },
+    from: { email: "marisolfondini@gmail.com" },
     subject: "Confirmación de Pedido - Fondini Áridos",
     content: [
       {
