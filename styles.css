@@ -233,32 +233,3 @@ form .input-row.single {
     width: 90%;
   }
 }
-
-/* Agregar esto al final del archivo CSS */
-button {
-  /* Estilos existentes... */
-  margin: 2px;
-}
-
-button:nth-of-type(1) {
-  background: #1e88e5; /* Azul para botones principales */
-}
-
-button:nth-of-type(2) {
-  background: #43a047; /* Verde para confirmación */
-}
-
-button:nth-of-type(3) {
-  background: #e53935; /* Rojo para eliminar */
-}
-
-button:nth-of-type(4) {
-  background: #fb8c00; /* Naranja para otras acciones */
-}
-
-@media (max-width: 768px) {
-  button {
-    padding: 10px 15px;
-    font-size: 14px;
-  }
-}
