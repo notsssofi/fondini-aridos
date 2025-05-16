@@ -312,15 +312,19 @@ window.cargarPedidosCliente = function (clienteId) {
         return;
       }
 
-      Object.values(pedidos).forEach(pedido => {
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td>${pedido.producto}</td>
-          <td>${pedido.estado}</td>
-          <td>${new Date(pedido.fecha).toLocaleString()}</td>
-        `;
-        tbody.appendChild(tr);
-      });
+      // Dentro de window.cargarPedidosCliente, modifica la creación de la fila:
+Object.values(pedidos).forEach(pedido => {
+  const tr = document.createElement("tr");
+  tr.innerHTML = `
+    <td>${pedido.producto}</td>
+    <td>${pedido.estado}</td>
+    <td>${new Date(pedido.fecha).toLocaleString()}</td>
+    <td>
+      <button onclick="confirmarPedido('${clienteId}', '${Object.keys(pedidos)[0]}', '${cliente.email}', '${cliente.nombre}')">Confirmar Pedido</button>
+    </td>
+  `;
+  tbody.appendChild(tr);
+});
     });
   });
 };
@@ -394,25 +398,23 @@ function cargarPedidos() {
         return;
       }
 
-      Object.entries(pedidosData).forEach(([clienteId, pedidos]) => {
-        const cliente = clientes[clienteId] || {};
-        Object.entries(pedidos).forEach(([pedidoId, pedido]) => {
-          const tr = document.createElement("tr");
-          tr.innerHTML = `
-            <td>${cliente.nombre || 'Cliente desconocido'}</td>
-            <td>${cliente.dni || ''}</td>
-            <td>${pedido.producto}</td>
-            <td>${pedido.estado}</td>
-            <td>${new Date(pedido.fecha).toLocaleString()}</td>
-            <td>
-              <button onclick="editarPedido('${clienteId}', '${pedidoId}')">Editar</button>
-              <button onclick="eliminarPedido('${clienteId}', '${pedidoId}')">Eliminar</button>
-              ${cliente.email ? `<button onclick="confirmarPedido('${clienteId}', '${pedidoId}', '${cliente.email}', '${cliente.nombre}')">Confirmar Pedido</button>` : ''}
-            </td>
-          `;
-          tbody.appendChild(tr);
-        });
-      });
+      // Dentro de la función cargarPedidos, modifica la creación de la fila:
+Object.entries(pedidos).forEach(([pedidoId, pedido]) => {
+  const tr = document.createElement("tr");
+  tr.innerHTML = `
+    <td>${cliente.nombre || 'Cliente desconocido'}</td>
+    <td>${cliente.dni || ''}</td>
+    <td>${pedido.producto}</td>
+    <td>${pedido.estado}</td>
+    <td>${new Date(pedido.fecha).toLocaleString()}</td>
+    <td>
+      <button onclick="editarPedido('${clienteId}', '${pedidoId}')">Editar</button>
+      <button onclick="eliminarPedido('${clienteId}', '${pedidoId}')">Eliminar</button>
+      ${cliente.email ? `<button onclick="confirmarPedido('${clienteId}', '${pedidoId}', '${cliente.email}', '${cliente.nombre}')">Confirmar Pedido</button>` : ''}
+    </td>
+  `;
+  tbody.appendChild(tr);
+});
     });
   });
 }
