@@ -24,7 +24,6 @@ const DOM = {
     pedidosLista: document.getElementById("pedidosLista"),
     pedidosContent: document.getElementById("pedidosContent"),
     calculadora: document.getElementById("calculadora")
-
   },
   lists: {
     clientes: document.getElementById("listaClientes"),
@@ -197,7 +196,7 @@ DOM.forms.cliente.addEventListener("submit", async (e) => {
   };
 
   if (editId) {
-    await db.ref(clientes/${editId}).update(clienteData);
+    await db.ref('clientes/' + editId).update(clienteData);
     alert("Cliente actualizado");
     DOM.forms.cliente.removeAttribute("data-edit-id");
     DOM.inputs.dni.disabled = false;
@@ -213,7 +212,6 @@ DOM.forms.cliente.addEventListener("submit", async (e) => {
   resetForms();
   cargarClientes();
 });
-
 
 function cargarClientes() {
   db.ref('clientes').once('value').then(snapshot => {
@@ -241,7 +239,7 @@ function cargarClientes() {
 }
 
 window.editarCliente = function(id) {
-  db.ref(clientes/${id}).once('value').then(snapshot => {
+  db.ref('clientes/' + id).once('value').then(snapshot => {
     const cliente = snapshot.val();
     if (!cliente) return alert("Cliente no encontrado");
 
@@ -259,8 +257,8 @@ window.editarCliente = function(id) {
 
 window.eliminarCliente = function(id) {
   if (confirm("¿Estás seguro de eliminar este cliente y sus pedidos?")) {
-    db.ref(clientes/${id}).remove()
-      .then(() => db.ref(pedidos/${id}).remove())
+    db.ref('clientes/' + id).remove()
+      .then(() => db.ref('pedidos/' + id).remove())
       .then(() => {
         alert("Cliente y pedidos eliminados");
         cargarClientes();
@@ -269,14 +267,12 @@ window.eliminarCliente = function(id) {
   }
 };
 
-
 window.cargarPedidosCliente = function (clienteId) {
-  db.ref(clientes/${clienteId}).once('value').then(clienteSnap => {
+  db.ref('clientes/' + clienteId).once('value').then(clienteSnap => {
     const cliente = clienteSnap.val();
     if (!cliente) return alert("Cliente no encontrado");
 
-    db.ref(pedidos/${clienteId}).once('value').then(pedidosSnap => {
-      // Mostrar sólo la sección de pedidos
+    db.ref('pedidos/' + clienteId).once('value').then(pedidosSnap => {
       showSection(DOM.sections.pedidosLista);
       hideSection(DOM.sections.clientesLista);
       hideSection(DOM.sections.registroContainer);
@@ -329,7 +325,6 @@ window.cargarPedidosCliente = function (clienteId) {
   });
 };
 
-
 DOM.forms.pedido.addEventListener("submit", async (e) => {
   e.preventDefault();
   const { clientePedido, producto, estado } = DOM.inputs;
@@ -354,19 +349,18 @@ DOM.forms.pedido.addEventListener("submit", async (e) => {
   };
 
   if (editId) {
-    await db.ref(pedidos/${clienteIdFromAttr}/${editId}).update(pedidoData);
+    await db.ref('pedidos/' + clienteIdFromAttr + '/' + editId).update(pedidoData);
     alert("Pedido actualizado");
     DOM.forms.pedido.removeAttribute("data-edit-id");
     DOM.forms.pedido.removeAttribute("data-cliente-id");
   } else {
-    await db.ref(pedidos/${clienteId}).push(pedidoData);
+    await db.ref('pedidos/' + clienteId).push(pedidoData);
     alert("Pedido creado exitosamente");
   }
 
   resetForms();
   cargarPedidosCliente(clienteId);
 });
-
 
 function cargarPedidos() {
   db.ref('clientes').once('value').then(clientesSnap => {
@@ -413,6 +407,7 @@ function cargarPedidos() {
             <td>
               <button onclick="editarPedido('${clienteId}', '${pedidoId}')">Editar</button>
               <button onclick="eliminarPedido('${clienteId}', '${pedidoId}')">Eliminar</button>
+              ${cliente.email ? `<button onclick="confirmarPedido('${clienteId}', '${pedidoId}', '${cliente.email}', '${cliente.nombre}')">Confirmar Pedido</button>` : ''}
             </td>
           `;
           tbody.appendChild(tr);
@@ -423,7 +418,7 @@ function cargarPedidos() {
 }
 
 window.editarPedido = function(clienteId, pedidoId) {
-  db.ref(pedidos/${clienteId}/${pedidoId}).once('value').then(snapshot => {
+  db.ref('pedidos/' + clienteId + '/' + pedidoId).once('value').then(snapshot => {
     const pedido = snapshot.val();
     if (!pedido) return alert("Pedido no encontrado");
 
@@ -439,14 +434,61 @@ window.editarPedido = function(clienteId, pedidoId) {
 
 window.eliminarPedido = function(clienteId, pedidoId) {
   if (confirm("¿Eliminar este pedido?")) {
-    db.ref(pedidos/${clienteId}/${pedidoId}).remove()
+    db.ref('pedidos/' + clienteId + '/' + pedidoId).remove()
       .then(() => {
         alert("Pedido eliminado");
         cargarPedidosCliente(clienteId);
       })
       .catch(err => alert("Error: " + err.message));
   }
-  };
+};
+
+// Función para confirmar pedido por correo
+window.confirmarPedido = async function(clienteId, pedidoId, clienteEmail, clienteNombre) {
+  if (confirm(`¿Enviar confirmación de pedido a ${clienteNombre} (${clienteEmail})?`)) {
+    try {
+      // Cargar EmailJS SDK dinámicamente
+      await loadScript('https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js');
+      
+      // Inicializar EmailJS con tu User ID
+      emailjs.init('TU_USER_ID_DE_EMAILJS');
+      
+      const templateParams = {
+        to_email: clienteEmail,
+        to_name: clienteNombre,
+        message: '¡GRACIAS POR TU PEDIDO! Tu pedido será entregado en los próximos dos días. ¡Gracias por Confiar en Nosotros!'
+      };
+      
+      await emailjs.send(
+        'TU_SERVICE_ID_DE_EMAILJS',
+        'TU_TEMPLATE_ID_DE_EMAILJS',
+        templateParams
+      );
+      
+      alert('Correo de confirmación enviado con éxito');
+      
+      // Opcional: marcar el pedido como confirmado en la base de datos
+      await db.ref('pedidos/' + clienteId + '/' + pedidoId).update({
+        confirmado: true,
+        fechaConfirmacion: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error('Error al enviar correo:', error);
+      alert('Error al enviar correo de confirmación: ' + error.text);
+    }
+  }
+};
+
+// Función auxiliar para cargar scripts dinámicamente
+function loadScript(src) {
+  return new Promise((resolve, reject) => {
+    const script = document.createElement('script');
+    script.src = src;
+    script.onload = resolve;
+    script.onerror = reject;
+    document.head.appendChild(script);
+  });
+}
 
 window.calcularPresupuesto = function () {
   const materiales = parseFloat(document.getElementById("materiales").value) || 0;
