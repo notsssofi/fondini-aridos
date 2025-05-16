@@ -238,8 +238,9 @@ DOM.forms.pedido.addEventListener("submit", async (e) => {
   }
 });
 
-// Cargar todos los pedidos - CORREGIDO
 function cargarPedidos() {
+  console.log("CargarPedidos llamada"); // DEBUG
+
   db.ref('pedidos').once('value').then(snapshot => {
     const pedidos = snapshot.val();
     const tbody = document.getElementById("listaPedidosBody");
@@ -250,22 +251,33 @@ function cargarPedidos() {
       return;
     }
 
+    console.log("Pedidos obtenidos:", pedidos); // DEBUG
+
     Object.entries(pedidos).forEach(([pedidoId, pedido]) => {
+      console.log("Pedido individual:", pedidoId, pedido); // DEBUG
+
       const tr = document.createElement("tr");
       tr.innerHTML = `
-        <td>${pedido.clienteNombre || 'Cliente no especificado'}</td>
-        <td>${pedido.clienteDNI || ''}</td>
-        <td>${pedido.producto}</td>
-        <td>${pedido.estado}</td>
-        <td>${new Date(pedido.fecha).toLocaleString()}</td>`;
+        <td>${pedido.clienteNombre ?? 'Sin nombre'}</td>
+        <td>${pedido.clienteDNI ?? 'Sin DNI'}</td>
+        <td>${pedido.producto ?? 'Sin producto'}</td>
+        <td>${pedido.estado ?? 'Sin estado'}</td>
+        <td>${pedido.fecha ? new Date(pedido.fecha).toLocaleString() : 'Sin fecha'}</td>`;
       tbody.appendChild(tr);
     });
+
+    // Asegurar visibilidad de sección
+    showSection(DOM.sections.dashboard);
+    DOM.sections.registroContainer.classList.add("hidden");
+    DOM.sections.clientesLista.classList.add("hidden");
+    DOM.sections.pedidosLista.classList.remove("hidden");
   }).catch(error => {
     console.error("Error al cargar pedidos:", error);
     const tbody = document.getElementById("listaPedidosBody");
     tbody.innerHTML = '<tr><td colspan="5">Error al cargar los pedidos</td></tr>';
   });
 }
+
 
 // Cargar pedidos de un cliente específico - CORREGIDO
 window.cargarPedidosCliente = function (clienteId) {
