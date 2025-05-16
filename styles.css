@@ -180,6 +180,32 @@ p {
   box-shadow: 0 1px 5px rgba(0,0,0,0.4);
 }
 
+/* Estilo para agrupar inputs en filas de dos */
+form .input-row {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+form .input-row input,
+form .input-row button {
+  flex: 1 1 calc(50% - 10px);
+  min-width: 220px;
+}
+
+form .input-row.single {
+  justify-content: center;
+}
+
+@media (max-width: 600px) {
+  form .input-row input,
+  form .input-row button {
+    flex: 1 1 100%;
+  }
+}
+
+
 /* Animaciones */
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(10px); }
