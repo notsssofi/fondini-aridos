@@ -1,6 +1,4 @@
-// app.js completo y corregido
-
-// Configuración de Firebase
+// Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyAHTfYQXgWb3l5DqCar3ooOv2yzzsww9Ek",
   authDomain: "bd-fondini-aridos.firebaseapp.com",
@@ -15,7 +13,7 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.database();
 
-// Elementos del DOM
+// DOM
 const DOM = {
   sections: {
     login: document.getElementById("login"),
@@ -70,176 +68,154 @@ function showSection(section) {
 }
 
 function resetForms() {
-  Object.values(DOM.forms).forEach(form => form.reset());
+  Object.values(DOM.forms).forEach(f => f.reset());
 }
 
-const AppState = {
-  currentUser: null
-};
-
+// Auth
 auth.onAuthStateChanged(user => {
-  AppState.currentUser = user;
-  if (user) {
-    showSection(DOM.sections.menu);
-  } else {
-    showSection(DOM.sections.login);
-  }
+  if (user) showSection(DOM.sections.menu);
+  else showSection(DOM.sections.login);
 });
 
-// Login/registro
-DOM.forms.registro.addEventListener("submit", (e) => {
+// Registro/Login
+DOM.forms.registro.addEventListener("submit", async (e) => {
   e.preventDefault();
   const { nombreCompleto, correo, nuevaPassword } = DOM.inputs;
-
-  auth.createUserWithEmailAndPassword(correo.value, nuevaPassword.value)
-    .then(userCredential => {
-      return db.ref('users/' + userCredential.user.uid).set({
-        nombre: nombreCompleto.value,
-        email: correo.value
-      });
-    })
-    .then(() => {
-      alert("Cuenta creada con éxito");
-      resetForms();
-      showSection(DOM.sections.login);
-    })
-    .catch(error => {
-      alert("Error: " + error.message);
-    });
+  const cred = await auth.createUserWithEmailAndPassword(correo.value, nuevaPassword.value);
+  await db.ref(`users/${cred.user.uid}`).set({
+    nombre: nombreCompleto.value,
+    email: correo.value
+  });
+  alert("Cuenta creada");
+  resetForms();
+  showSection(DOM.sections.login);
 });
 
-DOM.forms.login.addEventListener("submit", (e) => {
+DOM.forms.login.addEventListener("submit", async (e) => {
   e.preventDefault();
   const { correoLogin, password } = DOM.inputs;
-
-  auth.signInWithEmailAndPassword(correoLogin.value, password.value)
-    .then(() => {
-      resetForms();
-      showSection(DOM.sections.menu);
-    })
-    .catch(error => alert("Error: " + error.message));
+  await auth.signInWithEmailAndPassword(correoLogin.value, password.value);
+  resetForms();
+  showSection(DOM.sections.menu);
 });
 
+// Navegación
 DOM.links.crearCuenta.addEventListener("click", e => {
   e.preventDefault();
   showSection(DOM.sections.registro);
 });
-
 DOM.links.volverLogin.addEventListener("click", e => {
   e.preventDefault();
   showSection(DOM.sections.login);
 });
-
 DOM.buttons.logout.addEventListener("click", () => {
   auth.signOut().then(() => showSection(DOM.sections.login));
 });
-
-// Botones volver
 DOM.buttons.volverMenuDesdeRegistro.addEventListener("click", () => showSection(DOM.sections.menu));
 DOM.buttons.volverMenuDesdeClientes.addEventListener("click", () => showSection(DOM.sections.menu));
 DOM.buttons.volverMenuDesdePedidos.addEventListener("click", () => showSection(DOM.sections.menu));
 
-// Menú principal
-const menuButtons = document.querySelectorAll(".menu-card");
-menuButtons.forEach(button => {
-  button.addEventListener("click", () => {
-    const action = button.dataset.action;
+// Menú
+document.querySelectorAll(".menu-card").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const action = btn.dataset.action;
     showSection(DOM.sections.dashboard);
     DOM.sections.menu.classList.add("hidden");
 
-    switch (action) {
-      case "crear-cliente":
-      case "crear-pedido":
-        DOM.sections.registroContainer.classList.remove("hidden");
-        DOM.sections.clientesLista.classList.add("hidden");
-        DOM.sections.pedidosLista.classList.add("hidden");
-        break;
-      case "ver-clientes":
-        DOM.sections.registroContainer.classList.add("hidden");
-        DOM.sections.clientesLista.classList.remove("hidden");
-        DOM.sections.pedidosLista.classList.add("hidden");
-        cargarClientes();
-        break;
-      case "ver-pedidos":
-        DOM.sections.registroContainer.classList.add("hidden");
-        DOM.sections.clientesLista.classList.add("hidden");
-        DOM.sections.pedidosLista.classList.remove("hidden");
-        cargarPedidos();
-        break;
-      case "calculadora":
-      case "configuracion":
-        alert("Esta sección aún no está disponible.");
-        break;
+    DOM.sections.registroContainer.classList.add("hidden");
+    DOM.sections.clientesLista.classList.add("hidden");
+    DOM.sections.pedidosLista.classList.add("hidden");
+
+    if (action === "crear-cliente" || action === "crear-pedido") {
+      DOM.sections.registroContainer.classList.remove("hidden");
+    } else if (action === "ver-clientes") {
+      DOM.sections.clientesLista.classList.remove("hidden");
+      cargarClientes();
+    } else if (action === "ver-pedidos") {
+      DOM.sections.pedidosLista.classList.remove("hidden");
+      cargarPedidos();
+    } else {
+      alert("Esta sección no está disponible.");
     }
   });
 });
 
-// Registro cliente
+// Crear cliente
 DOM.forms.cliente.addEventListener("submit", async (e) => {
   e.preventDefault();
   const { nombre, email, direccion, telefono, dni } = DOM.inputs;
-  const snapshot = await db.ref('clientes').orderByChild('dni').equalTo(dni.value).once('value');
-  if (snapshot.exists()) return alert("Ya existe un cliente con ese DNI");
-
-  const cliente = { nombre: nombre.value, email: email.value, direccion: direccion.value, telefono: telefono.value, dni: dni.value, fecha: new Date().toISOString() };
-  await db.ref('clientes').push(cliente);
+  const snap = await db.ref('clientes').orderByChild('dni').equalTo(dni.value).once('value');
+  if (snap.exists()) return alert("DNI existente");
+  await db.ref('clientes').push({
+    nombre: nombre.value,
+    email: email.value,
+    direccion: direccion.value,
+    telefono: telefono.value,
+    dni: dni.value,
+    fecha: new Date().toISOString()
+  });
   alert("Cliente agregado");
   resetForms();
   cargarClientes();
 });
 
+// Crear pedido
+DOM.forms.pedido.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const { clientePedido, producto, estado } = DOM.inputs;
+  const snap = await db.ref('clientes').orderByChild('dni').equalTo(clientePedido.value).once('value');
+  if (!snap.exists()) return alert("Cliente no encontrado");
+  const clienteId = Object.keys(snap.val())[0];
+  await db.ref(`pedidos/${clienteId}`).push({
+    producto: producto.value,
+    estado: estado.value,
+    fecha: new Date().toISOString()
+  });
+  alert("Pedido registrado");
+  resetForms();
+  cargarPedidosCliente(clienteId);
+});
+
+// Mostrar clientes
 function cargarClientes() {
   db.ref('clientes').once('value').then(snapshot => {
-    const tbody = DOM.lists.clientes;
-    tbody.innerHTML = "";
     const data = snapshot.val();
+    DOM.lists.clientes.innerHTML = "";
     if (data) {
-      Object.entries(data).forEach(([id, cliente]) => {
+      Object.entries(data).forEach(([id, c]) => {
         const tr = document.createElement("tr");
         tr.innerHTML = `
-          <td>${cliente.nombre}</td>
-          <td>${cliente.email}</td>
-          <td>${cliente.direccion}</td>
-          <td>${cliente.telefono}</td>
-          <td>${cliente.dni}</td>
+          <td>${c.nombre}</td><td>${c.email}</td><td>${c.direccion}</td>
+          <td>${c.telefono}</td><td>${c.dni}</td>
           <td><button onclick="cargarPedidosCliente('${id}')">Ver Pedidos</button></td>`;
-        tbody.appendChild(tr);
+        DOM.lists.clientes.appendChild(tr);
       });
     }
   });
 }
 
-window.cargarPedidosCliente = function(clienteId) {
-  db.ref(`clientes/${clienteId}`).once('value').then(clienteSnap => {
-    const cliente = clienteSnap.val();
-    db.ref(`pedidos/${clienteId}`).once('value').then(pedidosSnap => {
-      const container = DOM.sections.pedidosContent;
-      container.innerHTML = "";
-
-      const header = document.createElement("div");
-      header.className = "cliente-header";
-      header.innerHTML = `<h4>Pedidos de: ${cliente.nombre}</h4><p>${cliente.email} - ${cliente.telefono}</p>`;
-      container.appendChild(header);
-
-      const table = document.createElement("table");
-      table.innerHTML = `
-        <thead><tr><th>Producto</th><th>Cantidad</th><th>Fecha</th></tr></thead>
-        <tbody id="listaPedidosBody"></tbody>`;
-      container.appendChild(table);
-
+// Ver pedidos de un cliente
+window.cargarPedidosCliente = function (clienteId) {
+  db.ref(`clientes/${clienteId}`).once('value').then(cSnap => {
+    const cliente = cSnap.val();
+    db.ref(`pedidos/${clienteId}`).once('value').then(pSnap => {
+      const pedidos = pSnap.val();
       const tbody = document.getElementById("listaPedidosBody");
-      const pedidos = pedidosSnap.val();
+      tbody.innerHTML = "";
 
       if (!pedidos) {
-        const tr = document.createElement("tr");
-        tr.innerHTML = '<td colspan="3">No hay pedidos registrados</td>';
-        tbody.appendChild(tr);
+        tbody.innerHTML = '<tr><td colspan="5">No hay pedidos</td></tr>';
         return;
       }
 
-      Object.values(pedidos).forEach(pedido => {
+      Object.values(pedidos).forEach(p => {
         const tr = document.createElement("tr");
-        tr.innerHTML = `<td>${pedido.producto}</td><td>${pedido.estado}</td><td>${new Date(pedido.fecha).toLocaleString()}</td>`;
+        tr.innerHTML = `
+          <td>${cliente.nombre}</td>
+          <td>${cliente.dni}</td>
+          <td>${p.producto}</td>
+          <td>${p.estado}</td>
+          <td>${new Date(p.fecha).toLocaleString()}</td>`;
         tbody.appendChild(tr);
       });
 
@@ -249,35 +225,16 @@ window.cargarPedidosCliente = function(clienteId) {
       DOM.sections.pedidosLista.classList.remove("hidden");
     });
   });
-}
+};
 
-// Registro pedido
-DOM.forms.pedido.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const { clientePedido, producto, estado } = DOM.inputs;
-  const snap = await db.ref('clientes').orderByChild('dni').equalTo(clientePedido.value).once('value');
-  if (!snap.exists()) return alert("Cliente no encontrado");
-  const clienteId = Object.keys(snap.val())[0];
-  const nuevoPedido = { producto: producto.value, estado: estado.value, fecha: new Date().toISOString() };
-  await db.ref(`pedidos/${clienteId}`).push(nuevoPedido);
-  alert("Pedido registrado");
-  resetForms();
-  cargarPedidosCliente(clienteId);
-});
-
+// Ver todos los pedidos
 function cargarPedidos() {
   db.ref('clientes').once('value').then(clientesSnap => {
     const clientes = clientesSnap.val() || {};
     db.ref('pedidos').once('value').then(pedidosSnap => {
-      const container = DOM.sections.pedidosContent;
-      container.innerHTML = "";
-      const table = document.createElement("table");
-      table.innerHTML = `
-        <thead><tr><th>Cliente</th><th>DNI</th><th>Producto</th><th>Cantidad</th><th>Fecha</th></tr></thead>
-        <tbody id="listaPedidosBody"></tbody>`;
-      container.appendChild(table);
-
       const tbody = document.getElementById("listaPedidosBody");
+      tbody.innerHTML = "";
+
       const data = pedidosSnap.val();
       if (!data) {
         tbody.innerHTML = '<tr><td colspan="5">No hay pedidos</td></tr>';
@@ -288,7 +245,12 @@ function cargarPedidos() {
         const cliente = clientes[clienteId] || {};
         Object.values(pedidos).forEach(pedido => {
           const tr = document.createElement("tr");
-          tr.innerHTML = `<td>${cliente.nombre || 'Desconocido'}</td><td>${cliente.dni || ''}</td><td>${pedido.producto}</td><td>${pedido.estado}</td><td>${new Date(pedido.fecha).toLocaleString()}</td>`;
+          tr.innerHTML = `
+            <td>${cliente.nombre || "Desconocido"}</td>
+            <td>${cliente.dni || ""}</td>
+            <td>${pedido.producto}</td>
+            <td>${pedido.estado}</td>
+            <td>${new Date(pedido.fecha).toLocaleString()}</td>`;
           tbody.appendChild(tr);
         });
       });
