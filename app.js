@@ -175,29 +175,6 @@ DOM.forms.cliente.addEventListener("submit", async (e) => {
   }
 });
 
-// Crear pedido
-DOM.forms.pedido.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const { clientePedido, producto, estado } = DOM.inputs;
-  try {
-    const snap = await db.ref('clientes').orderByChild('dni').equalTo(clientePedido.value).once('value');
-    if (!snap.exists()) return alert("Cliente no encontrado");
-    
-    const clienteId = Object.keys(snap.val())[0];
-    await db.ref(`pedidos/${clienteId}`).push({
-      producto: producto.value,
-      estado: estado.value,
-      fecha: new Date().toISOString()
-    });
-    alert("Pedido registrado correctamente");
-    resetForms();
-    cargarPedidos();
-  } catch (error) {
-    console.error("Error al registrar pedido:", error);
-    alert("Error al registrar pedido: " + error.message);
-  }
-});
-
 // Mostrar clientes
 function cargarClientes() {
   db.ref('clientes').once('value').then(snapshot => {
@@ -220,73 +197,27 @@ function cargarClientes() {
     DOM.lists.clientes.innerHTML = '<tr><td colspan="6">Error al cargar clientes</td></tr>';
   });
 }
-
-// Ver pedidos de un cliente
-window.cargarPedidosCliente = function (clienteId) {
-  Promise.all([
-    db.ref(`clientes/${clienteId}`).once('value'),
-    db.ref(`pedidos/${clienteId}`).once('value')
-  ]).then(([cSnap, pSnap]) => {
-    const cliente = cSnap.val();
-    const pedidos = pSnap.val();
-    const tbody = document.getElementById("listaPedidosBody");
-    tbody.innerHTML = "";
-
-    if (!pedidos) {
-      tbody.innerHTML = '<tr><td colspan="5">No hay pedidos para este cliente</td></tr>';
-    } else {
-      Object.values(pedidos).forEach(p => {
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td>${cliente.nombre}</td>
-          <td>${cliente.dni}</td>
-          <td>${p.producto}</td>
-          <td>${p.estado}</td>
-          <td>${new Date(p.fecha).toLocaleString()}</td>`;
-        tbody.appendChild(tr);
-      });
-    }
-
-    showSection(DOM.sections.dashboard);
-    DOM.sections.registroContainer.classList.add("hidden");
-    DOM.sections.clientesLista.classList.add("hidden");
-    DOM.sections.pedidosLista.classList.remove("hidden");
-  }).catch(error => {
-    console.error("Error al cargar pedidos del cliente:", error);
-    const tbody = document.getElementById("listaPedidosBody");
-    tbody.innerHTML = '<tr><td colspan="5">Error al cargar pedidos</td></tr>';
-  });
-};
-
-// Ver todos los pedidos
+// Función corregida para cargar todos los pedidos
 function cargarPedidos() {
-  Promise.all([
-    db.ref('clientes').once('value'),
-    db.ref('pedidos').once('value')
-  ]).then(([clientesSnap, pedidosSnap]) => {
-    const clientes = clientesSnap.val() || {};
-    const pedidos = pedidosSnap.val() || {};
+  db.ref('pedidos').once('value').then(pedidosSnap => {
     const tbody = document.getElementById("listaPedidosBody");
     tbody.innerHTML = "";
 
+    const pedidos = pedidosSnap.val();
     if (!pedidos || Object.keys(pedidos).length === 0) {
       tbody.innerHTML = '<tr><td colspan="5">No hay pedidos registrados</td></tr>';
       return;
     }
 
-    Object.entries(pedidos).forEach(([clienteId, pedidosCliente]) => {
-      const cliente = clientes[clienteId] || {};
-      
-      Object.values(pedidosCliente).forEach(pedido => {
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td>${cliente.nombre || 'Cliente no encontrado'}</td>
-          <td>${cliente.dni || ''}</td>
-          <td>${pedido.producto}</td>
-          <td>${pedido.estado}</td>
-          <td>${new Date(pedido.fecha).toLocaleString()}</td>`;
-        tbody.appendChild(tr);
-      });
+    Object.entries(pedidos).forEach(([pedidoId, pedido]) => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${pedido.clienteNombre || 'Cliente no especificado'}</td>
+        <td>${pedido.clienteDNI || ''}</td>
+        <td>${pedido.producto}</td>
+        <td>${pedido.estado}</td>
+        <td>${new Date(pedido.fecha).toLocaleString()}</td>`;
+      tbody.appendChild(tr);
     });
   }).catch(error => {
     console.error("Error al cargar pedidos:", error);
@@ -294,3 +225,77 @@ function cargarPedidos() {
     tbody.innerHTML = '<tr><td colspan="5">Error al cargar los pedidos</td></tr>';
   });
 }
+
+// Función corregida para crear pedidos
+DOM.forms.pedido.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const { clientePedido, producto, estado } = DOM.inputs;
+  
+  try {
+    // Buscar cliente por DNI para obtener sus datos
+    const snap = await db.ref('clientes').orderByChild('dni').equalTo(clientePedido.value).once('value');
+    if (!snap.exists()) {
+      alert("Cliente no encontrado");
+      return;
+    }
+    
+    // Obtener datos del cliente
+    const clienteData = Object.values(snap.val())[0];
+    
+    // Crear el pedido con la nueva estructura
+    await db.ref('pedidos').push({
+      clienteDNI: clienteData.dni,
+      clienteEmail: clienteData.email,
+      clienteNombre: clienteData.nombre,
+      producto: producto.value,
+      estado: estado.value,
+      fecha: new Date().toISOString()
+    });
+    
+    alert("Pedido registrado correctamente");
+    resetForms();
+    cargarPedidos(); // Actualizar la lista de pedidos
+  } catch (error) {
+    console.error("Error al registrar pedido:", error);
+    alert("Ocurrió un error al registrar el pedido");
+  }
+});
+
+// Función corregida para ver pedidos de un cliente
+window.cargarPedidosCliente = function (clienteId) {
+  // Primero obtenemos los datos del cliente
+  db.ref(`clientes/${clienteId}`).once('value').then(cSnap => {
+    const cliente = cSnap.val();
+    
+    // Luego buscamos los pedidos de este cliente por DNI
+    db.ref('pedidos').orderByChild('clienteDNI').equalTo(cliente.dni).once('value').then(pSnap => {
+      const pedidos = pSnap.val();
+      const tbody = document.getElementById("listaPedidosBody");
+      tbody.innerHTML = "";
+
+      if (!pedidos) {
+        tbody.innerHTML = '<tr><td colspan="5">No hay pedidos para este cliente</td></tr>';
+      } else {
+        Object.entries(pedidos).forEach(([pedidoId, pedido]) => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${cliente.nombre}</td>
+            <td>${cliente.dni}</td>
+            <td>${pedido.producto}</td>
+            <td>${pedido.estado}</td>
+            <td>${new Date(pedido.fecha).toLocaleString()}</td>`;
+          tbody.appendChild(tr);
+        });
+      }
+
+      showSection(DOM.sections.dashboard);
+      DOM.sections.registroContainer.classList.add("hidden");
+      DOM.sections.clientesLista.classList.add("hidden");
+      DOM.sections.pedidosLista.classList.remove("hidden");
+    });
+  }).catch(error => {
+    console.error("Error al cargar pedidos del cliente:", error);
+    const tbody = document.getElementById("listaPedidosBody");
+    tbody.innerHTML = '<tr><td colspan="5">Error al cargar pedidos</td></tr>';
+  });
+};
