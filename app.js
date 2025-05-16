@@ -352,6 +352,7 @@ function cargarPedidos() {
     db.ref('pedidos').once('value').then(pedidosSnap => {
       DOM.sections.pedidosContent.innerHTML = "";
       const pedidosData = pedidosSnap.val();
+
       const table = document.createElement("table");
       table.innerHTML = `
         <thead>
@@ -361,6 +362,7 @@ function cargarPedidos() {
             <th>Producto</th>
             <th>Cantidad</th>
             <th>Fecha</th>
+            <th>Acciones</th>
           </tr>
         </thead>
         <tbody id="listaPedidosBody"></tbody>
@@ -370,14 +372,14 @@ function cargarPedidos() {
       const tbody = document.getElementById("listaPedidosBody");
       if (!pedidosData) {
         const tr = document.createElement("tr");
-        tr.innerHTML = '<td colspan="5">No hay pedidos registrados</td>';
+        tr.innerHTML = '<td colspan="6">No hay pedidos registrados</td>';
         tbody.appendChild(tr);
         return;
       }
 
       Object.entries(pedidosData).forEach(([clienteId, pedidos]) => {
         const cliente = clientes[clienteId] || {};
-        Object.values(pedidos).forEach(pedido => {
+        Object.entries(pedidos).forEach(([pedidoId, pedido]) => {
           const tr = document.createElement("tr");
           tr.innerHTML = `
             <td>${cliente.nombre || 'Cliente desconocido'}</td>
@@ -385,6 +387,10 @@ function cargarPedidos() {
             <td>${pedido.producto}</td>
             <td>${pedido.estado}</td>
             <td>${new Date(pedido.fecha).toLocaleString()}</td>
+            <td>
+              <button onclick="editarPedido('${clienteId}', '${pedidoId}')">Editar</button>
+              <button onclick="eliminarPedido('${clienteId}', '${pedidoId}')">Eliminar</button>
+            </td>
           `;
           tbody.appendChild(tr);
         });
