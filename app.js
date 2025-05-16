@@ -197,7 +197,7 @@ DOM.forms.cliente.addEventListener("submit", async (e) => {
   };
 
   if (editId) {
-    await db.ref(clientes/${editId}).update(clienteData);
+    await db.ref(`clientes/${editId}`).update(clienteData);
     alert("Cliente actualizado");
     DOM.forms.cliente.removeAttribute("data-edit-id");
     DOM.inputs.dni.disabled = false;
@@ -241,7 +241,7 @@ function cargarClientes() {
 }
 
 window.editarCliente = function(id) {
-  db.ref(clientes/${id}).once('value').then(snapshot => {
+  db.ref(`clientes/${id}`).once('value').then(snapshot => {
     const cliente = snapshot.val();
     if (!cliente) return alert("Cliente no encontrado");
 
@@ -259,8 +259,9 @@ window.editarCliente = function(id) {
 
 window.eliminarCliente = function(id) {
   if (confirm("¿Estás seguro de eliminar este cliente y sus pedidos?")) {
-    db.ref(clientes/${id}).remove()
-      .then(() => db.ref(pedidos/${id}).remove())
+    db.ref(`clientes/${id}`).remove()
+  .then(() => db.ref(`pedidos/${id}`).remove())
+
       .then(() => {
         alert("Cliente y pedidos eliminados");
         cargarClientes();
@@ -271,11 +272,11 @@ window.eliminarCliente = function(id) {
 
 
 window.cargarPedidosCliente = function (clienteId) {
-  db.ref(clientes/${clienteId}).once('value').then(clienteSnap => {
+  db.ref(`clientes/${clienteId}`).once('value').then(clienteSnap => {
     const cliente = clienteSnap.val();
     if (!cliente) return alert("Cliente no encontrado");
 
-    db.ref(pedidos/${clienteId}).once('value').then(pedidosSnap => {
+    db.ref(`pedidos/${clienteId}`).once('value').then(pedidosSnap => {
       // Mostrar sólo la sección de pedidos
       showSection(DOM.sections.pedidosLista);
       hideSection(DOM.sections.clientesLista);
@@ -354,12 +355,12 @@ DOM.forms.pedido.addEventListener("submit", async (e) => {
   };
 
   if (editId) {
-    await db.ref(pedidos/${clienteIdFromAttr}/${editId}).update(pedidoData);
+    await db.ref(`pedidos/${clienteIdFromAttr}/${editId}`).update(pedidoData);
     alert("Pedido actualizado");
     DOM.forms.pedido.removeAttribute("data-edit-id");
     DOM.forms.pedido.removeAttribute("data-cliente-id");
   } else {
-    await db.ref(pedidos/${clienteId}).push(pedidoData);
+    await db.ref(`pedidos/${clienteId}`).push(pedidoData);
     alert("Pedido creado exitosamente");
   }
 
