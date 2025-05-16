@@ -35,7 +35,7 @@
     <p><a href="#" id="volverLogin">Volver al inicio de sesión</a></p>
   </section>
 
-  <!-- Nuevo menú principal -->
+  <!-- Menú principal -->
   <section id="mainMenu" class="hidden">
     <h2>Menú Principal</h2>
     <div class="menu-grid">
@@ -49,8 +49,10 @@
     </div>
   </section>
 
-  <!-- Dashboard (formularios, listas) -->
+  <!-- Dashboard con formularios y listas -->
   <section id="dashboard" class="hidden">
+
+    <!-- Formulario de registro de cliente/pedido -->
     <div id="registroContainer" class="hidden">
       <h3>Registrar Cliente</h3>
       <form id="clienteForm">
@@ -69,8 +71,12 @@
         <input type="text" id="estado" placeholder="Cantidad" required />
         <button type="submit">Agregar Pedido</button>
       </form>
+
+      <!-- Botón volver -->
+      <button id="volverMenuDesdeRegistro">Volver al Menú</button>
     </div>
 
+    <!-- Listado de clientes -->
     <div id="clientesLista" class="hidden">
       <h3>Clientes</h3>
       <table>
@@ -86,12 +92,16 @@
         </thead>
         <tbody id="listaClientes"></tbody>
       </table>
+      <button id="volverMenuDesdeClientes">Volver al Menú</button>
     </div>
 
+    <!-- Listado de pedidos -->
     <div id="pedidosLista" class="hidden">
       <h3>Pedidos</h3>
       <div id="pedidosContent"></div>
+      <button id="volverMenuDesdePedidos">Volver al Menú</button>
     </div>
+
   </section>
 
   <!-- Firebase SDKs -->
