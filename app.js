@@ -260,8 +260,7 @@ window.editarCliente = function(id) {
 window.eliminarCliente = function(id) {
   if (confirm("¿Estás seguro de eliminar este cliente y sus pedidos?")) {
     db.ref(`clientes/${id}`).remove()
-  .then(() => db.ref(`pedidos/${id}`).remove())
-
+      .then(() => db.ref(`pedidos/${id}`).remove())
       .then(() => {
         alert("Cliente y pedidos eliminados");
         cargarClientes();
@@ -424,7 +423,7 @@ function cargarPedidos() {
 }
 
 window.editarPedido = function(clienteId, pedidoId) {
-  db.ref(pedidos/${clienteId}/${pedidoId}).once('value').then(snapshot => {
+  db.ref(`pedidos/${clienteId}/${pedidoId}`).once('value').then(snapshot => {
     const pedido = snapshot.val();
     if (!pedido) return alert("Pedido no encontrado");
 
@@ -440,7 +439,7 @@ window.editarPedido = function(clienteId, pedidoId) {
 
 window.eliminarPedido = function(clienteId, pedidoId) {
   if (confirm("¿Eliminar este pedido?")) {
-    db.ref(pedidos/${clienteId}/${pedidoId}).remove()
+    db.ref(`pedidos/${clienteId}/${pedidoId}`).remove()
       .then(() => {
         alert("Pedido eliminado");
         cargarPedidosCliente(clienteId);
