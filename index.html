@@ -5,11 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Áridos Fondini - Gestión de Clientes y Pedidos</title>
     <link rel="icon" href="data:,">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <div class="particles-container" id="particles-js"></div>
+    
     <header>
-        <h1>Áridos Fondini</h1>
+        <h1 class="animate__animated animate__fadeInDown">Áridos Fondini</h1>
     </header>
     
     <section id="dashboard" class="hidden">
@@ -66,43 +70,290 @@
         </div>
     </section>
 
-    <section id="login">
-        <h2>Iniciar Sesión</h2>
-        <form id="loginForm">
-            <input type="email" id="correoLogin" placeholder="Correo Electrónico" required>
-            <input type="password" id="password" placeholder="Contraseña" required>
-            <button type="submit">Ingresar</button>
-        </form>
-        <p><a href="#" id="crearCuentaLink">Crear cuenta</a></p>
+    <section id="login" class="animate__animated animate__fadeIn">
+        <div class="login-container">
+            <div class="login-image">
+                <div class="overlay"></div>
+            </div>
+            <div class="login-form-container animate__animated animate__fadeInRight">
+                <div class="logo-container">
+                    <div class="logo-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                            <polyline points="2 17 12 22 22 17"></polyline>
+                            <polyline points="2 12 12 17 22 12"></polyline>
+                        </svg>
+                    </div>
+                    <h2>Iniciar Sesión</h2>
+                </div>
+                <p class="welcome-text">Bienvenido al sistema de gestión de Áridos Fondini</p>
+                <form id="loginForm">
+                    <div class="input-group">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                        <input type="email" id="correoLogin" placeholder="Correo Electrónico" required>
+                    </div>
+                    <div class="input-group">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                        </svg>
+                        <input type="password" id="password" placeholder="Contraseña" required>
+                    </div>
+                    <button type="submit" class="login-btn animate__animated animate__pulse animate__infinite animate__slower">Ingresar</button>
+                </form>
+                <p class="create-account"><a href="#" id="crearCuentaLink">¿No tienes cuenta? Crear cuenta</a></p>
+            </div>
+        </div>
     </section>
     
-    <section id="registro" class="hidden">
-        <h2>Crear Cuenta</h2>
-        <form id="registroForm">
-            <input type="text" id="nombreCompleto" placeholder="Nombre Completo" required>
-            <input type="email" id="correo" placeholder="Correo Electrónico" required>
-            <input type="password" id="nuevaPassword" placeholder="Contraseña" required>
-            <button type="submit">Registrarse</button>
-        </form>
-        <p><a href="#" id="volverLogin">Volver al inicio de sesión</a></p>
+    <section id="registro" class="hidden animate__animated animate__fadeIn">
+        <div class="login-container">
+            <div class="login-image">
+                <div class="overlay"></div>
+            </div>
+            <div class="login-form-container animate__animated animate__fadeInRight">
+                <div class="logo-container">
+                    <div class="logo-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="8.5" cy="7" r="4"></circle>
+                            <line x1="20" y1="8" x2="20" y2="14"></line>
+                            <line x1="23" y1="11" x2="17" y2="11"></line>
+                        </svg>
+                    </div>
+                    <h2>Crear Cuenta</h2>
+                </div>
+                <form id="registroForm">
+                    <div class="input-group">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                        <input type="text" id="nombreCompleto" placeholder="Nombre Completo" required>
+                    </div>
+                    <div class="input-group">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                            <polyline points="22,6 12,13 2,6"></polyline>
+                        </svg>
+                        <input type="email" id="correo" placeholder="Correo Electrónico" required>
+                    </div>
+                    <div class="input-group">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                        </svg>
+                        <input type="password" id="nuevaPassword" placeholder="Contraseña" required>
+                    </div>
+                    <button type="submit">Registrarse</button>
+                </form>
+                <p class="create-account"><a href="#" id="volverLogin">Volver al inicio de sesión</a></p>
+            </div>
+        </div>
     </section>
 
-    <section id="calculadora" class="hidden">
-      <h3>Calculadora de Presupuesto</h3>
-      <input type="number" id="materiales" placeholder="Costo de materiales ($)">
-      <input type="number" id="transporte" placeholder="Costo de transporte ($)">
-      <input type="number" id="margen" placeholder="Margen de ganancia (%)">
-      <button onclick="calcularPresupuesto()">Calcular Total</button>
-      <div id="resultado"></div>
+    <!-- Nueva sección de calculadora rediseñada -->
+    <section id="calculadora" class="hidden animate__animated animate__fadeIn">
+        <div class="calculator-container">
+            <div class="calculator-header">
+                <div class="calculator-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect>
+                        <line x1="12" y1="10" x2="12" y2="16"></line>
+                        <line x1="9" y1="13" x2="15" y2="13"></line>
+                        <line x1="8" y1="6" x2="16" y2="6"></line>
+                    </svg>
+                </div>
+                <h3>Calculadora de Presupuesto</h3>
+            </div>
+            
+            <div class="calculator-body">
+                <div class="calculator-form">
+                    <div class="input-group">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="12" y1="1" x2="12" y2="23"></line>
+                            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                        </svg>
+                        <input type="number" id="materiales" placeholder="Costo de materiales ($)" min="0" step="0.01">
+                    </div>
+                    
+                    <div class="input-group">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="1" y="3" width="15" height="13"></rect>
+                            <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
+                            <circle cx="5.5" cy="18.5" r="2.5"></circle>
+                            <circle cx="18.5" cy="18.5" r="2.5"></circle>
+                        </svg>
+                        <input type="number" id="transporte" placeholder="Costo de transporte ($)" min="0" step="0.01">
+                    </div>
+                    
+                    <div class="input-group">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="12" y1="19" x2="12" y2="5"></line>
+                            <polyline points="5 12 12 5 19 12"></polyline>
+                        </svg>
+                        <input type="number" id="margen" placeholder="Margen de ganancia (%)" min="0" max="100" step="0.1">
+                    </div>
+                    
+                    <button type="button" onclick="calcularPresupuesto()" class="calculate-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="9 11 12 14 22 4"></polyline>
+                            <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+                        </svg>
+                        Calcular Presupuesto
+                    </button>
+                </div>
+                
+                <div id="resultado-calculadora" class="calculator-result hidden">
+                    <h4>Resultado del Presupuesto</h4>
+                    
+                    <div class="result-item">
+                        <div class="result-label">Subtotal:</div>
+                        <div id="subtotal-value" class="result-value">$0.00</div>
+                    </div>
+                    
+                    <div class="result-item">
+                        <div class="result-label">Ganancia:</div>
+                        <div id="ganancia-value" class="result-value">$0.00 (0%)</div>
+                    </div>
+                    
+                    <div class="result-item">
+                        <div class="result-label">Total sin IVA:</div>
+                        <div id="sin-iva-value" class="result-value">$0.00</div>
+                    </div>
+                    
+                    <div class="result-item total">
+                        <div class="result-label">Total con IVA (21%):</div>
+                        <div id="con-iva-value" class="result-value">$0.00</div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </section>
-
 
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
     
+    <!-- Particles.js para efectos de fondo -->
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    
     <!-- Script Principal -->
     <script src="app.js"></script>
+    
+    <!-- Script para Particles.js -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            particlesJS('particles-js', {
+                "particles": {
+                    "number": {
+                        "value": 80,
+                        "density": {
+                            "enable": true,
+                            "value_area": 800
+                        }
+                    },
+                    "color": {
+                        "value": "#3498db"
+                    },
+                    "shape": {
+                        "type": "circle",
+                        "stroke": {
+                            "width": 0,
+                            "color": "#000000"
+                        },
+                        "polygon": {
+                            "nb_sides": 5
+                        }
+                    },
+                    "opacity": {
+                        "value": 0.5,
+                        "random": false,
+                        "anim": {
+                            "enable": false,
+                            "speed": 1,
+                            "opacity_min": 0.1,
+                            "sync": false
+                        }
+                    },
+                    "size": {
+                        "value": 3,
+                        "random": true,
+                        "anim": {
+                            "enable": false,
+                            "speed": 40,
+                            "size_min": 0.1,
+                            "sync": false
+                        }
+                    },
+                    "line_linked": {
+                        "enable": true,
+                        "distance": 150,
+                        "color": "#3498db",
+                        "opacity": 0.4,
+                        "width": 1
+                    },
+                    "move": {
+                        "enable": true,
+                        "speed": 2,
+                        "direction": "none",
+                        "random": false,
+                        "straight": false,
+                        "out_mode": "out",
+                        "bounce": false,
+                        "attract": {
+                            "enable": false,
+                            "rotateX": 600,
+                            "rotateY": 1200
+                        }
+                    }
+                },
+                "interactivity": {
+                    "detect_on": "canvas",
+                    "events": {
+                        "onhover": {
+                            "enable": true,
+                            "mode": "grab"
+                        },
+                        "onclick": {
+                            "enable": true,
+                            "mode": "push"
+                        },
+                        "resize": true
+                    },
+                    "modes": {
+                        "grab": {
+                            "distance": 140,
+                            "line_linked": {
+                                "opacity": 1
+                            }
+                        },
+                        "bubble": {
+                            "distance": 400,
+                            "size": 40,
+                            "duration": 2,
+                            "opacity": 8,
+                            "speed": 3
+                        },
+                        "repulse": {
+                            "distance": 200,
+                            "duration": 0.4
+                        },
+                        "push": {
+                            "particles_nb": 4
+                        },
+                        "remove": {
+                            "particles_nb": 2
+                        }
+                    }
+                },
+                "retina_detect": true
+            });
+        });
+    </script>
 </body>
 </html>
