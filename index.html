@@ -234,6 +234,17 @@
         </div>
     </section>
 
+    <div id="formularioEmailContainer" class="hidden">
+  <form id="form">
+    <div class="field">
+      <label for="email">Email del cliente</label>
+        <input type="text" name="email" id="email" required>
+    </div>
+    <input type="submit" id="button" value="Enviar confirmación">
+  </form>
+</div>
+
+
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
@@ -355,5 +366,12 @@
             });
         });
     </script>
+
+        <script type="text/javascript"
+              src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+        <script type="text/javascript">
+              emailjs.init('HziRIGf46_g54AL-a')
+        </script>
+
 </body>
 </html>
