@@ -1,14 +1,59 @@
+/* Variables para temas */
+:root {
+  /* Variables para el tema oscuro (por defecto) */
+  --bg-gradient-start: #000428;
+  --bg-gradient-end: #004e92;
+  --text-color: #e0e0e0;
+  --heading-color: #ffffff;
+  --accent-color: #3498db;
+  --card-bg: rgba(16, 18, 27, 0.95);
+  --card-border: rgba(52, 152, 219, 0.2);
+  --input-bg: rgba(26, 26, 46, 0.8);
+  --input-border: #2c3e50;
+  --button-bg: #1a1a2e;
+  --button-border: #3498db;
+  --table-header-bg: #1a1a2e;
+  --table-row-even: rgba(26, 26, 46, 0.5);
+  --table-row-hover: rgba(52, 152, 219, 0.1);
+  --modal-overlay: rgba(0, 0, 0, 0.7);
+  --primary-color: #3498db;
+  --accent-color: #2980b9;
+  --success-color: #2ecc71; /* Color verde para botones de éxito */
+}
+
+/* Variables para el tema claro - Colores más elegantes */
+html[data-theme="light"] {
+  --bg-gradient-start: #f5f7fa;
+  --bg-gradient-end: #c3cfe2;
+  --text-color: #2c3e50;
+  --heading-color: #1e3a5f;
+  --accent-color: #3a7bd5;
+  --card-bg: rgba(255, 255, 255, 0.95);
+  --card-border: rgba(58, 123, 213, 0.2);
+  --input-bg: rgba(245, 247, 250, 0.8);
+  --input-border: #d1d8e0;
+  --button-bg: #ffffff;
+  --button-border: #3a7bd5;
+  --table-header-bg: #3a7bd5;
+  --table-row-even: rgba(245, 247, 250, 0.5);
+  --table-row-hover: rgba(58, 123, 213, 0.1);
+  --modal-overlay: rgba(0, 0, 0, 0.5);
+  --primary-color: #3a7bd5;
+  --accent-color: #2c5499;
+  --success-color: #27ae60; /* Color verde para botones de éxito en tema claro */
+}
+
 /* RESET & BASE */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: 'Poppins', sans-serif;
+  font-family: "Poppins", sans-serif;
 }
 
 body {
-  background: linear-gradient(135deg, #000428, #004e92);
-  color: #e0e0e0;
+  background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+  color: var(--text-color);
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -16,6 +61,7 @@ body {
   padding: 30px 15px;
   position: relative;
   overflow-x: hidden;
+  transition: background 0.3s ease, color 0.3s ease;
 }
 
 /* Particles container */
@@ -28,41 +74,144 @@ body {
   z-index: -1;
 }
 
-header h1 {
-  color: #ffffff;
-  font-size: 48px;
+/* Nuevo estilo para el header con flexbox mejorado */
+header {
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   margin-bottom: 30px;
+  padding: 0 20px;
+}
+
+/* Título principal con mejor responsividad */
+header h1 {
+  color: var(--heading-color);
+  font-size: 48px;
   text-align: center;
   font-weight: 700;
   text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7);
   letter-spacing: 1px;
   position: relative;
   padding-bottom: 15px;
+  margin: 0 auto;
+  z-index: 10;
+  transition: color 0.3s ease;
 }
 
 header h1:after {
-  content: '';
+  content: "";
   position: absolute;
   bottom: 0;
   left: 50%;
   transform: translateX(-50%);
   width: 100px;
   height: 3px;
-  background: linear-gradient(90deg, transparent, #3498db, transparent);
+  background: linear-gradient(90deg, transparent, var(--accent-color), transparent);
   animation: expandWidth 1.2s ease-out forwards;
+  transition: background 0.3s ease;
 }
 
+/* Estilos para el toggle de tema y el área de usuario */
+/* Modificar la posición del user-info para que aparezca en el lado izquierdo */
+/* Modificar la estructura del theme-toggle-container para incluir el user-info */
+.theme-toggle-container {
+  position: absolute;
+  top: 10px;
+  right: 20px;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+/* Mover el user-info dentro del theme-toggle-container */
+.user-info {
+  position: relative; /* Cambiar de absolute a relative */
+  top: auto; /* Eliminar posicionamiento absoluto */
+  left: auto; /* Eliminar posicionamiento absoluto */
+  display: flex;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.6);
+  padding: 8px 15px;
+  border-radius: 30px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  animation: fadeIn 0.5s ease-out forwards;
+  transition: background-color 0.3s ease, border 0.3s ease;
+}
+
+.theme-toggle {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: var(--heading-color);
+  cursor: pointer;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  padding: 0;
+}
+
+.theme-toggle:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateY(-2px);
+}
+
+.theme-toggle svg {
+  width: 24px;
+  height: 24px;
+  transition: all 0.3s ease;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* Mostrar/ocultar iconos según el tema */
+html[data-theme="light"] .sun-icon {
+  display: block;
+  opacity: 1;
+}
+
+html[data-theme="light"] .moon-icon {
+  display: none;
+  opacity: 0;
+}
+
+html[data-theme="dark"] .sun-icon {
+  display: none;
+  opacity: 0;
+}
+
+html[data-theme="dark"] .moon-icon {
+  display: block;
+  opacity: 1;
+}
 @keyframes expandWidth {
-  from { width: 0; }
-  to { width: 100px; }
+  from {
+    width: 0;
+  }
+  to {
+    width: 100px;
+  }
 }
 
-h2, h3 {
+h2,
+h3 {
   text-align: center;
   margin: 20px 0;
-  color: #3498db;
+  color: var(--accent-color);
   font-weight: 600;
   letter-spacing: 0.5px;
+  transition: color 0.3s ease;
 }
 
 .buttons-container {
@@ -75,9 +224,9 @@ h2, h3 {
 }
 
 button {
-  background: #1a1a2e;
-  color: #fff;
-  border: 1px solid #3498db;
+  background: var(--button-bg);
+  color: var(--text-color);
+  border: 1px solid var(--button-border);
   padding: 12px 22px;
   border-radius: 8px;
   font-size: 16px;
@@ -91,7 +240,7 @@ button {
 }
 
 button:before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: -100%;
@@ -105,7 +254,7 @@ button:before {
 button:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
-  border-color: #3498db;
+  border-color: var(--accent-color);
 }
 
 button:hover:before {
@@ -113,7 +262,7 @@ button:hover:before {
 }
 
 button:disabled {
-  background: #1a1a2e;
+  background: var(--button-bg);
   border-color: #555;
   color: #777;
   cursor: not-allowed;
@@ -122,9 +271,9 @@ button:disabled {
 
 /* Botón rojo para cerrar sesión */
 #logoutBtn {
-  background: #1a1a2e;
+  background: var(--button-bg);
   border-color: #e74c3c;
-  color: #fff;
+  color: var(--text-color);
 }
 
 #logoutBtn:hover {
@@ -138,7 +287,7 @@ button:disabled {
 }
 
 form {
-  background: rgba(16, 18, 27, 0.95);
+  background: var(--card-bg);
   padding: 30px;
   border-radius: 10px;
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
@@ -146,27 +295,28 @@ form {
   width: 100%;
   margin: 20px auto;
   animation: fadeInUp 0.5s ease;
-  border: 1px solid rgba(52, 152, 219, 0.2);
+  border: 1px solid var(--card-border);
   backdrop-filter: blur(10px);
+  transition: background 0.3s ease, border 0.3s ease, box-shadow 0.3s ease;
 }
 
 input {
   width: 100%;
   padding: 14px;
-  border: 1px solid #2c3e50;
+  border: 1px solid var(--input-border);
   border-radius: 6px;
   margin-bottom: 15px;
-  background: rgba(26, 26, 46, 0.8);
-  color: #ffffff;
+  background: var(--input-bg);
+  color: var(--text-color);
   font-size: 15px;
   transition: all 0.3s ease;
 }
 
 input:focus {
   outline: none;
-  border-color: #3498db;
+  border-color: var(--accent-color);
   box-shadow: 0 0 10px rgba(52, 152, 219, 0.3);
-  background: rgba(26, 26, 46, 0.95);
+  background: var(--input-bg);
 }
 
 /* Botón de ingresar centralizado */
@@ -204,46 +354,46 @@ section {
 }
 
 @keyframes slideInRight {
-  from { 
-    opacity: 0; 
-    transform: translateX(50px); 
+  from {
+    opacity: 0;
+    transform: translateX(50px);
   }
-  to { 
-    opacity: 1; 
-    transform: translateX(0); 
+  to {
+    opacity: 1;
+    transform: translateX(0);
   }
 }
 
 @keyframes slideInLeft {
-  from { 
-    opacity: 0; 
-    transform: translateX(-50px); 
+  from {
+    opacity: 0;
+    transform: translateX(-50px);
   }
-  to { 
-    opacity: 1; 
-    transform: translateX(0); 
+  to {
+    opacity: 1;
+    transform: translateX(0);
   }
 }
 
 @keyframes slideInUp {
-  from { 
-    opacity: 0; 
-    transform: translateY(50px); 
+  from {
+    opacity: 0;
+    transform: translateY(50px);
   }
-  to { 
-    opacity: 1; 
-    transform: translateY(0); 
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
 @keyframes zoomIn {
-  from { 
-    opacity: 0; 
-    transform: scale(0.9); 
+  from {
+    opacity: 0;
+    transform: scale(0.9);
   }
-  to { 
-    opacity: 1; 
-    transform: scale(1); 
+  to {
+    opacity: 1;
+    transform: scale(1);
   }
 }
 
@@ -251,59 +401,64 @@ table {
   width: 100%;
   border-collapse: collapse;
   margin-top: 20px;
-  background: rgba(16, 18, 27, 0.8);
-  color: #f0f0f0;
+  background: var(--card-bg);
+  color: var(--text-color);
   border-radius: 10px;
   overflow: hidden;
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
   animation: fadeInUp 0.5s ease;
-  border: 1px solid rgba(52, 152, 219, 0.2);
+  border: 1px solid var(--card-border);
+  transition: background 0.3s ease, border 0.3s ease, box-shadow 0.3s ease;
 }
 
-th, td {
+th,
+td {
   padding: 16px 20px;
   text-align: left;
-  border-bottom: 1px solid rgba(52, 152, 219, 0.2);
+  border-bottom: 1px solid var(--card-border);
+  transition: border 0.3s ease;
 }
 
 th {
-  background: #1a1a2e;
-  color: #3498db;
+  background: var(--table-header-bg);
+  color: #ffffff;
   text-transform: uppercase;
   font-size: 13px;
   letter-spacing: 1px;
   font-weight: 600;
+  transition: background 0.3s ease;
 }
 
 tr:nth-child(even) {
-  background-color: rgba(26, 26, 46, 0.5);
+  background-color: var(--table-row-even);
+  transition: background-color 0.3s ease;
 }
 
 tr:hover {
-  background-color: rgba(52, 152, 219, 0.1);
+  background-color: var(--table-row-hover);
   transition: background 0.3s ease;
 }
 
 a {
-  color: #3498db;
+  color: var(--accent-color);
   text-decoration: none;
   transition: all 0.3s ease;
   position: relative;
 }
 
 a:after {
-  content: '';
+  content: "";
   position: absolute;
   width: 0;
   height: 1px;
   bottom: -2px;
   left: 0;
-  background-color: #3498db;
-  transition: width 0.3s ease;
+  background-color: var(--accent-color);
+  transition: width 0.3s ease, background-color 0.3s ease;
 }
 
 a:hover {
-  color: #2980b9;
+  color: var(--accent-color);
   text-decoration: none;
 }
 
@@ -314,32 +469,35 @@ a:hover:after {
 p {
   text-align: center;
   font-size: 14px;
-  color: #bbb;
+  color: var(--text-color);
   margin-top: 15px;
+  transition: color 0.3s ease;
 }
 
 .cliente-header {
-  background: linear-gradient(90deg, #1a1a2e, #0d1b2a);
-  color: white;
+  background: linear-gradient(90deg, var(--button-bg), var(--table-header-bg));
+  color: var(--text-color);
   padding: 22px;
   margin-bottom: 20px;
   border-radius: 10px;
   text-align: center;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-  border-left: 3px solid #3498db;
+  border-left: 3px solid var(--accent-color);
   animation: fadeIn 0.5s ease-out;
+  transition: background 0.3s ease, color 0.3s ease, border 0.3s ease;
 }
 
 .cliente-header h4 {
   margin: 0 0 8px;
   font-size: 18px;
-  color: #3498db;
+  color: var(--accent-color);
+  transition: color 0.3s ease;
 }
 
 .cliente-header p {
   margin: 0;
   font-size: 14px;
-  color: #e0e0e0;
+  color: var(--text-color);
 }
 
 .cliente-header button {
@@ -347,8 +505,8 @@ p {
 }
 
 #resultado {
-  background: rgba(16, 18, 27, 0.8);
-  color: #e0e0e0;
+  background: var(--card-bg);
+  color: var(--text-color);
   padding: 20px;
   border-radius: 10px;
   margin-top: 20px;
@@ -356,8 +514,9 @@ p {
   font-family: monospace;
   line-height: 1.8em;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-  border-left: 3px solid #3498db;
+  border-left: 3px solid var(--accent-color);
   animation: fadeIn 0.5s ease-out;
+  transition: background 0.3s ease, color 0.3s ease, border 0.3s ease;
 }
 
 form .input-row {
@@ -377,20 +536,16 @@ form .input-row.single {
   justify-content: center;
 }
 /* Estilos CSS para la información de usuario en el dashboard */
-.user-info {
-  display: flex;
-  align-items: center;
-  position: absolute;
-  top: 15px;
-  left: 15px;
-  z-index: 100;
-  background-color: rgba(0, 0, 0, 0.6);
-  padding: 8px 15px;
-  border-radius: 30px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-  backdrop-filter: blur(5px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  animation: fadeInLeft 0.5s ease-out forwards;
+/* Modificar la posición del user-info para que aparezca en el lado izquierdo */
+/* Separar el user-info del theme-toggle-container y posicionarlo a la izquierda */
+/* Actualizar los media queries para mantener la posición izquierda */
+/* Asegurarnos que en pantallas muy pequeñas también esté a la izquierda */
+/* Modificar la posición del user-info para que aparezca en el lado izquierdo */
+
+html[data-theme="light"] .user-info {
+  background-color: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(58, 123, 213, 0.2);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 .user-logo {
@@ -403,6 +558,7 @@ form .input-row.single {
   justify-content: center;
   margin-right: 10px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  transition: background 0.3s ease;
 }
 
 .user-logo span {
@@ -420,6 +576,10 @@ form .input-row.single {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+html[data-theme="light"] .user-name {
+  color: var(--heading-color);
 }
 
 @keyframes fadeInLeft {
@@ -447,14 +607,15 @@ form .input-row.single {
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 15px 50px rgba(0, 0, 0, 0.3);
-  min-height: 600px; 
-  background: rgba(16, 18, 27, 0.95);
-  border: 1px solid rgba(52, 152, 219, 0.2);
+  min-height: 600px;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  transition: background 0.3s ease, border 0.3s ease;
 }
 
 .login-image {
   flex: 1;
-  background-image: url('LoginImage.jpg');
+  background-image: url("LoginImage.jpg");
   background-size: cover;
   background-position: center;
   position: relative;
@@ -470,6 +631,11 @@ form .input-row.single {
   width: 100%;
   height: 100%;
   background: linear-gradient(135deg, rgba(0, 4, 40, 0.8), rgba(0, 78, 146, 0.8));
+  transition: background 0.3s ease;
+}
+
+html[data-theme="light"] .login-image .overlay {
+  background: linear-gradient(135deg, rgba(58, 123, 213, 0.7), rgba(44, 84, 153, 0.7));
 }
 
 .login-form-container {
@@ -490,24 +656,26 @@ form .input-row.single {
   width: 70px;
   height: 70px;
   margin: 0 auto 15px;
-  background: linear-gradient(135deg, #1a1a2e, #0d1b2a);
+  background: linear-gradient(135deg, var(--button-bg), var(--table-header-bg));
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-  border: 2px solid rgba(52, 152, 219, 0.3);
+  border: 2px solid var(--card-border);
+  transition: background 0.3s ease, border 0.3s ease;
 }
 
 .logo-icon svg {
   width: 35px;
   height: 35px;
-  color: #3498db;
+  color: var(--accent-color);
+  transition: color 0.3s ease;
 }
 
 .welcome-text {
   text-align: center;
-  color: #bbb;
+  color: var(--text-color);
   margin-bottom: 30px;
   font-size: 15px;
 }
@@ -524,20 +692,21 @@ form .input-row.single {
   transform: translateY(-50%);
   width: 20px;
   height: 20px;
-  color: #3498db;
+  color: var(--accent-color);
+  transition: color 0.3s ease;
 }
 
 .input-group input {
   padding-left: 45px;
-  background: rgba(26, 26, 46, 0.5);
-  border: 1px solid rgba(52, 152, 219, 0.2);
+  background: var(--input-bg);
+  border: 1px solid var(--card-border);
   height: 50px;
   margin-bottom: 0; /* Eliminamos el margen inferior para controlar mejor el espacio */
 }
 
 .login-btn {
-  background: linear-gradient(90deg, #1a1a2e, #0d1b2a);
-  border: 1px solid #3498db;
+  background: linear-gradient(90deg, var(--button-bg), var(--table-header-bg));
+  border: 1px solid var(--button-border);
   padding: 14px 22px;
   border-radius: 8px;
   font-size: 16px;
@@ -551,7 +720,7 @@ form .input-row.single {
 }
 
 .login-btn:after {
-  content: '';
+  content: "";
   position: absolute;
   top: -50%;
   left: -50%;
@@ -578,6 +747,7 @@ form .input-row.single {
   }
 }
 
+/* Estilo para el botón "crear cuenta" en verde */
 .create-account {
   margin-top: 30px; /* Aumentado para asegurar visibilidad */
   text-align: center;
@@ -586,13 +756,38 @@ form .input-row.single {
 }
 
 .create-account a {
-  color: #3498db;
+  color: var(--success-color);
   font-weight: 500;
 }
 
+.create-account a:after {
+  background-color: var(--success-color);
+}
+
+/* Botón verde para crear cuenta */
+#registroForm button[type="submit"] {
+  background: var(--success-color);
+  border-color: var(--success-color);
+  color: white;
+}
+
+#registroForm button[type="submit"]:hover {
+  background: var(--success-color);
+  opacity: 0.9;
+  box-shadow: 0 6px 15px rgba(46, 204, 113, 0.3);
+}
+
+#registroForm button[type="submit"]:before {
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+}
+
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes fadeInUp {
@@ -607,74 +802,97 @@ form .input-row.single {
 }
 
 /* Animación para filas de tabla */
-#listaClientes tr, #listaPedidosBody tr {
+#listaClientes tr,
+#listaPedidosBody tr {
   animation: fadeInRow 0.3s ease-out;
   animation-fill-mode: both;
 }
 
 @keyframes fadeInRow {
-  from { 
-    opacity: 0; 
-    transform: translateX(20px); 
+  from {
+    opacity: 0;
+    transform: translateX(20px);
   }
-  to { 
-    opacity: 1; 
-    transform: translateX(0); 
+  to {
+    opacity: 1;
+    transform: translateX(0);
   }
 }
 
 /* Aplicar retraso a las filas para efecto cascada */
-#listaClientes tr:nth-child(1), #listaPedidosBody tr:nth-child(1) { animation-delay: 0.1s; }
-#listaClientes tr:nth-child(2), #listaPedidosBody tr:nth-child(2) { animation-delay: 0.2s; }
-#listaClientes tr:nth-child(3), #listaPedidosBody tr:nth-child(3) { animation-delay: 0.3s; }
-#listaClientes tr:nth-child(4), #listaPedidosBody tr:nth-child(4) { animation-delay: 0.4s; }
-#listaClientes tr:nth-child(5), #listaPedidosBody tr:nth-child(5) { animation-delay: 0.5s; }
-#listaClientes tr:nth-child(n+6), #listaPedidosBody tr:nth-child(n+6) { animation-delay: 0.6s; }
+#listaClientes tr:nth-child(1),
+#listaPedidosBody tr:nth-child(1) {
+  animation-delay: 0.1s;
+}
+#listaClientes tr:nth-child(2),
+#listaPedidosBody tr:nth-child(2) {
+  animation-delay: 0.2s;
+}
+#listaClientes tr:nth-child(3),
+#listaPedidosBody tr:nth-child(3) {
+  animation-delay: 0.3s;
+}
+#listaClientes tr:nth-child(4),
+#listaPedidosBody tr:nth-child(4) {
+  animation-delay: 0.4s;
+}
+#listaClientes tr:nth-child(5),
+#listaPedidosBody tr:nth-child(5) {
+  animation-delay: 0.5s;
+}
+#listaClientes tr:nth-child(n + 6),
+#listaPedidosBody tr:nth-child(n + 6) {
+  animation-delay: 0.6s;
+}
 
 /* Estilos para la calculadora rediseñada */
 .calculator-container {
   max-width: 800px;
   margin: 0 auto;
-  background: rgba(16, 18, 27, 0.95);
+  background: var(--card-bg);
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 15px 50px rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(52, 152, 219, 0.2);
+  border: 1px solid var(--card-border);
   backdrop-filter: blur(10px);
+  transition: background 0.3s ease, border 0.3s ease;
 }
 
 .calculator-header {
-  background: linear-gradient(90deg, #1a1a2e, #0d1b2a);
+  background: linear-gradient(90deg, var(--button-bg), var(--table-header-bg));
   padding: 25px;
   text-align: center;
-  border-bottom: 1px solid rgba(52, 152, 219, 0.2);
+  border-bottom: 1px solid var(--card-border);
   display: flex;
   flex-direction: column;
   align-items: center;
+  transition: background 0.3s ease, border 0.3s ease;
 }
 
 .calculator-icon {
   width: 60px;
   height: 60px;
-  background: rgba(26, 26, 46, 0.8);
+  background: var(--input-bg);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   margin-bottom: 15px;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-  border: 2px solid rgba(52, 152, 219, 0.3);
+  border: 2px solid var(--card-border);
+  transition: background 0.3s ease, border 0.3s ease;
 }
 
 .calculator-icon svg {
   width: 30px;
   height: 30px;
-  color: #3498db;
+  color: var(--accent-color);
+  transition: color 0.3s ease;
 }
 
 .calculator-header h3 {
   margin: 0;
-  color: #3498db;
+  color: var(--accent-color);
   font-size: 22px;
   font-weight: 600;
 }
@@ -682,6 +900,14 @@ form .input-row.single {
 .calculator-body {
   padding: 30px;
   display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.calculator-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
   flex-direction: column;
   gap: 30px;
 }
@@ -701,8 +927,8 @@ form .input-row.single {
   align-items: center;
   justify-content: center;
   gap: 10px;
-  background: linear-gradient(90deg, #1a1a2e, #0d1b2a);
-  border: 1px solid #3498db;
+  background: linear-gradient(90deg, var(--button-bg), var(--table-header-bg));
+  border: 1px solid var(--button-border);
   padding: 14px 22px;
   border-radius: 8px;
   font-size: 16px;
@@ -726,26 +952,29 @@ form .input-row.single {
 }
 
 .calculator-result {
-  background: rgba(26, 26, 46, 0.5);
+  background: var(--input-bg);
   border-radius: 10px;
   padding: 25px;
-  border: 1px solid rgba(52, 152, 219, 0.2);
+  border: 1px solid var(--card-border);
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  transition: background 0.3s ease, border 0.3s ease;
 }
 
 .calculator-result h4 {
   margin: 0 0 20px;
-  color: #3498db;
+  color: var(--accent-color);
   font-size: 18px;
   text-align: center;
   font-weight: 600;
+  transition: color 0.3s ease;
 }
 
 .result-item {
   display: flex;
   justify-content: space-between;
   padding: 12px 0;
-  border-bottom: 1px solid rgba(52, 152, 219, 0.1);
+  border-bottom: 1px solid var(--card-border);
+  transition: border 0.3s ease;
 }
 
 .result-item:last-child {
@@ -753,112 +982,265 @@ form .input-row.single {
 }
 
 .result-label {
-  color: #bbb;
+  color: var(--text-color);
   font-size: 15px;
+  transition: color 0.3s ease;
 }
 
 .result-value {
-  color: #fff;
+  color: var(--text-color);
   font-size: 15px;
   font-weight: 500;
+  transition: color 0.3s ease;
 }
 
 .result-item.total {
   margin-top: 10px;
   padding-top: 15px;
-  border-top: 2px solid rgba(52, 152, 219, 0.3);
+  border-top: 2px solid var(--card-border);
+  transition: border 0.3s ease;
 }
 
 .result-item.total .result-label {
-  color: #3498db;
+  color: var(--accent-color);
   font-weight: 600;
   font-size: 16px;
+  transition: color 0.3s ease;
 }
 
 .result-item.total .result-value {
-  color: #3498db;
+  color: var(--accent-color);
   font-weight: 700;
   font-size: 18px;
+  transition: color 0.3s ease;
+}
+
+/* Estilos para el modal */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: var(--modal-overlay);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(5px);
+  animation: fadeIn 0.3s ease-out;
+  transition: background-color 0.3s ease;
+}
+
+.modal-container {
+  background: var(--card-bg);
+  border-radius: 10px;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 15px 50px rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--card-border);
+  animation: slideInDown 0.4s ease-out;
+  overflow: hidden;
+  transition: background 0.3s ease, border 0.3s ease;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  background: linear-gradient(90deg, var(--button-bg), var(--table-header-bg));
+  border-bottom: 1px solid var(--card-border);
+  transition: background 0.3s ease, border 0.3s ease;
+}
+
+.modal-header h3 {
+  margin: 0;
+  color: var(--accent-color);
+  font-size: 18px;
+  text-align: left;
+}
+
+.close-modal {
+  background: transparent;
+  border: none;
+  color: var(--text-color);
+  cursor: pointer;
+  padding: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.close-modal:hover {
+  transform: scale(1.1);
+}
+
+.close-modal svg {
+  width: 20px;
+  height: 20px;
+}
+
+.modal-container form {
+  padding: 20px;
+  margin: 0;
+  background: transparent;
+  box-shadow: none;
+  border: none;
+  animation: none;
+}
+
+.modal-container .field {
+  margin-bottom: 20px;
+}
+
+.modal-container label {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--text-color);
+  font-size: 14px;
+  transition: color 0.3s ease;
+}
+
+.modal-submit-btn {
+  background: linear-gradient(90deg, var(--button-bg), var(--table-header-bg));
+  border: 1px solid var(--button-border);
+  padding: 14px 22px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  color: var(--text-color);
+  width: 100%;
+}
+
+.modal-submit-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+}
+
+@keyframes slideInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Media queries para responsividad */
 @media (max-width: 768px) {
+  /* Mejora de la responsividad del header */
+  header {
+    flex-direction: column;
+    padding-top: 60px; /* Espacio para el toggle de tema y usuario */
+  }
+
+  /* Reposicionar el componente de usuario y toggle en móviles */
+  .theme-toggle-container {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    flex-direction: row;
+    width: auto;
+  }
+
+  /* Eliminar el posicionamiento separado del user-info */
+  .user-info {
+    position: relative;
+    top: auto;
+    left: auto;
+    margin-bottom: 0;
+  }
+
   header h1 {
     font-size: 32px;
+    margin-top: 20px; /* Aumentado para dar espacio al user-info */
   }
+
   .buttons-container {
     flex-direction: column;
     align-items: center;
   }
+
   button {
     width: 90%;
     max-width: 300px;
   }
+
   table {
     display: block;
     overflow-x: auto;
   }
+
   form {
     width: 90%;
   }
-  
+
   /* Mejoras adicionales para responsividad */
-  input, button {
+  input,
+  button {
     font-size: 16px; /* Evita zoom en iOS */
   }
-  
-  th, td {
+
+  th,
+  td {
     padding: 12px 15px;
   }
-  
+
   /* Ajustes para el login en móviles */
   .login-container {
     flex-direction: column;
     height: auto;
     max-width: 90%;
   }
-  
+
   .login-image {
     height: 150px;
   }
-  
+
   .login-form-container {
     padding: 30px 20px;
   }
-  
+
   .logo-icon {
     width: 60px;
     height: 60px;
   }
-  
+
   .logo-icon svg {
     width: 30px;
     height: 30px;
   }
-  
+
   /* Ajustes para la calculadora en móviles */
   .calculator-container {
     width: 90%;
   }
-  
+
   .calculator-body {
     padding: 20px;
   }
-  
+
   .calculator-header {
     padding: 20px;
   }
-  
+
   .calculator-icon {
     width: 50px;
     height: 50px;
   }
-  
+
   .calculator-icon svg {
     width: 25px;
     height: 25px;
   }
-  
+
   .calculator-result {
     padding: 20px;
   }
@@ -866,47 +1248,140 @@ form .input-row.single {
 
 /* Ajustes para pantallas muy pequeñas */
 @media (max-width: 480px) {
+  /* Eliminar el posicionamiento separado del user-info */
+  .user-info {
+    position: relative;
+    top: auto;
+    left: auto;
+    padding: 5px 10px;
+  }
+
   header h1 {
     font-size: 28px;
+    margin-top: 30px; /* Aumentado para dar más espacio al user-info */
   }
-  
+
   .login-image {
     height: 120px;
   }
-  
+
   .login-form-container {
     padding: 25px 15px;
   }
-  
+
   .logo-icon {
     width: 50px;
     height: 50px;
     margin-bottom: 10px;
   }
-  
+
   .logo-icon svg {
     width: 25px;
     height: 25px;
   }
-  
+
   .welcome-text {
     font-size: 14px;
     margin-bottom: 20px;
   }
-  
+
   .calculator-header h3 {
     font-size: 18px;
   }
-  
-  .result-label, .result-value {
+
+  .result-label,
+  .result-value {
     font-size: 14px;
   }
-  
+
   .result-item.total .result-label {
     font-size: 15px;
   }
-  
+
   .result-item.total .result-value {
     font-size: 16px;
+  }
+
+  /* Mejora de la responsividad del header en pantallas muy pequeñas */
+  .theme-toggle-container {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+  }
+
+  .user-info {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    padding: 5px 10px;
+  }
+
+  .user-logo {
+    width: 28px;
+    height: 28px;
+  }
+
+  .user-name {
+    max-width: 100px;
+    font-size: 12px;
+  }
+
+  header {
+    padding-top: 50px;
+  }
+}
+
+/* Ajustes específicos para pantallas muy pequeñas donde se solapan los elementos */
+@media (max-width: 360px) {
+  /* Reorganizar completamente el header para pantallas muy pequeñas */
+  header {
+    padding-top: 60px; /* Reducir el espacio */
+  }
+
+  /* Colocar el toggle de tema y el user-info en la esquina superior derecha */
+  .theme-toggle-container {
+    top: 10px;
+    right: 10px;
+    flex-direction: column; /* Apilar verticalmente en pantallas muy pequeñas */
+    align-items: flex-end;
+  }
+
+  /* Eliminar el posicionamiento separado del user-info */
+  .user-info {
+    position: relative;
+    top: auto;
+    left: auto;
+    transform: none;
+    width: auto;
+    margin-top: 5px;
+    margin-bottom: 0;
+  }
+
+  /* Reducir aún más el tamaño del título */
+  header h1 {
+    font-size: 24px;
+    margin-top: 10px;
+  }
+
+  /* Ajustar el tamaño del componente de usuario */
+  .user-logo {
+    width: 24px;
+    height: 24px;
+  }
+
+  .user-name {
+    max-width: 120px;
+    font-size: 11px;
+  }
+
+  /* Reducir el tamaño del toggle */
+  .theme-toggle {
+    width: 36px;
+    height: 36px;
+  }
+
+  .theme-toggle svg {
+    width: 20px;
+    height: 20px;
   }
 }
