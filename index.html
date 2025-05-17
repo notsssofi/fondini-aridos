@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,9 +11,27 @@
 </head>
 <body>
     <div class="particles-container" id="particles-js"></div>
-    
+
     <header>
         <h1 class="animate__animated animate__fadeInDown">Áridos Fondini</h1>
+        <div class="theme-toggle-container">
+            <button id="themeToggle" class="theme-toggle" aria-label="Cambiar tema">
+                <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="5"></circle>
+                    <line x1="12" y1="1" x2="12" y2="3"></line>
+                    <line x1="12" y1="21" x2="12" y2="23"></line>
+                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                    <line x1="1" y1="12" x2="3" y2="12"></line>
+                    <line x1="21" y1="12" x2="23" y2="12"></line>
+                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                </svg>
+                <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                </svg>
+            </button>
+        </div>
     </header>
     
     <section id="dashboard" class="hidden">
@@ -234,16 +252,27 @@
         </div>
     </section>
 
-    <div id="formularioEmailContainer" class="hidden">
-  <form id="form">
-    <div class="field">
-      <label for="email">Email del cliente</label>
-        <input type="text" name="email" id="email" required>
+    <!-- Modal para confirmar pedido -->
+    <div id="modalOverlay" class="modal-overlay hidden">
+      <div class="modal-container">
+        <div class="modal-header">
+          <h3>Confirmar Pedido</h3>
+          <button type="button" class="close-modal" onclick="cerrarModal()">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+        <form id="form">
+          <div class="field">
+            <label for="email">Email del cliente</label>
+            <input type="text" name="email" id="email" required>
+          </div>
+          <input type="submit" id="button" value="Enviar confirmación" class="modal-submit-btn">
+        </form>
+      </div>
     </div>
-    <input type="submit" id="button" value="Enviar confirmación">
-  </form>
-</div>
-
 
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
@@ -252,6 +281,12 @@
     
     <!-- Particles.js para efectos de fondo -->
     <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    
+    <!-- EmailJS -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <script type="text/javascript">
+        emailjs.init('HziRIGf46_g54AL-a')
+    </script>
     
     <!-- Script Principal -->
     <script src="app.js"></script>
@@ -366,12 +401,5 @@
             });
         });
     </script>
-
-        <script type="text/javascript"
-              src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-        <script type="text/javascript">
-              emailjs.init('HziRIGf46_g54AL-a')
-        </script>
-
 </body>
 </html>
