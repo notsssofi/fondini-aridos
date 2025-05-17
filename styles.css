@@ -454,7 +454,7 @@ form .input-row.single {
 
 .login-image {
   flex: 1;
-  background-image: url('sources/LoginImage.jpg');
+  background-image: url('LoginImage.jpg');
   background-size: cover;
   background-position: center;
   position: relative;
